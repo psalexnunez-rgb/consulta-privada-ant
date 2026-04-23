@@ -6,34 +6,50 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Consulta">
-<meta name="theme-color" content="#f5f7fa">
-<title>Consulta Privada 2026</title>
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231b3f6e'/><text y='.9em' font-size='68' x='14'>🩺</text></svg>">
+<meta name="theme-color" content="#f5f7fa" id="theme-color-meta">
+<title>Consulta Privada</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231b3f6e'/><text y='.92em' font-size='72' x='10' fill='white'>ψ</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ── THEMES ─────────────────────────────────────────── */
 :root{
-  --navy:#1b3f6e;--navy-hover:#15325a;--navy-pale:#eaf0f9;--navy-pale2:#d4e3f5;
+  --sb:#1b3f6e;--sb-hover:#15325a;--sb-pale:#eaf0f9;--sb-pale2:#d4e3f5;
   --bg:#f5f7fa;--surface:#ffffff;--surface2:#f0f3f8;
   --border:#e0e6ef;--border2:#c8d4e8;
   --text:#1a2035;--text2:#4a5578;--text3:#8c96b0;
   --green:#1a7a5a;--green-bg:#e6f5ef;
   --red:#b83232;--red-bg:#fdeaea;
   --blue:#1a5fa8;--blue-bg:#e8f0fb;
+  --accent:#1b3f6e;--accent-pale:#eaf0f9;
   --r:10px;--r-sm:7px;
-  --sh:0 1px 3px rgba(27,63,110,0.08);
-  --sh-md:0 4px 16px rgba(27,63,110,0.12);
-  --font:'Inter',-apple-system,sans-serif;
-  --mono:'SF Mono','Fira Mono',monospace;
+  --sh:0 1px 3px rgba(27,63,110,.08);--sh-md:0 4px 16px rgba(27,63,110,.12);
+  --font:'Inter',-apple-system,sans-serif;--mono:'SF Mono','Fira Mono',monospace;
   --sw:230px;
 }
+[data-theme="green"]{
+  --sb:#1a5c3a;--sb-hover:#134d2f;--sb-pale:#e6f5ef;--sb-pale2:#c3e8d5;
+  --accent:#1a5c3a;--accent-pale:#e6f5ef;
+  --blue:#1a5c3a;--blue-bg:#e6f5ef;
+}
+[data-theme="dark"]{
+  --sb:#0f0f23;--sb-hover:#1a1a2e;--sb-pale:#1e1e32;--sb-pale2:#2a2a42;
+  --bg:#0a0a14;--surface:#111120;--surface2:#1a1a2e;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --text:#f0f0f5;--text2:#8888a0;--text3:#55556a;
+  --accent:#7c6aff;--accent-pale:rgba(124,106,255,.15);
+  --blue:#7c6aff;--blue-bg:rgba(124,106,255,.15);
+  --sh:0 1px 3px rgba(0,0,0,.3);--sh-md:0 4px 16px rgba(0,0,0,.4);
+}
+
+/* ── BASE ───────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
 .app{display:flex;height:100vh;height:100dvh}
 
-/* Sidebar */
-.sidebar{width:var(--sw);min-width:var(--sw);background:var(--navy);display:flex;flex-direction:column;overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:50}
+/* ── SIDEBAR ────────────────────────────────────────── */
+.sidebar{width:var(--sw);min-width:var(--sw);background:var(--sb);display:flex;flex-direction:column;overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),background .25s;z-index:50}
 .sb-logo{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-.sb-icon{width:35px;height:35px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-icon{width:35px;height:35px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;font-family:serif;letter-spacing:-1px}
 .sb-title{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
 .sb-sub{font-size:11px;color:rgba(255,255,255,.4)}
 .sync-pill{margin-left:auto;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);transition:all .3s;flex-shrink:0}
@@ -56,29 +72,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .add-btn{width:100%;padding:9px;background:rgba(255,255,255,.1);border:1px dashed rgba(255,255,255,.25);border-radius:var(--r-sm);color:rgba(255,255,255,.8);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
 .add-btn:hover{background:rgba(255,255,255,.18);color:#fff}
 
-/* Main */
+/* ── MAIN ───────────────────────────────────────────── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.main-header{height:56px;min-height:56px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);box-shadow:var(--sh)}
+.main-header{height:56px;min-height:56px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);box-shadow:var(--sh);transition:background .25s,border-color .25s}
 .hamburger{display:none;width:34px;height:34px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;align-items:center;justify-content:center;font-size:15px;color:var(--text2);flex-shrink:0}
 .h-title{font-size:15px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .h-actions{display:flex;gap:8px;flex-shrink:0}
-.main-body{flex:1;overflow-y:auto;padding:22px}
+.main-body{flex:1;overflow-y:auto;padding:22px;transition:background .25s}
 .main-body::-webkit-scrollbar{width:4px}
 .main-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* Buttons */
+/* ── BUTTONS ────────────────────────────────────────── */
 .btn{padding:8px 14px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap;box-shadow:var(--sh)}
 .btn:hover{background:var(--surface2);color:var(--text)}
-.btn-primary{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(27,63,110,.25)}
-.btn-primary:hover{background:var(--navy-hover);border-color:var(--navy-hover)}
+.btn-primary{background:var(--sb);border-color:var(--sb);color:#fff;box-shadow:0 2px 8px rgba(27,63,110,.2)}
+.btn-primary:hover{background:var(--sb-hover);border-color:var(--sb-hover)}
 .btn-danger{color:var(--red);border-color:transparent;background:var(--red-bg);box-shadow:none}
 .btn-danger:hover{background:#fad4d4}
 .btn-sm{padding:5px 11px;font-size:12px}
 
-/* Metrics */
+/* ── METRICS ────────────────────────────────────────── */
 .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
-.metric.navy{background:var(--navy);border-color:var(--navy)}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);transition:background .25s,border-color .25s}
+.metric.navy{background:var(--sb);border-color:var(--sb)}
 .metric.navy .m-label{color:rgba(255,255,255,.5)}
 .metric.navy .m-value{color:#fff}
 .metric.navy .m-sub{color:rgba(255,255,255,.35)}
@@ -86,95 +102,117 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .m-value{font-size:21px;font-weight:600;line-height:1.1;color:var(--text)}
 .m-sub{font-size:11px;color:var(--text3);margin-top:4px}
 
-/* Table */
-.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);box-shadow:var(--sh)}
+/* ── TABLE ──────────────────────────────────────────── */
+.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);box-shadow:var(--sh);transition:background .25s,border-color .25s}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;transition:background .25s}
+td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle;transition:background .25s}
 tr:last-child td{border-bottom:none}
 tbody tr{background:var(--surface);transition:background .1s}
-tbody tr:hover{background:var(--navy-pale)}
+tbody tr:hover{background:var(--sb-pale)}
 
-/* Badges */
+/* ── BADGES ─────────────────────────────────────────── */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
 .bc{background:var(--green-bg);color:var(--green)}
 .bp{background:var(--blue-bg);color:var(--blue)}
 .bpe{background:var(--red-bg);color:var(--red)}
 .be{background:var(--surface2);color:var(--text3)}
 
-/* Chart */
+/* ── CHART ──────────────────────────────────────────── */
 .chart{display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:4px}
 .bc2{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bbar{width:100%;border-radius:4px 4px 0 0;background:var(--navy-pale2);min-height:3px;transition:height .4s ease}
-.bbar:hover{background:var(--navy)}
+.bbar{width:100%;border-radius:4px 4px 0 0;background:var(--sb-pale2);min-height:3px;transition:height .4s ease,background .25s}
+.bbar:hover{background:var(--sb)}
 .blbl{font-size:10px;color:var(--text3);white-space:nowrap}
 .bval{font-size:9px;color:var(--text3);white-space:nowrap}
 
-/* Section title */
+/* ── SECTION TITLE ──────────────────────────────────── */
 .stitle{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
 
-/* Modal */
-.overlay{position:fixed;inset:0;background:rgba(27,63,110,.2);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;animation:fi .15s ease}
+/* ── MODAL ──────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;animation:fi .15s ease}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-md);animation:su .2s cubic-bezier(.4,0,.2,1)}
 @keyframes su{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal h3{font-size:16px;font-weight:600;margin-bottom:20px;color:var(--navy)}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:20px;color:var(--text)}
 .fg{margin-bottom:14px}
 .fl{display:block;font-size:12px;color:var(--text2);font-weight:500;margin-bottom:5px}
 .fi2,.fs{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
-.fi2:focus,.fs:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-pale)}
+.fi2:focus,.fs:focus{border-color:var(--sb);box-shadow:0 0 0 3px var(--sb-pale)}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mf{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
 
-/* Tabs */
+/* ── TABS ───────────────────────────────────────────── */
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px}
 .tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--font);transition:all .15s;margin-bottom:-1px}
-.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.tab.active{color:var(--text);border-bottom-color:var(--sb)}
 
-/* Month summary */
+/* ── MONTH SUMMARY ──────────────────────────────────── */
 .msummary{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
 .mrow{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
 .mrow:last-of-type{border-bottom:none}
-.mtotal{display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:600;color:var(--navy)}
+.mtotal{display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:600;color:var(--text)}
 
-/* Empty / Loading */
+/* ── SETTINGS ───────────────────────────────────────── */
+.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:20px;transition:background .25s,border-color .25s}
+.settings-card h4{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.tarifa-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.tarifa-row:last-child{border-bottom:none}
+.tarifa-name{font-size:13px;color:var(--text2);font-weight:500}
+.tarifa-year{font-size:11px;color:var(--text3)}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.theme-card{border:2px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.theme-card:hover{border-color:var(--border2)}
+.theme-card.active{border-color:var(--sb)}
+.theme-preview{height:48px;border-radius:6px;margin-bottom:8px;display:flex;overflow:hidden}
+.theme-preview .tp-sb{width:35%;border-radius:6px 0 0 6px}
+.theme-preview .tp-main{flex:1;border-radius:0 6px 6px 0}
+.theme-name{font-size:12px;font-weight:500;color:var(--text2)}
+
+/* ── EMPTY / LOADING ────────────────────────────────── */
 .empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:13px}
 .ei{font-size:36px;margin-bottom:10px;opacity:.4}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;gap:12px;color:var(--text3);font-size:13px}
-.spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--sb);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.sb-overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49}
 
-/* Overlay sidebar mobile */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(27,63,110,.4);z-index:49}
-
+/* ── RESPONSIVE ─────────────────────────────────────── */
 @media(max-width:768px){
   :root{--sw:255px}
   .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(27,63,110,.25)}
-  .sb-overlay.visible{display:block}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.25)}
+  .sb-overlay-bg.visible{display:block}
   .hamburger{display:flex}
   .main-body{padding:14px}
   .metric-grid{grid-template-columns:1fr 1fr;gap:10px}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr!important}
   .h-actions .btn-danger{display:none}
+  .tarifa-row{grid-template-columns:1fr 1fr}
+  .tarifa-year{display:none}
+  .theme-grid{grid-template-columns:1fr 1fr 1fr}
 }
 @media(max-width:400px){.m-value{font-size:17px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="sb-overlay" id="sb-overlay" onclick="closeSb()"></div>
+  <div class="sb-overlay-bg" id="sb-overlay" onclick="closeSb()"></div>
   <div class="sidebar" id="sidebar">
     <div class="sb-logo">
-      <div class="sb-icon">🩺</div>
-      <div><div class="sb-title">Consulta Privada</div><div class="sb-sub">2026</div></div>
+      <div class="sb-icon">ψ</div>
+      <div>
+        <div class="sb-title">Consulta Privada</div>
+        <div class="sb-sub" id="year-label">2026</div>
+      </div>
       <div class="sync-pill" id="sync-pill">…</div>
     </div>
     <div class="sb-section">
       <div class="sb-label">Vistas</div>
       <button class="nb active" id="nav-dashboard" onclick="showView('dashboard')">◈ &nbsp;Dashboard</button>
       <button class="nb" id="nav-resumen" onclick="showView('resumen')">≋ &nbsp;Resumen general</button>
+      <button class="nb" id="nav-config" onclick="showView('config')">⚙ &nbsp;Configuración</button>
     </div>
     <div class="sb-section" style="padding-bottom:0"><div class="sb-label">Pacientes</div></div>
     <div class="search-wrap"><input type="search" class="search-input" id="search-input" placeholder="Buscar paciente..." oninput="renderNav()" autocomplete="off"></div>
@@ -202,14 +240,59 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const PREV=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuerdo'];
+const PREV_LIST=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuerdo'];
 const ESTADOS=['','Cobrado','Pagado','Pendiente'];
-const TARIFAS={Fonasa:19260,Colmena:16850,'Cruz Blanca':23072,Particular:35000,'Particular Acuerdo':30000};
+const CUR_YEAR=new Date().getFullYear();
+
+// Default tarifas por año
+const DEFAULT_TARIFAS={
+  Fonasa:{'2026':20980},
+  Colmena:{'2026':16850},
+  'Cruz Blanca':{'2026':24598},
+  Particular:{'2026':35000},
+  'Particular Acuerdo':{'2026':30000}
+};
+
 const SEED={"Francisca Silva":{p:"Particular",s:[{fecha:"12/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"19/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"16/04/2026",mes:"abril",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""}]},"Guillermo Little":{p:"Cruz Blanca",s:[{fecha:"07/04/2026",mes:"abril",prevision:"Cruz Blanca",monto:23072,estado:"Pagado",observaciones:""},{fecha:"14/04/2026",mes:"abril",prevision:"Cruz Blanca",monto:23072,estado:"Pagado",observaciones:""}]},"Emmanuel Villanueva":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"15/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:"222 0107"},{fecha:"26/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"19/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"17/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Alta",observaciones:""}]},"Yohana Gatica":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"10/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Cinthia Moyano":{p:"Fonasa",s:[{fecha:"24/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"01/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Vanessa Campos":{p:"Colmena",s:[{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Melanie Flandes":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Andrea Reyes":{p:"Colmena",s:[{fecha:"15/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"03/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"13/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"16/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Antonia Ramirez":{p:"Fonasa",s:[{fecha:"19/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"02/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"08/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Luciana Pezzali":{p:"Fonasa",s:[{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"12/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Jennifer Salom":{p:"Fonasa",s:[{fecha:"02/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""}]},"Jaime Jara":{p:"Colmena",s:[{fecha:"26/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"25/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:"Revisar"},{fecha:"01/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"08/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Andrea Raglianti":{p:"Fonasa",s:[{fecha:"07/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"13/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"21/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"28/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"03/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"11/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"18/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"14/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Ana Cayul":{p:"Colmena",s:[{fecha:"14/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"28/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Carlos Burgos":{p:"Fonasa",s:[{fecha:"30/01/2025",mes:"enero",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""},{fecha:"05/02/2025",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""},{fecha:"15/02/2025",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""},{fecha:"19/03/2025",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""},{fecha:"05/04/2025",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""}]},"Maria Jose Valdivieso":{p:"Colmena",s:[{fecha:"28/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Camila Duran":{p:"Colmena",s:[{fecha:"03/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Javiera Catalan":{p:"Colmena",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"14/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Gloria Gonzalez":{p:"Fonasa",s:[{fecha:"12/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Nicolas Yañez":{p:"Colmena",s:[{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"24/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]}};
 
 let pts={},view='dashboard',pid=null,sbOpen=false;
+let tarifas=JSON.parse(JSON.stringify(DEFAULT_TARIFAS));
+let curTheme='blue';
 
-function sync(state,txt){const el=document.getElementById('sync-pill');if(!el)return;el.className='sync-pill '+state;el.textContent={ok:'✓ Sync',saving:'Guardando…',error:'Sin conexión'}[state]||txt||'…';}
+// ── INIT ─────────────────────────────────────────────
+document.getElementById('year-label').textContent=CUR_YEAR;
+
+function applyTheme(t){
+  curTheme=t;
+  document.documentElement.setAttribute('data-theme',t==='blue'?'':t);
+  localStorage.setItem('cp_theme',t);
+  const mc=document.getElementById('theme-color-meta');
+  if(mc){const map={blue:'#f5f7fa',green:'#f0f9f4',dark:'#0a0a14'};mc.content=map[t]||'#f5f7fa';}
+}
+function loadTheme(){
+  const t=localStorage.getItem('cp_theme')||'blue';
+  applyTheme(t);
+}
+function loadTarifasLocal(){
+  try{const s=localStorage.getItem('cp_tarifas');if(s)tarifas=JSON.parse(s);}catch(e){}
+}
+function saveTarifasLocal(){
+  localStorage.setItem('cp_tarifas',JSON.stringify(tarifas));
+}
+function getTarifa(prevision){
+  const yr=String(CUR_YEAR);
+  return tarifas[prevision]?.[yr]||tarifas[prevision]?.[String(CUR_YEAR-1)]||0;
+}
+
+loadTheme();
+loadTarifasLocal();
+
+// ── SYNC ─────────────────────────────────────────────
+function sync(state,txt){
+  const el=document.getElementById('sync-pill');if(!el)return;
+  el.className='sync-pill '+state;
+  el.textContent={ok:'✓ Sync',saving:'Guardando…',error:'Sin conexión'}[state]||txt||'…';
+}
 function toggleSb(){sbOpen=!sbOpen;document.getElementById('sidebar').classList.toggle('open',sbOpen);document.getElementById('sb-overlay').classList.toggle('visible',sbOpen);}
 function closeSb(){sbOpen=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('visible');}
 function fmt(n){return Math.round(n).toLocaleString('es-CL');}
@@ -221,6 +304,7 @@ function badge(estado){
 }
 function allSessions(){let a=[];Object.values(pts).forEach(p=>p.ses.forEach(s=>a.push({...s,paciente:p.nombre})));return a;}
 
+// ── LOAD DATA ────────────────────────────────────────
 async function loadData(){
   sync('saving','Cargando…');
   try{
@@ -235,10 +319,9 @@ async function loadData(){
     sync('ok');renderNav();renderDashboard();
   }catch(e){
     sync('error');
-    document.getElementById('main-body').innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Error al conectar.<br>Verifica tu conexión.</p></div>';
+    document.getElementById('main-body').innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Error al conectar.<br>Verifica tu conexión a internet.</p></div>';
   }
 }
-
 async function seedData(){
   sync('saving','Importando datos…');
   for(const[nombre,d]of Object.entries(SEED)){
@@ -248,6 +331,7 @@ async function seedData(){
   await loadData();
 }
 
+// ── NAV ──────────────────────────────────────────────
 function renderNav(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
   const list=Object.values(pts).filter(p=>p.nombre.toLowerCase().includes(q)).sort((a,b)=>a.nombre.localeCompare(b.nombre));
@@ -255,13 +339,14 @@ function renderNav(){
     ?list.map(p=>`<button class="nb ${view==='patient'&&pid===p.id?'active':''}" onclick="showPatient('${esc(p.id)}')">${p.nombre}</button>`).join('')
     :'<div style="padding:8px;font-size:12px;color:rgba(255,255,255,.3)">Sin resultados</div>';
 }
-
 function showView(v){
   view=v;pid=null;
   document.querySelectorAll('.nb').forEach(e=>e.classList.remove('active'));
   document.getElementById('nav-'+v)?.classList.add('active');
   renderNav();closeSb();
-  v==='dashboard'?renderDashboard():renderResumen();
+  if(v==='dashboard')renderDashboard();
+  else if(v==='resumen')renderResumen();
+  else if(v==='config')renderConfig();
 }
 function showPatient(id){
   view='patient';pid=id;
@@ -269,6 +354,7 @@ function showPatient(id){
   renderNav();closeSb();renderPatient(id);
 }
 
+// ── DASHBOARD ────────────────────────────────────────
 function renderDashboard(){
   document.getElementById('view-title').textContent='Dashboard';
   document.getElementById('header-actions').innerHTML='';
@@ -295,13 +381,13 @@ function renderDashboard(){
     <div class="tw"><table><thead><tr><th>Previsión</th><th>Sesiones</th><th style="text-align:right">Total</th></tr></thead><tbody>${pRows}</tbody></table></div>`;
 }
 
+// ── RESUMEN ──────────────────────────────────────────
 function renderResumen(){
   document.getElementById('view-title').textContent='Resumen general';
   document.getElementById('header-actions').innerHTML='';
   const all=allSessions();
   const mRows=MESES.map(m=>{
-    const s=all.filter(x=>x.mes===m);
-    const t=s.reduce((a,x)=>a+x.monto,0);
+    const s=all.filter(x=>x.mes===m);const t=s.reduce((a,x)=>a+x.monto,0);
     const c=s.filter(x=>x.estado==='Cobrado'||x.estado==='Pagado').reduce((a,x)=>a+x.monto,0);
     return t?`<tr><td style="font-weight:500">${m[0].toUpperCase()+m.slice(1)}</td><td style="color:var(--text3)">${s.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--red);font-family:var(--mono)">$${fmt(t-c)}</td></tr>`:''}).join('');
   const total=all.reduce((a,s)=>a+s.monto,0);
@@ -309,8 +395,7 @@ function renderResumen(){
   const pRows=Object.values(pts).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>{
     const t=p.ses.reduce((a,s)=>a+s.monto,0);
     const c=p.ses.filter(s=>s.estado==='Cobrado'||s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
-    const est=c===t&&t>0?'Cobrado':c>0?'Pagado':'';
-    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--navy);font-weight:500">${p.nombre}</a></td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td>${badge(est)}</td></tr>`;}).join('');
+    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a></td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td>${badge(c===t&&t>0?'Cobrado':c>0?'Pagado':'')}</td></tr>`;}).join('');
   document.getElementById('main-body').innerHTML=`
     <div class="tabs"><button class="tab active" onclick="switchTab(this,'tm')">Por mes</button><button class="tab" onclick="switchTab(this,'tp')">Por paciente</button></div>
     <div id="tm"><div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th>Cobrado</th><th>Pendiente</th></tr></thead><tbody>${mRows}<tr style="background:var(--surface2)"><td style="font-weight:600">Total</td><td style="color:var(--text3)">${all.length}</td><td style="font-family:var(--mono);font-weight:600">$${fmt(total)}</td><td style="color:var(--green);font-family:var(--mono);font-weight:600">$${fmt(cob)}</td><td style="color:var(--red);font-family:var(--mono);font-weight:600">$${fmt(total-cob)}</td></tr></tbody></table></div></div>
@@ -318,6 +403,49 @@ function renderResumen(){
 }
 function switchTab(btn,id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');['tm','tp'].forEach(t=>{const el=document.getElementById(t);if(el)el.style.display='none';});document.getElementById(id).style.display='';}
 
+// ── CONFIG ───────────────────────────────────────────
+function renderConfig(){
+  document.getElementById('view-title').textContent='Configuración';
+  document.getElementById('header-actions').innerHTML='';
+  const yr=String(CUR_YEAR);
+  const tarifaRows=PREV_LIST.map(p=>{
+    const val=tarifas[p]?.[yr]||'';
+    return`<div class="tarifa-row">
+      <div class="tarifa-name">${p}</div>
+      <div class="tarifa-year">${yr}</div>
+      <input class="fi2" style="text-align:right;font-family:var(--mono)" type="number" value="${val}" placeholder="Monto" id="t-${p.replace(/ /g,'_')}" oninput="saveTarifa('${p}',this.value)">
+    </div>`;}).join('');
+
+  const themes=[
+    {id:'blue',name:'Azul marino',sb:'#1b3f6e',main:'#f5f7fa'},
+    {id:'green',name:'Verde salud',sb:'#1a5c3a',main:'#f0f9f4'},
+    {id:'dark',name:'Oscuro',sb:'#0f0f23',main:'#111120'}
+  ];
+  const themeCards=themes.map(t=>`
+    <div class="theme-card ${curTheme===t.id?'active':''}" onclick="applyTheme('${t.id}');renderConfig()">
+      <div class="theme-preview"><div class="tp-sb" style="background:${t.sb}"></div><div class="tp-main" style="background:${t.main};border:1px solid #e0e6ef"></div></div>
+      <div class="theme-name">${t.name}</div>
+    </div>`).join('');
+
+  document.getElementById('main-body').innerHTML=`
+    <div class="settings-card">
+      <h4>Tarifas por previsión — ${yr}</h4>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Estos valores se cargan automáticamente al registrar una sesión según el año en curso. Puedes editarlos en cualquier momento o ingresar un monto distinto en cada sesión.</p>
+      ${tarifaRows}
+    </div>
+    <div class="settings-card">
+      <h4>Tema visual</h4>
+      <div class="theme-grid">${themeCards}</div>
+    </div>`;
+}
+function saveTarifa(prev,val){
+  const yr=String(CUR_YEAR);
+  if(!tarifas[prev])tarifas[prev]={};
+  tarifas[prev][yr]=parseInt(val)||0;
+  saveTarifasLocal();
+}
+
+// ── PATIENT ──────────────────────────────────────────
 function renderPatient(id){
   const p=pts[id];if(!p)return;
   document.getElementById('view-title').textContent=p.nombre;
@@ -340,8 +468,9 @@ function renderPatient(id){
     </div>`;
 }
 
+// ── MODALS ───────────────────────────────────────────
 function showAddPatient(){
-  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>Nuevo paciente</h3><div class="fg"><label class="fl">Nombre completo</label><input class="fi2" id="np-n" type="text" placeholder="Ej: María García" autofocus></div><div class="fg"><label class="fl">Previsión</label><select class="fs" id="np-p">${PREV.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Crear paciente</button></div></div></div>`;
+  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>Nuevo paciente</h3><div class="fg"><label class="fl">Nombre completo</label><input class="fi2" id="np-n" type="text" placeholder="Ej: María García" autofocus></div><div class="fg"><label class="fl">Previsión</label><select class="fs" id="np-p">${PREV_LIST.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Crear paciente</button></div></div></div>`;
 }
 async function addPatient(){
   const nombre=document.getElementById('np-n').value.trim();
@@ -361,21 +490,33 @@ function sesForm(id,ses=null){
   const dd=String(today.getDate()).padStart(2,'0'),mm=String(today.getMonth()+1).padStart(2,'0');
   const dFecha=ses?.fecha||`${dd}/${mm}/${today.getFullYear()}`;
   const dMes=ses?.mes||MESES[today.getMonth()];
-  const dPrev=ses?.prevision||p?.ses[0]?.prevision||p?.prevision||'Fonasa';
-  const dMonto=ses?.monto??TARIFAS[dPrev]??0;
+  const dPrev=ses?.prevision||p?.ses[p.ses.length-1]?.prevision||p?.prevision||'Fonasa';
+  const dMonto=ses?.monto??getTarifa(dPrev);
   const dEst=ses?.estado||'';
   const dObs=ses?.observaciones||'';
   const action=ses?`saveSesEdit('${esc(id)}','${esc(ses.id)}')`:`saveSesNew('${esc(id)}')`;
-  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>${ses?'Editar':'Nueva'} sesión — ${p?.nombre||''}</h3><div class="fr"><div class="fg"><label class="fl">Fecha (DD/MM/AAAA)</label><input class="fi2" id="s-f" type="text" value="${dFecha}"></div><div class="fg"><label class="fl">Mes</label><select class="fs" id="s-m">${MESES.map(m=>`<option value="${m}" ${m===dMes?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></div></div><div class="fr"><div class="fg"><label class="fl">Previsión</label><select class="fs" id="s-p" onchange="autoM()">${PREV.map(pr=>`<option ${pr===dPrev?'selected':''}>${pr}</option>`).join('')}</select></div><div class="fg"><label class="fl">Monto ($)</label><input class="fi2" id="s-mo" type="number" value="${dMonto}"></div></div><div class="fg"><label class="fl">Estado de pago</label><select class="fs" id="s-e">${ESTADOS.map(e=>`<option value="${e}" ${e===dEst?'selected':''}>${e||'Sin estado'}</option>`).join('')}</select></div><div class="fg"><label class="fl">Observaciones</label><input class="fi2" id="s-o" type="text" value="${dObs}" placeholder="Notas opcionales…"></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="${action}">Guardar</button></div></div></div>`;
+  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal">
+    <h3>${ses?'Editar':'Nueva'} sesión — ${p?.nombre||''}</h3>
+    <div class="fr">
+      <div class="fg"><label class="fl">Fecha (DD/MM/AAAA)</label><input class="fi2" id="s-f" type="text" value="${dFecha}"></div>
+      <div class="fg"><label class="fl">Mes</label><select class="fs" id="s-m">${MESES.map(m=>`<option value="${m}" ${m===dMes?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('')}</select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Previsión</label><select class="fs" id="s-p" onchange="autoM()">${PREV_LIST.map(pr=>`<option ${pr===dPrev?'selected':''}>${pr}</option>`).join('')}</select></div>
+      <div class="fg"><label class="fl">Monto ($)</label><input class="fi2" id="s-mo" type="number" value="${dMonto}"></div>
+    </div>
+    <div class="fg"><label class="fl">Estado de pago</label><select class="fs" id="s-e">${ESTADOS.map(e=>`<option value="${e}" ${e===dEst?'selected':''}>${e||'Sin estado'}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Observaciones</label><input class="fi2" id="s-o" type="text" value="${dObs}" placeholder="Notas opcionales…"></div>
+    <div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="${action}">Guardar</button></div>
+  </div></div>`;
 }
 function showAddSes(id){sesForm(id);}
 function showEditSes(id,sid){const s=pts[id]?.ses.find(x=>x.id===sid);if(s)sesForm(id,s);}
-function autoM(){const p=document.getElementById('s-p')?.value;if(p&&TARIFAS[p])document.getElementById('s-mo').value=TARIFAS[p];}
+function autoM(){const p=document.getElementById('s-p')?.value;if(p)document.getElementById('s-mo').value=getTarifa(p);}
 function getSesData(){return{fecha:document.getElementById('s-f').value.trim(),mes:document.getElementById('s-m').value,prevision:document.getElementById('s-p').value,monto:parseInt(document.getElementById('s-mo').value)||0,estado:document.getElementById('s-e').value,observaciones:document.getElementById('s-o').value.trim()};}
 
 async function saveSesNew(id){
-  const data={paciente_id:id,...getSesData()};
-  sync('saving');
+  const data={paciente_id:id,...getSesData()};sync('saving');
   const{data:saved,error}=await sb.from('sesiones').insert(data).select().single();
   if(error){sync('error');alert('Error al guardar');return;}
   pts[id].ses.push(saved);sync('ok');closeModal();renderPatient(id);
