@@ -200,8 +200,9 @@ tbody tr:hover{background:var(--sb-pale)}
 .obs-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;border-radius:4px;transition:background .15s;line-height:1}
 .obs-btn:hover{background:var(--surface2)}
 
+/* Portrait mobile */
 @media(max-width:768px){
-  :root{--sw:88vw}
+  :root{--sw:255px}
   .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0);box-shadow:6px 0 32px rgba(0,0,0,.3)}
   .sb-overlay-bg.visible{display:block}
@@ -215,13 +216,45 @@ tbody tr:hover{background:var(--sb-pale)}
   .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
   .h-actions .btn-danger{display:none}
-  /* Hide obs column on mobile — replaced by icon */
   .col-obs{display:none}
-  /* Compact table on mobile */
   td,th{padding:8px 8px}
   .h-title{font-size:14px}
 }
 @media(max-width:400px){.m-value{font-size:16px};.metric{padding:10px 11px}}
+
+/* Landscape mobile — maximize patient list visibility */
+@media(max-height:500px) and (max-width:900px){
+  :root{--sw:240px}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0);box-shadow:6px 0 32px rgba(0,0,0,.3)}
+  /* Compact logo area */
+  .sb-logo{padding:8px 12px;min-height:0}
+  .sb-icon{width:26px;height:26px;font-size:14px;border-radius:7px}
+  .sb-title{font-size:12px}
+  .sb-sub{display:none}
+  .sync-pill{font-size:9px;padding:2px 6px}
+  /* Compact nav section */
+  .sb-section{padding:6px 8px 2px}
+  .sb-label{font-size:9px;padding:0 6px 4px}
+  .nb{padding:6px 8px;font-size:12px}
+  /* Maximize scrollable patient area */
+  .search-wrap{padding:4px 8px 2px}
+  .search-input{padding:6px 9px;font-size:12px}
+  .filter-toggle{font-size:10px;padding:3px 6px}
+  .pat-scroll{padding:2px 8px 4px}
+  /* Each patient button smaller */
+  .pat-scroll .nb{padding:7px 8px;font-size:12px;border-radius:5px}
+  /* Compact footer */
+  .sb-footer{padding:6px 8px}
+  .add-btn{padding:7px;font-size:12px}
+  /* Main header compact */
+  .main-header{height:44px;min-height:44px;padding:0 14px}
+  .main-body{padding:10px}
+  .metric-grid{grid-template-columns:repeat(4,1fr);gap:6px}
+  .metric{padding:8px 10px}
+  .m-value{font-size:16px}
+  .m-label{font-size:10px;margin-bottom:4px}
+}
 </style>
 </head>
 <body>
