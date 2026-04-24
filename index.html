@@ -11,7 +11,6 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231b3f6e'/><text y='.92em' font-size='72' x='10' fill='white'>ψ</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ── THEMES ─────────────────────────────────────────── */
 :root{
   --sb:#1b3f6e;--sb-hover:#15325a;--sb-pale:#eaf0f9;--sb-pale2:#d4e3f5;
   --bg:#f5f7fa;--surface:#ffffff;--surface2:#f0f3f8;
@@ -20,36 +19,42 @@
   --green:#1a7a5a;--green-bg:#e6f5ef;
   --red:#b83232;--red-bg:#fdeaea;
   --blue:#1a5fa8;--blue-bg:#e8f0fb;
-  --accent:#1b3f6e;--accent-pale:#eaf0f9;
+  --orange:#b86000;--orange-bg:#fff3e0;
   --r:10px;--r-sm:7px;
   --sh:0 1px 3px rgba(27,63,110,.08);--sh-md:0 4px 16px rgba(27,63,110,.12);
   --font:'Inter',-apple-system,sans-serif;--mono:'SF Mono','Fira Mono',monospace;
   --sw:230px;
 }
-[data-theme="green"]{
-  --sb:#1a5c3a;--sb-hover:#134d2f;--sb-pale:#e6f5ef;--sb-pale2:#c3e8d5;
-  --accent:#1a5c3a;--accent-pale:#e6f5ef;
-  --blue:#1a5c3a;--blue-bg:#e6f5ef;
-}
+[data-theme="green"]{--sb:#1a5c3a;--sb-hover:#134d2f;--sb-pale:#e6f5ef;--sb-pale2:#c3e8d5;}
 [data-theme="dark"]{
   --sb:#0f0f23;--sb-hover:#1a1a2e;--sb-pale:#1e1e32;--sb-pale2:#2a2a42;
   --bg:#0a0a14;--surface:#111120;--surface2:#1a1a2e;
   --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
   --text:#f0f0f5;--text2:#8888a0;--text3:#55556a;
-  --accent:#7c6aff;--accent-pale:rgba(124,106,255,.15);
-  --blue:#7c6aff;--blue-bg:rgba(124,106,255,.15);
   --sh:0 1px 3px rgba(0,0,0,.3);--sh-md:0 4px 16px rgba(0,0,0,.4);
 }
-
-/* ── BASE ───────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
 .app{display:flex;height:100vh;height:100dvh}
 
-/* ── SIDEBAR ────────────────────────────────────────── */
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--sb);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:0}
+.login-box{background:var(--surface);border-radius:16px;padding:36px 32px;width:100%;max-width:340px;box-shadow:var(--sh-md);text-align:center}
+.login-psi{font-size:48px;font-family:serif;color:var(--sb);margin-bottom:8px;font-weight:700}
+.login-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
+.login-input{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:var(--font);font-size:15px;outline:none;text-align:center;letter-spacing:2px;transition:border-color .2s;margin-bottom:12px}
+.login-input:focus{border-color:var(--sb);box-shadow:0 0 0 3px var(--sb-pale)}
+.login-btn{width:100%;padding:11px;background:var(--sb);border:none;border-radius:var(--r-sm);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--sb-hover)}
+.login-error{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
+.login-remember{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);justify-content:center;margin-bottom:16px;cursor:pointer}
+.login-remember input{cursor:pointer}
+
+/* SIDEBAR */
 .sidebar{width:var(--sw);min-width:var(--sw);background:var(--sb);display:flex;flex-direction:column;overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),background .25s;z-index:50}
 .sb-logo{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
-.sb-icon{width:35px;height:35px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;font-family:serif;letter-spacing:-1px}
+.sb-icon{width:35px;height:35px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;font-family:serif}
 .sb-title{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
 .sb-sub{font-size:11px;color:rgba(255,255,255,.4)}
 .sync-pill{margin-left:auto;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);transition:all .3s;flex-shrink:0}
@@ -61,6 +66,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .nb{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;color:rgba(255,255,255,.6);font-family:var(--font);font-size:13px;border-radius:var(--r-sm);cursor:pointer;text-align:left;transition:all .15s}
 .nb:hover{background:rgba(255,255,255,.08);color:#fff}
 .nb.active{background:rgba(255,255,255,.15);color:#fff;font-weight:500}
+.nb.alta{opacity:.5;font-style:italic}
 .search-wrap{padding:8px 10px 2px}
 .search-input{width:100%;padding:8px 11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-sm);color:#fff;font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s}
 .search-input::placeholder{color:rgba(255,255,255,.3)}
@@ -68,11 +74,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .pat-scroll{flex:1;overflow-y:auto;padding:4px 10px 8px}
 .pat-scroll::-webkit-scrollbar{width:3px}
 .pat-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.filter-toggle{margin:4px 10px 0;display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;padding:4px 8px;border-radius:var(--r-sm);transition:all .15s;border:none;background:none;width:calc(100% - 20px)}
+.filter-toggle:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)}
 .sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.08)}
 .add-btn{width:100%;padding:9px;background:rgba(255,255,255,.1);border:1px dashed rgba(255,255,255,.25);border-radius:var(--r-sm);color:rgba(255,255,255,.8);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
 .add-btn:hover{background:rgba(255,255,255,.18);color:#fff}
 
-/* ── MAIN ───────────────────────────────────────────── */
+/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .main-header{height:56px;min-height:56px;padding:0 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);box-shadow:var(--sh);transition:background .25s,border-color .25s}
 .hamburger{display:none;width:34px;height:34px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;align-items:center;justify-content:center;font-size:15px;color:var(--text2);flex-shrink:0}
@@ -82,27 +90,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .main-body::-webkit-scrollbar{width:4px}
 .main-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* ── BUTTONS ────────────────────────────────────────── */
+/* BUTTONS */
 .btn{padding:8px 14px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text2);transition:all .15s;white-space:nowrap;box-shadow:var(--sh)}
 .btn:hover{background:var(--surface2);color:var(--text)}
 .btn-primary{background:var(--sb);border-color:var(--sb);color:#fff;box-shadow:0 2px 8px rgba(27,63,110,.2)}
 .btn-primary:hover{background:var(--sb-hover);border-color:var(--sb-hover)}
 .btn-danger{color:var(--red);border-color:transparent;background:var(--red-bg);box-shadow:none}
 .btn-danger:hover{background:#fad4d4}
+.btn-warning{color:var(--orange);border-color:transparent;background:var(--orange-bg);box-shadow:none}
+.btn-warning:hover{background:#ffe0b2}
+.btn-success{color:var(--green);border-color:transparent;background:var(--green-bg);box-shadow:none}
+.btn-success:hover{background:#c8eadb}
 .btn-sm{padding:5px 11px;font-size:12px}
 
-/* ── METRICS ────────────────────────────────────────── */
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
+/* METRICS */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:22px}
 .metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);transition:background .25s,border-color .25s}
 .metric.navy{background:var(--sb);border-color:var(--sb)}
 .metric.navy .m-label{color:rgba(255,255,255,.5)}
 .metric.navy .m-value{color:#fff}
 .metric.navy .m-sub{color:rgba(255,255,255,.35)}
 .m-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
-.m-value{font-size:21px;font-weight:600;line-height:1.1;color:var(--text)}
+.m-value{font-size:20px;font-weight:600;line-height:1.1;color:var(--text)}
 .m-sub{font-size:11px;color:var(--text3);margin-top:4px}
 
-/* ── TABLE ──────────────────────────────────────────── */
+/* TABLE */
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);box-shadow:var(--sh);transition:background .25s,border-color .25s}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;transition:background .25s}
@@ -111,14 +123,15 @@ tr:last-child td{border-bottom:none}
 tbody tr{background:var(--surface);transition:background .1s}
 tbody tr:hover{background:var(--sb-pale)}
 
-/* ── BADGES ─────────────────────────────────────────── */
+/* BADGES */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
-.bc{background:var(--green-bg);color:var(--green)}
-.bp{background:var(--blue-bg);color:var(--blue)}
-.bpe{background:var(--red-bg);color:var(--red)}
-.be{background:var(--surface2);color:var(--text3)}
+.b-cobrado{background:var(--green-bg);color:var(--green)}
+.b-pagado{background:var(--blue-bg);color:var(--blue)}
+.b-pendiente{background:var(--red-bg);color:var(--red)}
+.b-empty{background:var(--surface2);color:var(--text3)}
+.b-alta{background:var(--orange-bg);color:var(--orange)}
 
-/* ── CHART ──────────────────────────────────────────── */
+/* CHART */
 .chart{display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:4px}
 .bc2{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .bbar{width:100%;border-radius:4px 4px 0 0;background:var(--sb-pale2);min-height:3px;transition:height .4s ease,background .25s}
@@ -126,10 +139,9 @@ tbody tr:hover{background:var(--sb-pale)}
 .blbl{font-size:10px;color:var(--text3);white-space:nowrap}
 .bval{font-size:9px;color:var(--text3);white-space:nowrap}
 
-/* ── SECTION TITLE ──────────────────────────────────── */
 .stitle{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
 
-/* ── MODAL ──────────────────────────────────────────── */
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;animation:fi .15s ease}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-md);animation:su .2s cubic-bezier(.4,0,.2,1)}
@@ -142,24 +154,24 @@ tbody tr:hover{background:var(--sb-pale)}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mf{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid var(--border)}
 
-/* ── TABS ───────────────────────────────────────────── */
+/* TABS */
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px}
 .tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--font);transition:all .15s;margin-bottom:-1px}
 .tab.active{color:var(--text);border-bottom-color:var(--sb)}
 
-/* ── MONTH SUMMARY ──────────────────────────────────── */
+/* MONTH SUMMARY */
 .msummary{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
 .mrow{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
 .mrow:last-of-type{border-bottom:none}
 .mtotal{display:flex;justify-content:space-between;padding:8px 0 0;font-size:13px;font-weight:600;color:var(--text)}
 
-/* ── SETTINGS ───────────────────────────────────────── */
+/* SETTINGS */
 .settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:20px;transition:background .25s,border-color .25s}
 .settings-card h4{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)}
-.tarifa-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.tarifa-row{display:grid;grid-template-columns:1fr 80px 120px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
 .tarifa-row:last-child{border-bottom:none}
 .tarifa-name{font-size:13px;color:var(--text2);font-weight:500}
-.tarifa-year{font-size:11px;color:var(--text3)}
+.tarifa-year{font-size:11px;color:var(--text3);text-align:center}
 .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .theme-card{border:2px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;text-align:center}
 .theme-card:hover{border-color:var(--border2)}
@@ -169,7 +181,7 @@ tbody tr:hover{background:var(--sb-pale)}
 .theme-preview .tp-main{flex:1;border-radius:0 6px 6px 0}
 .theme-name{font-size:12px;font-weight:500;color:var(--text2)}
 
-/* ── EMPTY / LOADING ────────────────────────────────── */
+/* EMPTY / LOADING */
 .empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:13px}
 .ei{font-size:36px;margin-bottom:10px;opacity:.4}
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:220px;gap:12px;color:var(--text3);font-size:13px}
@@ -177,7 +189,6 @@ tbody tr:hover{background:var(--sb-pale)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sb-overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49}
 
-/* ── RESPONSIVE ─────────────────────────────────────── */
 @media(max-width:768px){
   :root{--sw:255px}
   .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
@@ -188,16 +199,28 @@ tbody tr:hover{background:var(--sb-pale)}
   .metric-grid{grid-template-columns:1fr 1fr;gap:10px}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr!important}
-  .h-actions .btn-danger{display:none}
-  .tarifa-row{grid-template-columns:1fr 1fr}
+  .tarifa-row{grid-template-columns:1fr 100px}
   .tarifa-year{display:none}
-  .theme-grid{grid-template-columns:1fr 1fr 1fr}
 }
 @media(max-width:400px){.m-value{font-size:17px}}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-psi">ψ</div>
+    <div class="login-title">Consulta Privada</div>
+    <div class="login-sub">Ingresa tu contraseña para continuar</div>
+    <input class="login-input" type="password" id="login-pw" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="login-remember"><input type="checkbox" id="login-remember" checked> Recordar en este dispositivo</label>
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
   <div class="sb-overlay-bg" id="sb-overlay" onclick="closeSb()"></div>
   <div class="sidebar" id="sidebar">
     <div class="sb-logo">
@@ -216,6 +239,7 @@ tbody tr:hover{background:var(--sb-pale)}
     </div>
     <div class="sb-section" style="padding-bottom:0"><div class="sb-label">Pacientes</div></div>
     <div class="search-wrap"><input type="search" class="search-input" id="search-input" placeholder="Buscar paciente..." oninput="renderNav()" autocomplete="off"></div>
+    <button class="filter-toggle" id="filter-toggle" onclick="toggleAltaFilter()">👁 Mostrar pacientes dados de alta</button>
     <div class="pat-scroll" id="patient-nav"><div class="loading"><div class="spinner"></div></div></div>
     <div class="sb-footer"><button class="add-btn" onclick="showAddPatient()">+ Nuevo paciente</button></div>
   </div>
@@ -239,55 +263,64 @@ const SB_URL='https://ybztenzmpwufcvzvmwao.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlienRlbnptcHd1ZmN2enZtd2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzM0NzYsImV4cCI6MjA5MjUwOTQ3Nn0.bHC65JMkp6LSd9qWEVgZyhwtLlnOYzVjuEHV46LfVag';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
+const PWD_HASH='8e4b3f2a1c9d6e5b7f0a2c4e8d1b3f5a9c2e4b6d8f0a1c3e5b7d9f2a4c6e8b0';
+const PWD='Amandita202@';
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const PREV_LIST=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuerdo'];
 const ESTADOS=['','Cobrado','Pagado','Pendiente'];
 const CUR_YEAR=new Date().getFullYear();
+const DEFAULT_TARIFAS={Fonasa:{[CUR_YEAR]:20980},Colmena:{[CUR_YEAR]:16850},'Cruz Blanca':{[CUR_YEAR]:24598},Particular:{[CUR_YEAR]:35000},'Particular Acuerdo':{[CUR_YEAR]:30000}};
 
-// Default tarifas por año
-const DEFAULT_TARIFAS={
-  Fonasa:{'2026':20980},
-  Colmena:{'2026':16850},
-  'Cruz Blanca':{'2026':24598},
-  Particular:{'2026':35000},
-  'Particular Acuerdo':{'2026':30000}
-};
-
-const SEED={"Francisca Silva":{p:"Particular",s:[{fecha:"12/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"19/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""},{fecha:"16/04/2026",mes:"abril",prevision:"Particular",monto:35000,estado:"Cobrado",observaciones:""}]},"Guillermo Little":{p:"Cruz Blanca",s:[{fecha:"07/04/2026",mes:"abril",prevision:"Cruz Blanca",monto:23072,estado:"Pagado",observaciones:""},{fecha:"14/04/2026",mes:"abril",prevision:"Cruz Blanca",monto:23072,estado:"Pagado",observaciones:""}]},"Emmanuel Villanueva":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"15/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:"222 0107"},{fecha:"26/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"19/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"17/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Alta",observaciones:""}]},"Yohana Gatica":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"10/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Cinthia Moyano":{p:"Fonasa",s:[{fecha:"24/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"01/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Vanessa Campos":{p:"Colmena",s:[{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Melanie Flandes":{p:"Fonasa",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Andrea Reyes":{p:"Colmena",s:[{fecha:"15/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"03/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"13/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"16/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Antonia Ramirez":{p:"Fonasa",s:[{fecha:"19/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"02/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"08/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Luciana Pezzali":{p:"Fonasa",s:[{fecha:"05/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"12/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"26/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"09/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Jennifer Salom":{p:"Fonasa",s:[{fecha:"02/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""}]},"Jaime Jara":{p:"Colmena",s:[{fecha:"26/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"25/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:"Revisar"},{fecha:"01/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"08/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Andrea Raglianti":{p:"Fonasa",s:[{fecha:"07/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"13/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"21/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"28/01/2026",mes:"enero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"03/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"11/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/02/2026",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"18/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"25/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""},{fecha:"14/04/2026",mes:"abril",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Ana Cayul":{p:"Colmena",s:[{fecha:"14/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"28/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"31/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"15/04/2026",mes:"abril",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Carlos Burgos":{p:"Fonasa",s:[{fecha:"30/01/2025",mes:"enero",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""},{fecha:"05/02/2025",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""},{fecha:"15/02/2025",mes:"febrero",prevision:"Fonasa",monto:19260,estado:"Pagado",observaciones:""},{fecha:"19/03/2025",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""},{fecha:"05/04/2025",mes:"abril",prevision:"Fonasa",monto:19260,estado:"Pendiente",observaciones:""}]},"Maria Jose Valdivieso":{p:"Colmena",s:[{fecha:"28/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Camila Duran":{p:"Colmena",s:[{fecha:"03/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Javiera Catalan":{p:"Colmena",s:[{fecha:"08/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"14/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"22/01/2026",mes:"enero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"11/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]},"Gloria Gonzalez":{p:"Fonasa",s:[{fecha:"12/03/2026",mes:"marzo",prevision:"Fonasa",monto:19260,estado:"",observaciones:""}]},"Nicolas Yañez":{p:"Colmena",s:[{fecha:"12/02/2026",mes:"febrero",prevision:"Colmena",monto:16850,estado:"",observaciones:""},{fecha:"24/03/2026",mes:"marzo",prevision:"Colmena",monto:16850,estado:"",observaciones:""}]}};
-
-let pts={},view='dashboard',pid=null,sbOpen=false;
+let pts={},view='dashboard',pid=null,sbOpen=false,showAlta=false;
 let tarifas=JSON.parse(JSON.stringify(DEFAULT_TARIFAS));
 let curTheme='blue';
 
-// ── INIT ─────────────────────────────────────────────
-document.getElementById('year-label').textContent=CUR_YEAR;
+// ── LOGIN ─────────────────────────────────────────────
+function checkLogin(){
+  if(localStorage.getItem('cp_auth')==='1'){showApp();return;}
+  document.getElementById('login-screen').style.display='flex';
+}
+function doLogin(){
+  const val=document.getElementById('login-pw').value;
+  const err=document.getElementById('login-error');
+  if(val===PWD){
+    if(document.getElementById('login-remember').checked){
+      localStorage.setItem('cp_auth','1');
+    }
+    showApp();
+  } else {
+    err.textContent='Contraseña incorrecta';
+    document.getElementById('login-pw').value='';
+    document.getElementById('login-pw').focus();
+    setTimeout(()=>err.textContent='',3000);
+  }
+}
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='flex';
+  loadTheme();loadTarifasLocal();
+  document.getElementById('year-label').textContent=CUR_YEAR;
+  loadData();
+}
+function doLogout(){
+  localStorage.removeItem('cp_auth');
+  location.reload();
+}
 
+// ── THEME ─────────────────────────────────────────────
 function applyTheme(t){
   curTheme=t;
   document.documentElement.setAttribute('data-theme',t==='blue'?'':t);
   localStorage.setItem('cp_theme',t);
   const mc=document.getElementById('theme-color-meta');
-  if(mc){const map={blue:'#f5f7fa',green:'#f0f9f4',dark:'#0a0a14'};mc.content=map[t]||'#f5f7fa';}
+  if(mc){const m={blue:'#f5f7fa',green:'#f0f9f4',dark:'#0a0a14'};mc.content=m[t]||'#f5f7fa';}
 }
-function loadTheme(){
-  const t=localStorage.getItem('cp_theme')||'blue';
-  applyTheme(t);
-}
-function loadTarifasLocal(){
-  try{const s=localStorage.getItem('cp_tarifas');if(s)tarifas=JSON.parse(s);}catch(e){}
-}
-function saveTarifasLocal(){
-  localStorage.setItem('cp_tarifas',JSON.stringify(tarifas));
-}
-function getTarifa(prevision){
-  const yr=String(CUR_YEAR);
-  return tarifas[prevision]?.[yr]||tarifas[prevision]?.[String(CUR_YEAR-1)]||0;
-}
+function loadTheme(){const t=localStorage.getItem('cp_theme')||'blue';applyTheme(t);}
+function loadTarifasLocal(){try{const s=localStorage.getItem('cp_tarifas');if(s)tarifas=JSON.parse(s);}catch(e){}}
+function saveTarifasLocal(){localStorage.setItem('cp_tarifas',JSON.stringify(tarifas));}
+function getTarifa(prev){const yr=String(CUR_YEAR);return tarifas[prev]?.[yr]||tarifas[prev]?.[String(CUR_YEAR-1)]||0;}
 
-loadTheme();
-loadTarifasLocal();
-
-// ── SYNC ─────────────────────────────────────────────
+// ── SYNC ──────────────────────────────────────────────
 function sync(state,txt){
   const el=document.getElementById('sync-pill');if(!el)return;
   el.className='sync-pill '+state;
@@ -297,14 +330,19 @@ function toggleSb(){sbOpen=!sbOpen;document.getElementById('sidebar').classList.
 function closeSb(){sbOpen=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('visible');}
 function fmt(n){return Math.round(n).toLocaleString('es-CL');}
 function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
-function badge(estado){
-  if(!estado)return'<span class="badge be">Sin estado</span>';
-  const m={Cobrado:'bc',Pagado:'bp',Pendiente:'bpe'};
-  return`<span class="badge ${m[estado]||'be'}">${estado}</span>`;
-}
-function allSessions(){let a=[];Object.values(pts).forEach(p=>p.ses.forEach(s=>a.push({...s,paciente:p.nombre})));return a;}
 
-// ── LOAD DATA ────────────────────────────────────────
+function badge(estado){
+  if(!estado)return'<span class="badge b-empty">Sin estado</span>';
+  const m={Cobrado:'b-cobrado',Pagado:'b-pagado',Pendiente:'b-pendiente'};
+  return`<span class="badge ${m[estado]||'b-empty'}">${estado}</span>`;
+}
+function allSessions(){
+  let a=[];
+  Object.values(pts).forEach(p=>p.ses.forEach(s=>a.push({...s,paciente:p.nombre})));
+  return a;
+}
+
+// ── LOAD DATA ─────────────────────────────────────────
 async function loadData(){
   sync('saving','Cargando…');
   try{
@@ -313,30 +351,29 @@ async function loadData(){
     const{data:sess,error:e2}=await sb.from('sesiones').select('*').order('created_at');
     if(e2)throw e2;
     pts={};
-    pats.forEach(p=>{pts[p.id]={id:p.id,nombre:p.nombre,prevision:p.prevision,ses:[]};});
+    pats.forEach(p=>{pts[p.id]={id:p.id,nombre:p.nombre,prevision:p.prevision,alta:p.alta||false,ses:[]};});
     sess.forEach(s=>{if(pts[s.paciente_id])pts[s.paciente_id].ses.push(s);});
-    if(!pats.length){await seedData();return;}
     sync('ok');renderNav();renderDashboard();
   }catch(e){
     sync('error');
-    document.getElementById('main-body').innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Error al conectar.<br>Verifica tu conexión a internet.</p></div>';
+    document.getElementById('main-body').innerHTML='<div class="empty"><div class="ei">⚠️</div><p>Error al conectar.<br>Verifica tu conexión.</p></div>';
   }
-}
-async function seedData(){
-  sync('saving','Importando datos…');
-  for(const[nombre,d]of Object.entries(SEED)){
-    const{data:pat}=await sb.from('pacientes').insert({nombre,prevision:d.p}).select().single();
-    if(pat&&d.s.length)await sb.from('sesiones').insert(d.s.map(s=>({paciente_id:pat.id,...s})));
-  }
-  await loadData();
 }
 
-// ── NAV ──────────────────────────────────────────────
+// ── NAV ───────────────────────────────────────────────
+function toggleAltaFilter(){
+  showAlta=!showAlta;
+  const btn=document.getElementById('filter-toggle');
+  btn.textContent=showAlta?'👁 Ocultar dados de alta':'👁 Mostrar dados de alta';
+  renderNav();
+}
 function renderNav(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const list=Object.values(pts).filter(p=>p.nombre.toLowerCase().includes(q)).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  let list=Object.values(pts).filter(p=>p.nombre.toLowerCase().includes(q));
+  if(!showAlta)list=list.filter(p=>!p.alta);
+  list.sort((a,b)=>a.nombre.localeCompare(b.nombre));
   document.getElementById('patient-nav').innerHTML=list.length
-    ?list.map(p=>`<button class="nb ${view==='patient'&&pid===p.id?'active':''}" onclick="showPatient('${esc(p.id)}')">${p.nombre}</button>`).join('')
+    ?list.map(p=>`<button class="nb ${view==='patient'&&pid===p.id?'active':''} ${p.alta?'alta':''}" onclick="showPatient('${esc(p.id)}')">${p.alta?'✓ ':''} ${p.nombre}</button>`).join('')
     :'<div style="padding:8px;font-size:12px;color:rgba(255,255,255,.3)">Sin resultados</div>';
 }
 function showView(v){
@@ -354,56 +391,98 @@ function showPatient(id){
   renderNav();closeSb();renderPatient(id);
 }
 
-// ── DASHBOARD ────────────────────────────────────────
+// ── DASHBOARD ─────────────────────────────────────────
 function renderDashboard(){
   document.getElementById('view-title').textContent='Dashboard';
   document.getElementById('header-actions').innerHTML='';
-  const all=allSessions();
+  const all=allSessions(); // todos incluyendo dados de alta
   const total=all.reduce((a,s)=>a+s.monto,0);
-  const cobrado=all.filter(s=>s.estado==='Cobrado'||s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+  const cobrado=all.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+  const pagado=all.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
   const pendiente=all.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
-  const mon={};MESES.forEach(m=>mon[m]=0);
-  all.forEach(s=>{if(s.mes&&mon.hasOwnProperty(s.mes))mon[s.mes]+=s.monto;});
-  const act=MESES.filter(m=>mon[m]>0);
-  const maxV=Math.max(...Object.values(mon),1);
-  const bars=act.map(m=>{const h=Math.max(Math.round((mon[m]/maxV)*88),3);return`<div class="bc2"><div class="bval">$${fmt(mon[m])}</div><div class="bbar" style="height:${h}px"></div><div class="blbl">${m.slice(0,3)}</div></div>`;}).join('');
+
+  // Agrupar por año+mes cronológicamente
+  const monMap={};
+  all.forEach(s=>{
+    const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
+    const key=`${yr}-${String(MESES.indexOf(s.mes)+1).padStart(2,'0')}`;
+    monMap[key]=(monMap[key]||0)+s.monto;
+  });
+  const sortedKeys=Object.keys(monMap).sort();
+  const maxV=Math.max(...Object.values(monMap),1);
+  const bars=sortedKeys.map(k=>{
+    const[yr,m]=k.split('-');
+    const label=MESES[parseInt(m)-1].slice(0,3)+' '+yr.slice(2);
+    const h=Math.max(Math.round((monMap[k]/maxV)*88),3);
+    return`<div class="bc2"><div class="bval">$${fmt(monMap[k])}</div><div class="bbar" style="height:${h}px"></div><div class="blbl">${label}</div></div>`;
+  }).join('');
+
   const pt={};all.forEach(s=>{pt[s.prevision]=(pt[s.prevision]||0)+s.monto;});
   const pRows=Object.entries(pt).sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<tr><td>${p}</td><td style="color:var(--text3)">${all.filter(s=>s.prevision===p).length} ses.</td><td style="text-align:right;font-weight:600;font-family:var(--mono)">$${fmt(v)}</td></tr>`).join('');
+
+  const nActivos=Object.values(pts).filter(p=>!p.alta).length;
+  const nAlta=Object.values(pts).filter(p=>p.alta).length;
+
   document.getElementById('main-body').innerHTML=`
     <div class="metric-grid">
-      <div class="metric navy"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} sesiones · ${Object.keys(pts).length} pacientes</div></div>
-      <div class="metric"><div class="m-label">Cobrado/Pagado</div><div class="m-value" style="color:var(--green)">$${fmt(cobrado)}</div></div>
+      <div class="metric navy"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} ses. · ${nActivos} activos${nAlta?` · ${nAlta} alta`:''}</div></div>
+      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cobrado)}</div></div>
+      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pagado)}</div></div>
       <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(pendiente)}</div></div>
-      <div class="metric"><div class="m-label">Sin gestionar</div><div class="m-value" style="color:var(--text2)">$${fmt(total-cobrado-pendiente)}</div></div>
     </div>
     <div style="margin-bottom:24px"><div class="stitle">Ingresos por mes</div><div class="chart">${bars||'<span style="color:var(--text3);font-size:12px">Sin datos aún</span>'}</div></div>
     <div class="stitle">Por previsión</div>
     <div class="tw"><table><thead><tr><th>Previsión</th><th>Sesiones</th><th style="text-align:right">Total</th></tr></thead><tbody>${pRows}</tbody></table></div>`;
 }
 
-// ── RESUMEN ──────────────────────────────────────────
+// ── RESUMEN ───────────────────────────────────────────
 function renderResumen(){
   document.getElementById('view-title').textContent='Resumen general';
   document.getElementById('header-actions').innerHTML='';
   const all=allSessions();
-  const mRows=MESES.map(m=>{
-    const s=all.filter(x=>x.mes===m);const t=s.reduce((a,x)=>a+x.monto,0);
-    const c=s.filter(x=>x.estado==='Cobrado'||x.estado==='Pagado').reduce((a,x)=>a+x.monto,0);
-    return t?`<tr><td style="font-weight:500">${m[0].toUpperCase()+m.slice(1)}</td><td style="color:var(--text3)">${s.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--red);font-family:var(--mono)">$${fmt(t-c)}</td></tr>`:''}).join('');
+
+  // Meses ordenados con año
+  const monMap={};
+  all.forEach(s=>{
+    const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
+    const mesIdx=MESES.indexOf(s.mes);
+    if(mesIdx<0)return;
+    const key=`${yr}-${String(mesIdx+1).padStart(2,'0')}`;
+    if(!monMap[key])monMap[key]={yr,mes:s.mes,ses:[],total:0,cob:0,pag:0,pen:0};
+    monMap[key].ses.push(s);
+    monMap[key].total+=s.monto;
+    if(s.estado==='Cobrado')monMap[key].cob+=s.monto;
+    else if(s.estado==='Pagado')monMap[key].pag+=s.monto;
+    else if(s.estado==='Pendiente')monMap[key].pen+=s.monto;
+  });
+  const mRows=Object.keys(monMap).sort().map(k=>{
+    const d=monMap[k];
+    const label=d.mes[0].toUpperCase()+d.mes.slice(1)+' '+d.yr;
+    return`<tr><td style="font-weight:500">${label}</td><td style="color:var(--text3)">${d.ses.length}</td><td style="font-family:var(--mono)">$${fmt(d.total)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(d.cob)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(d.pag)}</td><td style="color:var(--red);font-family:var(--mono)">$${fmt(d.pen)}</td></tr>`;
+  }).join('');
+
   const total=all.reduce((a,s)=>a+s.monto,0);
-  const cob=all.filter(s=>s.estado==='Cobrado'||s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+  const cob=all.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+  const pag=all.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+  const pen=all.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
+
   const pRows=Object.values(pts).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>{
     const t=p.ses.reduce((a,s)=>a+s.monto,0);
-    const c=p.ses.filter(s=>s.estado==='Cobrado'||s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
-    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a></td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td>${badge(c===t&&t>0?'Cobrado':c>0?'Pagado':'')}</td></tr>`;}).join('');
+    const c=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+    const pg=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+    const altaBadge=p.alta?'<span class="badge b-alta" style="margin-left:6px">Alta</span>':'';
+    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(pg)}</td></tr>`;
+  }).join('');
+
   document.getElementById('main-body').innerHTML=`
     <div class="tabs"><button class="tab active" onclick="switchTab(this,'tm')">Por mes</button><button class="tab" onclick="switchTab(this,'tp')">Por paciente</button></div>
-    <div id="tm"><div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th>Cobrado</th><th>Pendiente</th></tr></thead><tbody>${mRows}<tr style="background:var(--surface2)"><td style="font-weight:600">Total</td><td style="color:var(--text3)">${all.length}</td><td style="font-family:var(--mono);font-weight:600">$${fmt(total)}</td><td style="color:var(--green);font-family:var(--mono);font-weight:600">$${fmt(cob)}</td><td style="color:var(--red);font-family:var(--mono);font-weight:600">$${fmt(total-cob)}</td></tr></tbody></table></div></div>
-    <div id="tp" style="display:none"><div class="tw"><table><thead><tr><th>Paciente</th><th>Previsión</th><th>Ses.</th><th>Total</th><th>Estado</th></tr></thead><tbody>${pRows}</tbody></table></div></div>`;
+    <div id="tm"><div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th><th style="color:var(--red)">Pendiente</th></tr></thead>
+    <tbody>${mRows}<tr style="background:var(--surface2)"><td style="font-weight:600">Total</td><td style="color:var(--text3)">${all.length}</td><td style="font-family:var(--mono);font-weight:600">$${fmt(total)}</td><td style="color:var(--green);font-family:var(--mono);font-weight:600">$${fmt(cob)}</td><td style="color:var(--blue);font-family:var(--mono);font-weight:600">$${fmt(pag)}</td><td style="color:var(--red);font-family:var(--mono);font-weight:600">$${fmt(pen)}</td></tr></tbody></table></div></div>
+    <div id="tp" style="display:none"><div class="tw"><table><thead><tr><th>Paciente</th><th>Previsión</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th></tr></thead><tbody>${pRows}</tbody></table></div></div>`;
 }
 function switchTab(btn,id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');['tm','tp'].forEach(t=>{const el=document.getElementById(t);if(el)el.style.display='none';});document.getElementById(id).style.display='';}
 
-// ── CONFIG ───────────────────────────────────────────
+// ── CONFIG ────────────────────────────────────────────
 function renderConfig(){
   document.getElementById('view-title').textContent='Configuración';
   document.getElementById('header-actions').innerHTML='';
@@ -413,54 +492,84 @@ function renderConfig(){
     return`<div class="tarifa-row">
       <div class="tarifa-name">${p}</div>
       <div class="tarifa-year">${yr}</div>
-      <input class="fi2" style="text-align:right;font-family:var(--mono)" type="number" value="${val}" placeholder="Monto" id="t-${p.replace(/ /g,'_')}" oninput="saveTarifa('${p}',this.value)">
+      <input class="fi2" style="text-align:right;font-family:var(--mono)" type="number" value="${val}" placeholder="Monto" oninput="saveTarifa('${p}',this.value)">
     </div>`;}).join('');
-
-  const themes=[
-    {id:'blue',name:'Azul marino',sb:'#1b3f6e',main:'#f5f7fa'},
-    {id:'green',name:'Verde salud',sb:'#1a5c3a',main:'#f0f9f4'},
-    {id:'dark',name:'Oscuro',sb:'#0f0f23',main:'#111120'}
-  ];
-  const themeCards=themes.map(t=>`
-    <div class="theme-card ${curTheme===t.id?'active':''}" onclick="applyTheme('${t.id}');renderConfig()">
-      <div class="theme-preview"><div class="tp-sb" style="background:${t.sb}"></div><div class="tp-main" style="background:${t.main};border:1px solid #e0e6ef"></div></div>
-      <div class="theme-name">${t.name}</div>
-    </div>`).join('');
-
+  const themes=[{id:'blue',name:'Azul marino',sb:'#1b3f6e',main:'#f5f7fa'},{id:'green',name:'Verde salud',sb:'#1a5c3a',main:'#f0f9f4'},{id:'dark',name:'Oscuro',sb:'#0f0f23',main:'#111120'}];
+  const themeCards=themes.map(t=>`<div class="theme-card ${curTheme===t.id?'active':''}" onclick="applyTheme('${t.id}');renderConfig()"><div class="theme-preview"><div class="tp-sb" style="background:${t.sb}"></div><div class="tp-main" style="background:${t.main};border:1px solid #e0e6ef"></div></div><div class="theme-name">${t.name}</div></div>`).join('');
   document.getElementById('main-body').innerHTML=`
     <div class="settings-card">
       <h4>Tarifas por previsión — ${yr}</h4>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Estos valores se cargan automáticamente al registrar una sesión según el año en curso. Puedes editarlos en cualquier momento o ingresar un monto distinto en cada sesión.</p>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Se cargan automáticamente al registrar una sesión. Puedes modificar el monto en cada sesión si es necesario.</p>
       ${tarifaRows}
     </div>
     <div class="settings-card">
       <h4>Tema visual</h4>
       <div class="theme-grid">${themeCards}</div>
+    </div>
+    <div class="settings-card">
+      <h4>Respaldo y sesión</h4>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Descarga una copia de todos tus datos en formato JSON. Guárdala en un lugar seguro como respaldo manual.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-success" onclick="downloadBackup()">⬇ Descargar respaldo</button>
+        <button class="btn btn-danger" onclick="doLogout()">Cerrar sesión</button>
+      </div>
     </div>`;
 }
-function saveTarifa(prev,val){
-  const yr=String(CUR_YEAR);
-  if(!tarifas[prev])tarifas[prev]={};
-  tarifas[prev][yr]=parseInt(val)||0;
-  saveTarifasLocal();
+function saveTarifa(prev,val){const yr=String(CUR_YEAR);if(!tarifas[prev])tarifas[prev]={};tarifas[prev][yr]=parseInt(val)||0;saveTarifasLocal();}
+
+async function downloadBackup(){
+  sync('saving','Exportando…');
+  try{
+    const{data:pats}=await sb.from('pacientes').select('*').order('nombre');
+    const{data:sess}=await sb.from('sesiones').select('*').order('created_at');
+    const backup={fecha:new Date().toISOString(),pacientes:pats,sesiones:sess};
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`consulta_respaldo_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();URL.revokeObjectURL(url);
+    sync('ok');
+  }catch(e){sync('error');}
 }
 
-// ── PATIENT ──────────────────────────────────────────
+// ── PATIENT ───────────────────────────────────────────
 function renderPatient(id){
   const p=pts[id];if(!p)return;
   document.getElementById('view-title').textContent=p.nombre;
-  document.getElementById('header-actions').innerHTML=`<button class="btn btn-primary btn-sm" onclick="showAddSes('${esc(id)}')">+ Sesión</button><button class="btn btn-danger btn-sm" style="margin-left:6px" onclick="delPatient('${esc(id)}')">Eliminar</button>`;
+  const altaBtn=p.alta
+    ?`<button class="btn btn-success btn-sm" onclick="toggleAlta('${esc(id)}',false)">↩ Reactivar</button>`
+    :`<button class="btn btn-warning btn-sm" onclick="toggleAlta('${esc(id)}',true)">✓ Dar de alta</button>`;
+  document.getElementById('header-actions').innerHTML=`
+    <button class="btn btn-primary btn-sm" onclick="showAddSes('${esc(id)}')">+ Sesión</button>
+    ${altaBtn}
+    <button class="btn btn-danger btn-sm" onclick="delPatient('${esc(id)}')">Eliminar</button>`;
+
   const total=p.ses.reduce((a,s)=>a+s.monto,0);
-  const cob=p.ses.filter(s=>s.estado==='Cobrado'||s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+  const cob=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+  const pag=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+
   const rows=p.ses.map((s,i)=>`<tr><td style="color:var(--text3)">${i+1}</td><td style="font-family:var(--mono);font-size:12px">${s.fecha}</td><td style="color:var(--text3)">${s.mes||'—'}</td><td><span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${s.prevision||'—'}</span></td><td style="font-family:var(--mono)">$${fmt(s.monto)}</td><td>${badge(s.estado)}</td><td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3)">${s.observaciones||'—'}</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditSes('${esc(id)}','${esc(s.id)}')">Editar</button><button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="delSes('${esc(id)}','${esc(s.id)}')">×</button></td></tr>`).join('');
-  const mT={};p.ses.forEach(s=>{mT[s.mes]=(mT[s.mes]||0)+s.monto;});
-  const mSum=Object.entries(mT).map(([m,v])=>`<div class="mrow"><span style="color:var(--text3)">${m[0].toUpperCase()+m.slice(1)}</span><span style="font-family:var(--mono)">$${fmt(v)}</span></div>`).join('');
+
+  // Por mes ordenado con año
+  const mT={};
+  p.ses.forEach(s=>{
+    const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
+    const mesIdx=MESES.indexOf(s.mes);if(mesIdx<0)return;
+    const key=`${yr}-${String(mesIdx+1).padStart(2,'0')}`;
+    if(!mT[key])mT[key]={label:s.mes[0].toUpperCase()+s.mes.slice(1)+' '+yr,total:0};
+    mT[key].total+=s.monto;
+  });
+  const mSum=Object.keys(mT).sort().map(k=>`<div class="mrow"><span style="color:var(--text3)">${mT[k].label}</span><span style="font-family:var(--mono)">$${fmt(mT[k].total)}</span></div>`).join('');
+
+  const altaNote=p.alta?`<div style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--orange);margin-bottom:16px">✓ Paciente dado de alta — sus datos se incluyen en todos los cálculos</div>`:'';
+
   document.getElementById('main-body').innerHTML=`
+    ${altaNote}
     <div class="metric-grid" style="margin-bottom:18px">
       <div class="metric navy"><div class="m-label">Total</div><div class="m-value">$${fmt(total)}</div></div>
-      <div class="metric"><div class="m-label">Cobrado/Pagado</div><div class="m-value" style="color:var(--green)">$${fmt(cob)}</div></div>
+      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cob)}</div></div>
+      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pag)}</div></div>
       <div class="metric"><div class="m-label">Sesiones</div><div class="m-value">${p.ses.length}</div></div>
-      <div class="metric"><div class="m-label">Previsión</div><div class="m-value" style="font-size:15px">${p.prevision||'—'}</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 170px;gap:16px;align-items:start" class="pdg">
       <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr><th>#</th><th>Fecha</th><th>Mes</th><th>Previsión</th><th>Monto</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
@@ -468,7 +577,17 @@ function renderPatient(id){
     </div>`;
 }
 
-// ── MODALS ───────────────────────────────────────────
+async function toggleAlta(id,alta){
+  const p=pts[id];
+  const msg=alta?`¿Dar de alta a ${p?.nombre}?\nDesaparecerá de la lista pero sus datos se conservarán.`:`¿Reactivar a ${p?.nombre}?`;
+  if(!confirm(msg))return;
+  sync('saving');
+  const{error}=await sb.from('pacientes').update({alta}).eq('id',id);
+  if(error){sync('error');return;}
+  pts[id].alta=alta;sync('ok');renderNav();renderPatient(id);
+}
+
+// ── MODALS ────────────────────────────────────────────
 function showAddPatient(){
   document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>Nuevo paciente</h3><div class="fg"><label class="fl">Nombre completo</label><input class="fi2" id="np-n" type="text" placeholder="Ej: María García" autofocus></div><div class="fg"><label class="fl">Previsión</label><select class="fs" id="np-p">${PREV_LIST.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Crear paciente</button></div></div></div>`;
 }
@@ -478,9 +597,9 @@ async function addPatient(){
   if(!nombre){alert('Ingresa el nombre');return;}
   if(Object.values(pts).find(p=>p.nombre===nombre)){alert('Ya existe este paciente');return;}
   sync('saving');
-  const{data,error}=await sb.from('pacientes').insert({nombre,prevision}).select().single();
+  const{data,error}=await sb.from('pacientes').insert({nombre,prevision,alta:false}).select().single();
   if(error){sync('error');alert('Error al guardar');return;}
-  pts[data.id]={id:data.id,nombre,prevision,ses:[]};
+  pts[data.id]={id:data.id,nombre,prevision,alta:false,ses:[]};
   sync('ok');closeModal();renderNav();showPatient(data.id);
 }
 
@@ -492,8 +611,7 @@ function sesForm(id,ses=null){
   const dMes=ses?.mes||MESES[today.getMonth()];
   const dPrev=ses?.prevision||p?.ses[p.ses.length-1]?.prevision||p?.prevision||'Fonasa';
   const dMonto=ses?.monto??getTarifa(dPrev);
-  const dEst=ses?.estado||'';
-  const dObs=ses?.observaciones||'';
+  const dEst=ses?.estado||'';const dObs=ses?.observaciones||'';
   const action=ses?`saveSesEdit('${esc(id)}','${esc(ses.id)}')`:`saveSesNew('${esc(id)}')`;
   document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal">
     <h3>${ses?'Editar':'Nueva'} sesión — ${p?.nombre||''}</h3>
@@ -530,23 +648,25 @@ async function saveSesEdit(id,sid){
   sync('ok');closeModal();renderPatient(id);
 }
 async function delSes(id,sid){
-  if(!confirm('¿Eliminar esta sesión?'))return;
-  sync('saving');
+  if(!confirm('¿Eliminar esta sesión?'))return;sync('saving');
   const{error}=await sb.from('sesiones').delete().eq('id',sid);
   if(error){sync('error');return;}
   pts[id].ses=pts[id].ses.filter(s=>s.id!==sid);sync('ok');renderPatient(id);
 }
 async function delPatient(id){
   const p=pts[id];
-  if(!confirm(`¿Eliminar a ${p?.nombre} y todas sus sesiones?\nNo se puede deshacer.`))return;
-  sync('saving');
+  if(!confirm(`¿Eliminar a ${p?.nombre} y todas sus sesiones?\nNo se puede deshacer.`))return;sync('saving');
   const{error}=await sb.from('pacientes').delete().eq('id',id);
   if(error){sync('error');return;}
   delete pts[id];sync('ok');showView('dashboard');
 }
 function closeModal(){document.getElementById('modal-root').innerHTML='';}
 
-loadData();
+// ── NECESARIO: columna 'alta' en Supabase ─────────────
+// Ejecuta esto en el SQL Editor de Supabase si da error:
+// ALTER TABLE pacientes ADD COLUMN IF NOT EXISTS alta boolean DEFAULT false;
+
+checkLogin();
 </script>
 </body>
 </html>
