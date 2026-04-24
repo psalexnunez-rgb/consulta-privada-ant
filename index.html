@@ -502,6 +502,7 @@ function renderConfig(){
       <h4>Respaldo y sesión</h4>
       <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Descarga una copia de todos tus datos como respaldo manual.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPdfDialog()">📄 Exportar PDF</button>
         <button class="btn btn-success" onclick="downloadBackup()">⬇ Descargar respaldo</button>
         <button class="btn btn-danger" onclick="doLogout()">Cerrar sesión</button>
       </div>
@@ -647,6 +648,258 @@ async function delPatient(id){
 function closeModal(){document.getElementById('modal-root').innerHTML='';}
 
 checkSession();
+// ── PDF EXPORT ────────────────────────────────────────
+async function showPdfDialog(){
+  const years=[...new Set(allSessions().map(s=>s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR)))].filter(Boolean).sort();
+  const yearOpts=years.map(y=>`<option value="${y}" ${y===String(CUR_YEAR)?'selected':''}>${y}</option>`).join('');
+  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal">
+    <h3>Exportar a PDF</h3>
+    <div class="fg"><label class="fl">Año a exportar</label><select class="fs" id="pdf-year">${yearOpts}</select></div>
+    <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px 14px;font-size:12px;color:var(--text2);margin-bottom:4px">
+      <b>El PDF incluirá:</b><br>
+      • Portada con resumen del año<br>
+      • Totales por mes y por previsión<br>
+      • Gráfico de ingresos mensuales<br>
+      • Una página por paciente con todas sus sesiones del año
+    </div>
+    <div class="mf">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="generatePdf()">Generar PDF</button>
+    </div>
+  </div></div>`;
+}
+
+async function generatePdf(){
+  const year=document.getElementById('pdf-year')?.value||String(CUR_YEAR);
+  closeModal();
+  sync('saving','Generando PDF…');
+
+  const all=allSessions();
+  const yearSessions=all.filter(s=>s.fecha&&s.fecha.split('/')[2]===year);
+
+  // Pacientes con sesiones en el año (incluye dados de alta)
+  const patientsWithSessions=Object.values(pts)
+    .filter(p=>p.ses.some(s=>s.fecha&&s.fecha.split('/')[2]===year))
+    .sort((a,b)=>a.nombre.localeCompare(b.nombre));
+
+  // Totales generales
+  const total=yearSessions.reduce((a,s)=>a+s.monto,0);
+  const cobrado=yearSessions.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+  const pagado=yearSessions.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+  const pendiente=yearSessions.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
+  const sinGestionar=total-cobrado-pagado-pendiente;
+
+  // Por mes
+  const monMap={};
+  yearSessions.forEach(s=>{
+    const mesIdx=MESES.indexOf(s.mes);if(mesIdx<0)return;
+    const key=String(mesIdx+1).padStart(2,'0');
+    if(!monMap[key])monMap[key]={mes:s.mes,total:0,cob:0,pag:0,pen:0,n:0};
+    monMap[key].total+=s.monto;monMap[key].n++;
+    if(s.estado==='Cobrado')monMap[key].cob+=s.monto;
+    else if(s.estado==='Pagado')monMap[key].pag+=s.monto;
+    else if(s.estado==='Pendiente')monMap[key].pen+=s.monto;
+  });
+  const sortedMon=Object.keys(monMap).sort().map(k=>({...monMap[k],key:k}));
+
+  // Por previsión
+  const prevMap={};
+  yearSessions.forEach(s=>{prevMap[s.prevision]=(prevMap[s.prevision]||{total:0,n:0});prevMap[s.prevision].total+=s.monto;prevMap[s.prevision].n++;});
+
+  // Gráfico SVG
+  const maxV=Math.max(...sortedMon.map(m=>m.total),1);
+  const barW=sortedMon.length>0?Math.floor(460/sortedMon.length)-4:40;
+  const bars=sortedMon.map((m,i)=>{
+    const h=Math.max(Math.round((m.total/maxV)*80),2);
+    const x=i*(barW+4)+10;
+    const label=m.mes.slice(0,3);
+    return`<rect x="${x}" y="${90-h}" width="${barW}" height="${h}" fill="#1b3f6e" rx="2"/>
+<text x="${x+barW/2}" y="105" text-anchor="middle" font-size="8" fill="#666">${label}</text>
+<text x="${x+barW/2}" y="${85-h}" text-anchor="middle" font-size="7" fill="#1b3f6e">$${Math.round(m.total/1000)}k</text>`;
+  }).join('');
+  const chartSvg=`<svg width="480" height="115" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+
+  // Tabla meses
+  const mesRows=sortedMon.map(m=>`
+    <tr>
+      <td>${m.mes[0].toUpperCase()+m.mes.slice(1)}</td>
+      <td style="text-align:center">${m.n}</td>
+      <td style="text-align:right">$${fmt(m.total)}</td>
+      <td style="text-align:right;color:#1a7a5a">$${fmt(m.cob)}</td>
+      <td style="text-align:right;color:#1a5fa8">$${fmt(m.pag)}</td>
+      <td style="text-align:right;color:#b83232">$${fmt(m.pen)}</td>
+    </tr>`).join('');
+
+  // Tabla previsiones
+  const prevRows=Object.entries(prevMap).sort((a,b)=>b[1].total-a[1].total).map(([p,v])=>`
+    <tr><td>${p}</td><td style="text-align:center">${v.n}</td><td style="text-align:right">$${fmt(v.total)}</td></tr>`).join('');
+
+  // Páginas de pacientes
+  const patientPages=patientsWithSessions.map(p=>{
+    const pSes=p.ses.filter(s=>s.fecha&&s.fecha.split('/')[2]===year);
+    const pTotal=pSes.reduce((a,s)=>a+s.monto,0);
+    const pCob=pSes.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
+    const pPag=pSes.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
+    const pPen=pSes.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
+    const sesRows=pSes.map((s,i)=>`
+      <tr style="background:${i%2===0?'#fff':'#f7f9fc'}">
+        <td style="text-align:center">${i+1}</td>
+        <td>${s.fecha}</td>
+        <td>${s.mes?s.mes[0].toUpperCase()+s.mes.slice(1):'—'}</td>
+        <td>${s.prevision||'—'}</td>
+        <td style="text-align:right">$${fmt(s.monto)}</td>
+        <td style="text-align:center">${s.estado||'Sin estado'}</td>
+        <td style="color:#666;font-size:11px">${s.observaciones||'—'}</td>
+      </tr>`).join('');
+    const altaTag=p.alta?'<span style="background:#fff3e0;color:#b86000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px">Alta</span>':'';
+    return`
+      <div style="page-break-before:always;padding:32px 40px;font-family:Arial,sans-serif">
+        <div style="border-bottom:2px solid #1b3f6e;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end">
+          <div>
+            <div style="font-size:10px;color:#8c96b0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Paciente</div>
+            <div style="font-size:20px;font-weight:700;color:#1a2035">${p.nombre}${altaTag}</div>
+            <div style="font-size:12px;color:#4a5578;margin-top:4px">Previsión: ${p.prevision||'—'} &nbsp;·&nbsp; Año ${year}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:700;color:#1b3f6e">$${fmt(pTotal)}</div>
+            <div style="font-size:11px;color:#8c96b0">${pSes.length} sesiones</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+          <div style="background:#f5f7fa;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:#8c96b0;text-transform:uppercase;margin-bottom:4px">Total</div>
+            <div style="font-size:16px;font-weight:700;color:#1a2035">$${fmt(pTotal)}</div>
+          </div>
+          <div style="background:#e6f5ef;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:#1a7a5a;text-transform:uppercase;margin-bottom:4px">Cobrado</div>
+            <div style="font-size:16px;font-weight:700;color:#1a7a5a">$${fmt(pCob)}</div>
+          </div>
+          <div style="background:#e8f0fb;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:#1a5fa8;text-transform:uppercase;margin-bottom:4px">Pagado</div>
+            <div style="font-size:16px;font-weight:700;color:#1a5fa8">$${fmt(pPag)}</div>
+          </div>
+          <div style="background:#fdeaea;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:#b83232;text-transform:uppercase;margin-bottom:4px">Pendiente</div>
+            <div style="font-size:16px;font-weight:700;color:#b83232">$${fmt(pPen)}</div>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:#1b3f6e;color:#fff">
+              <th style="padding:8px;text-align:center;width:30px">#</th>
+              <th style="padding:8px;text-align:left">Fecha</th>
+              <th style="padding:8px;text-align:left">Mes</th>
+              <th style="padding:8px;text-align:left">Previsión</th>
+              <th style="padding:8px;text-align:right">Monto</th>
+              <th style="padding:8px;text-align:center">Estado</th>
+              <th style="padding:8px;text-align:left">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>${sesRows}</tbody>
+          <tfoot>
+            <tr style="background:#f0f3f8;font-weight:700;border-top:2px solid #1b3f6e">
+              <td colspan="4" style="padding:8px">Total ${year}</td>
+              <td style="padding:8px;text-align:right">$${fmt(pTotal)}</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Consulta Privada — Resumen ${year}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;color:#1a2035;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:0;size:A4}
+  @media print{body{margin:0}}
+  table{border-collapse:collapse;width:100%}
+  th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}
+  thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
+  tbody tr:hover{background:#eaf0f9}
+</style>
+</head><body>
+
+<!-- PORTADA / RESUMEN -->
+<div style="padding:40px;min-height:297mm;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid #1b3f6e">
+    <div style="width:52px;height:52px;background:#1b3f6e;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;font-family:serif;font-weight:700">ψ</div>
+    <div>
+      <div style="font-size:24px;font-weight:700;color:#1b3f6e">Consulta Privada — ${year}</div>
+      <div style="font-size:13px;color:#8c96b0;margin-top:2px">Generado el ${new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+    <div style="background:#1b3f6e;border-radius:10px;padding:16px;color:#fff">
+      <div style="font-size:10px;opacity:.6;text-transform:uppercase;margin-bottom:6px">Total facturado</div>
+      <div style="font-size:22px;font-weight:700">$${fmt(total)}</div>
+      <div style="font-size:11px;opacity:.5;margin-top:4px">${yearSessions.length} sesiones · ${patientsWithSessions.length} pacientes</div>
+    </div>
+    <div style="background:#e6f5ef;border-radius:10px;padding:16px">
+      <div style="font-size:10px;color:#1a7a5a;text-transform:uppercase;margin-bottom:6px">Cobrado</div>
+      <div style="font-size:22px;font-weight:700;color:#1a7a5a">$${fmt(cobrado)}</div>
+    </div>
+    <div style="background:#e8f0fb;border-radius:10px;padding:16px">
+      <div style="font-size:10px;color:#1a5fa8;text-transform:uppercase;margin-bottom:6px">Pagado</div>
+      <div style="font-size:22px;font-weight:700;color:#1a5fa8">$${fmt(pagado)}</div>
+    </div>
+    <div style="background:#fdeaea;border-radius:10px;padding:16px">
+      <div style="font-size:10px;color:#b83232;text-transform:uppercase;margin-bottom:6px">Pendiente</div>
+      <div style="font-size:22px;font-weight:700;color:#b83232">$${fmt(pendiente)}</div>
+    </div>
+  </div>
+
+  <!-- GRÁFICO -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:11px;font-weight:600;color:#8c96b0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Ingresos por mes</div>
+    ${chartSvg}
+  </div>
+
+  <!-- TABLA MESES -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:11px;font-weight:600;color:#8c96b0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Detalle por mes</div>
+    <table>
+      <thead><tr><th>Mes</th><th style="text-align:center">Ses.</th><th style="text-align:right">Total</th><th style="text-align:right">Cobrado</th><th style="text-align:right">Pagado</th><th style="text-align:right">Pendiente</th></tr></thead>
+      <tbody>${mesRows}</tbody>
+      <tfoot><tr style="background:#f0f3f8;font-weight:700;border-top:2px solid #1b3f6e">
+        <td>Total ${year}</td><td style="text-align:center">${yearSessions.length}</td>
+        <td style="text-align:right">$${fmt(total)}</td>
+        <td style="text-align:right;color:#1a7a5a">$${fmt(cobrado)}</td>
+        <td style="text-align:right;color:#1a5fa8">$${fmt(pagado)}</td>
+        <td style="text-align:right;color:#b83232">$${fmt(pendiente)}</td>
+      </tr></tfoot>
+    </table>
+  </div>
+
+  <!-- TABLA PREVISIONES -->
+  <div>
+    <div style="font-size:11px;font-weight:600;color:#8c96b0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Por previsión</div>
+    <table>
+      <thead><tr><th>Previsión</th><th style="text-align:center">Sesiones</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${prevRows}</tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PÁGINAS DE PACIENTES -->
+${patientPages}
+
+</body></html>`;
+
+  // Abrir en nueva ventana e imprimir
+  const win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload=()=>{
+    setTimeout(()=>{win.print();},500);
+  };
+  sync('ok');
+}
+
 </script>
 </body>
 </html>
