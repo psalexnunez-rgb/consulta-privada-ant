@@ -492,12 +492,18 @@ function renderDashboard(){
   const pRows=Object.entries(pt).sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<tr><td>${p}</td><td style="color:var(--text3)">${all.filter(s=>s.prevision===p).length} ses.</td><td style="text-align:right;font-weight:600;font-family:var(--mono)">$${fmt(v)}</td></tr>`).join('');
   const nActivos=Object.values(pts).filter(p=>!p.alta).length;
   const nAlta=Object.values(pts).filter(p=>p.alta).length;
+  const IMPUESTO_D=0.1525;
+  const nMesesD=new Set(all.map(s=>s.fecha?s.fecha.split('/')[2]+'-'+s.mes:'')).size;
+  const impuestoD=Math.round(total*IMPUESTO_D);
+  const costoD=costoConsulta*nMesesD;
+  const liquido=total-impuestoD-costoD;
   document.getElementById('main-body').innerHTML=`
     <div class="metric-grid">
       <div class="metric navy" style="padding:18px 20px"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} ses. · ${nActivos} activos${nAlta?` · ${nAlta} alta`:''}</div></div>
       <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cobrado)}</div><div class="m-sub">${all.filter(s=>s.estado==='Cobrado').length} sesiones</div></div>
       <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pagado)}</div><div class="m-sub">${all.filter(s=>s.estado==='Pagado').length} sesiones</div></div>
       <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(pendiente)}</div><div class="m-sub">${all.filter(s=>s.estado==='Pendiente').length} sesiones</div></div>
+      <div class="metric" style="border-left:3px solid var(--sb)"><div class="m-label">Líquido a percibir</div><div class="m-value" style="color:var(--sb)">$${fmt(liquido)}</div><div class="m-sub">-imp. -consulta</div></div>
     </div>
     <div style="margin-bottom:24px"><div class="stitle">Ingresos por mes</div><div class="chart">${bars||'<span style="color:var(--text3);font-size:12px">Sin datos aún</span>'}</div></div>
     <div class="stitle">Por previsión</div>
