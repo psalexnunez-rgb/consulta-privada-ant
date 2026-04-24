@@ -544,7 +544,7 @@ function renderResumen(){
   const pen=all.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
   const nMeses=Object.keys(monMap).length;
   const totalImp=Math.round(total*IMPUESTO);
-  const totalCosto=costoConsulta*12;
+  const totalCosto=costoConsulta*nMeses;
   const totalLiquido=total-totalImp-totalCosto;
   const pRows=Object.values(pts).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>{
     const t=p.ses.reduce((a,s)=>a+s.monto,0);
