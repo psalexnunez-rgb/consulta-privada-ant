@@ -38,18 +38,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .app{display:flex;height:100vh;height:100dvh}
 
 /* LOGIN */
-.login-screen{position:fixed;inset:0;background:var(--sb);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:0}
-.login-box{background:var(--surface);border-radius:16px;padding:36px 32px;width:100%;max-width:340px;box-shadow:var(--sh-md);text-align:center}
-.login-psi{font-size:48px;font-family:serif;color:var(--sb);margin-bottom:8px;font-weight:700}
-.login-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
-.login-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
-.login-input{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:var(--font);font-size:15px;outline:none;text-align:center;letter-spacing:2px;transition:border-color .2s;margin-bottom:12px}
-.login-input:focus{border-color:var(--sb);box-shadow:0 0 0 3px var(--sb-pale)}
-.login-btn{width:100%;padding:11px;background:var(--sb);border:none;border-radius:var(--r-sm);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
-.login-btn:hover{background:var(--sb-hover)}
-.login-error{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
-.login-remember{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);justify-content:center;margin-bottom:16px;cursor:pointer}
-.login-remember input{cursor:pointer}
+.login-screen{position:fixed;inset:0;background:var(--sb);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-box{background:#fff;border-radius:16px;padding:36px 32px;width:100%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
+.login-psi{font-size:52px;font-family:serif;color:var(--sb);margin-bottom:6px;font-weight:700;line-height:1}
+.login-title{font-size:18px;font-weight:600;color:#1a2035;margin-bottom:4px}
+.login-sub{font-size:13px;color:#8c96b0;margin-bottom:24px}
+.login-label{display:block;font-size:12px;color:#4a5578;font-weight:500;margin-bottom:5px;text-align:left}
+.login-input{width:100%;padding:11px 14px;background:#f5f7fa;border:1px solid #c8d4e8;border-radius:8px;color:#1a2035;font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px}
+.login-input:focus{border-color:#1b3f6e;box-shadow:0 0 0 3px #eaf0f9}
+.login-btn{width:100%;padding:12px;background:#1b3f6e;border:none;border-radius:8px;color:#fff;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:4px}
+.login-btn:hover{background:#15325a}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-error{font-size:12px;color:#b83232;margin-top:10px;min-height:18px;background:#fdeaea;border-radius:6px;padding:6px 10px;display:none}
+.login-error.show{display:block}
+.login-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 
 /* SIDEBAR */
 .sidebar{width:var(--sw);min-width:var(--sw);background:var(--sb);display:flex;flex-direction:column;overflow:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1),background .25s;z-index:50}
@@ -138,7 +140,6 @@ tbody tr:hover{background:var(--sb-pale)}
 .bbar:hover{background:var(--sb)}
 .blbl{font-size:10px;color:var(--text3);white-space:nowrap}
 .bval{font-size:9px;color:var(--text3);white-space:nowrap}
-
 .stitle{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
 
 /* MODAL */
@@ -168,7 +169,7 @@ tbody tr:hover{background:var(--sb-pale)}
 /* SETTINGS */
 .settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:20px;transition:background .25s,border-color .25s}
 .settings-card h4{font-size:13px;font-weight:600;margin-bottom:16px;color:var(--text)}
-.tarifa-row{display:grid;grid-template-columns:1fr 80px 120px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.tarifa-row{display:grid;grid-template-columns:1fr 80px 130px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
 .tarifa-row:last-child{border-bottom:none}
 .tarifa-name{font-size:13px;color:var(--text2);font-weight:500}
 .tarifa-year{font-size:11px;color:var(--text3);text-align:center}
@@ -199,8 +200,9 @@ tbody tr:hover{background:var(--sb-pale)}
   .metric-grid{grid-template-columns:1fr 1fr;gap:10px}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr!important}
-  .tarifa-row{grid-template-columns:1fr 100px}
+  .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
+  .h-actions .btn-danger{display:none}
 }
 @media(max-width:400px){.m-value{font-size:17px}}
 </style>
@@ -212,10 +214,12 @@ tbody tr:hover{background:var(--sb-pale)}
   <div class="login-box">
     <div class="login-psi">ψ</div>
     <div class="login-title">Consulta Privada</div>
-    <div class="login-sub">Ingresa tu contraseña para continuar</div>
-    <input class="login-input" type="password" id="login-pw" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    <label class="login-remember"><input type="checkbox" id="login-remember" checked> Recordar en este dispositivo</label>
-    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-sub">Ingresa tus credenciales para continuar</div>
+    <label class="login-label">Correo electrónico</label>
+    <input class="login-input" type="email" id="login-email" placeholder="tu@email.com" autocomplete="email">
+    <label class="login-label">Contraseña</label>
+    <input class="login-input" type="password" id="login-pw" placeholder="••••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Ingresar</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -239,7 +243,7 @@ tbody tr:hover{background:var(--sb-pale)}
     </div>
     <div class="sb-section" style="padding-bottom:0"><div class="sb-label">Pacientes</div></div>
     <div class="search-wrap"><input type="search" class="search-input" id="search-input" placeholder="Buscar paciente..." oninput="renderNav()" autocomplete="off"></div>
-    <button class="filter-toggle" id="filter-toggle" onclick="toggleAltaFilter()">👁 Mostrar pacientes dados de alta</button>
+    <button class="filter-toggle" id="filter-toggle" onclick="toggleAltaFilter()">👁 Mostrar dados de alta</button>
     <div class="pat-scroll" id="patient-nav"><div class="loading"><div class="spinner"></div></div></div>
     <div class="sb-footer"><button class="add-btn" onclick="showAddPatient()">+ Nuevo paciente</button></div>
   </div>
@@ -251,7 +255,7 @@ tbody tr:hover{background:var(--sb-pale)}
       <div class="h-actions" id="header-actions"></div>
     </div>
     <div class="main-body" id="main-body">
-      <div class="loading"><div class="spinner"></div><span>Conectando con la base de datos…</span></div>
+      <div class="loading"><div class="spinner"></div><span>Conectando…</span></div>
     </div>
   </div>
 </div>
@@ -261,10 +265,8 @@ tbody tr:hover{background:var(--sb-pale)}
 <script>
 const SB_URL='https://ybztenzmpwufcvzvmwao.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlienRlbnptcHd1ZmN2enZtd2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzM0NzYsImV4cCI6MjA5MjUwOTQ3Nn0.bHC65JMkp6LSd9qWEVgZyhwtLlnOYzVjuEHV46LfVag';
-const sb=supabase.createClient(SB_URL,SB_KEY);
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
 
-const PWD_HASH='8e4b3f2a1c9d6e5b7f0a2c4e8d1b3f5a9c2e4b6d8f0a1c3e5b7d9f2a4c6e8b0';
-const PWD='Amandita202@';
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const PREV_LIST=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuerdo'];
 const ESTADOS=['','Cobrado','Pagado','Pendiente'];
@@ -276,25 +278,33 @@ let tarifas=JSON.parse(JSON.stringify(DEFAULT_TARIFAS));
 let curTheme='blue';
 
 // ── LOGIN ─────────────────────────────────────────────
-function checkLogin(){
-  if(localStorage.getItem('cp_auth')==='1'){showApp();return;}
-  document.getElementById('login-screen').style.display='flex';
+async function checkSession(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){showApp();}
+  else{document.getElementById('login-screen').style.display='flex';}
 }
-function doLogin(){
-  const val=document.getElementById('login-pw').value;
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const btn=document.getElementById('login-btn');
   const err=document.getElementById('login-error');
-  if(val===PWD){
-    if(document.getElementById('login-remember').checked){
-      localStorage.setItem('cp_auth','1');
-    }
-    showApp();
-  } else {
-    err.textContent='Contraseña incorrecta';
-    document.getElementById('login-pw').value='';
-    document.getElementById('login-pw').focus();
-    setTimeout(()=>err.textContent='',3000);
-  }
+  if(!email||!pw){showErr('Ingresa tu correo y contraseña');return;}
+  btn.disabled=true;
+  btn.innerHTML='<span class="login-spinner"></span>Ingresando…';
+  err.classList.remove('show');
+  const{error}=await sb.auth.signInWithPassword({email,password:pw});
+  if(error){
+    showErr('Correo o contraseña incorrectos');
+    btn.disabled=false;btn.innerHTML='Ingresar';
+  } else {showApp();}
 }
+
+function showErr(msg){
+  const el=document.getElementById('login-error');
+  el.textContent=msg;el.classList.add('show');
+}
+
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main-app').style.display='flex';
@@ -302,8 +312,9 @@ function showApp(){
   document.getElementById('year-label').textContent=CUR_YEAR;
   loadData();
 }
-function doLogout(){
-  localStorage.removeItem('cp_auth');
+
+async function doLogout(){
+  await sb.auth.signOut();
   location.reload();
 }
 
@@ -330,16 +341,13 @@ function toggleSb(){sbOpen=!sbOpen;document.getElementById('sidebar').classList.
 function closeSb(){sbOpen=false;document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('visible');}
 function fmt(n){return Math.round(n).toLocaleString('es-CL');}
 function esc(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
-
 function badge(estado){
   if(!estado)return'<span class="badge b-empty">Sin estado</span>';
   const m={Cobrado:'b-cobrado',Pagado:'b-pagado',Pendiente:'b-pendiente'};
   return`<span class="badge ${m[estado]||'b-empty'}">${estado}</span>`;
 }
 function allSessions(){
-  let a=[];
-  Object.values(pts).forEach(p=>p.ses.forEach(s=>a.push({...s,paciente:p.nombre})));
-  return a;
+  let a=[];Object.values(pts).forEach(p=>p.ses.forEach(s=>a.push({...s,paciente:p.nombre})));return a;
 }
 
 // ── LOAD DATA ─────────────────────────────────────────
@@ -363,8 +371,7 @@ async function loadData(){
 // ── NAV ───────────────────────────────────────────────
 function toggleAltaFilter(){
   showAlta=!showAlta;
-  const btn=document.getElementById('filter-toggle');
-  btn.textContent=showAlta?'👁 Ocultar dados de alta':'👁 Mostrar dados de alta';
+  document.getElementById('filter-toggle').textContent=showAlta?'👁 Ocultar dados de alta':'👁 Mostrar dados de alta';
   renderNav();
 }
 function renderNav(){
@@ -395,18 +402,16 @@ function showPatient(id){
 function renderDashboard(){
   document.getElementById('view-title').textContent='Dashboard';
   document.getElementById('header-actions').innerHTML='';
-  const all=allSessions(); // todos incluyendo dados de alta
+  const all=allSessions();
   const total=all.reduce((a,s)=>a+s.monto,0);
   const cobrado=all.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
   const pagado=all.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
   const pendiente=all.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
-
-  // Agrupar por año+mes cronológicamente
   const monMap={};
   all.forEach(s=>{
     const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
     const key=`${yr}-${String(MESES.indexOf(s.mes)+1).padStart(2,'0')}`;
-    monMap[key]=(monMap[key]||0)+s.monto;
+    if(MESES.indexOf(s.mes)>=0)monMap[key]=(monMap[key]||0)+s.monto;
   });
   const sortedKeys=Object.keys(monMap).sort();
   const maxV=Math.max(...Object.values(monMap),1);
@@ -416,13 +421,10 @@ function renderDashboard(){
     const h=Math.max(Math.round((monMap[k]/maxV)*88),3);
     return`<div class="bc2"><div class="bval">$${fmt(monMap[k])}</div><div class="bbar" style="height:${h}px"></div><div class="blbl">${label}</div></div>`;
   }).join('');
-
   const pt={};all.forEach(s=>{pt[s.prevision]=(pt[s.prevision]||0)+s.monto;});
   const pRows=Object.entries(pt).sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<tr><td>${p}</td><td style="color:var(--text3)">${all.filter(s=>s.prevision===p).length} ses.</td><td style="text-align:right;font-weight:600;font-family:var(--mono)">$${fmt(v)}</td></tr>`).join('');
-
   const nActivos=Object.values(pts).filter(p=>!p.alta).length;
   const nAlta=Object.values(pts).filter(p=>p.alta).length;
-
   document.getElementById('main-body').innerHTML=`
     <div class="metric-grid">
       <div class="metric navy"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} ses. · ${nActivos} activos${nAlta?` · ${nAlta} alta`:''}</div></div>
@@ -440,17 +442,13 @@ function renderResumen(){
   document.getElementById('view-title').textContent='Resumen general';
   document.getElementById('header-actions').innerHTML='';
   const all=allSessions();
-
-  // Meses ordenados con año
   const monMap={};
   all.forEach(s=>{
     const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
-    const mesIdx=MESES.indexOf(s.mes);
-    if(mesIdx<0)return;
+    const mesIdx=MESES.indexOf(s.mes);if(mesIdx<0)return;
     const key=`${yr}-${String(mesIdx+1).padStart(2,'0')}`;
     if(!monMap[key])monMap[key]={yr,mes:s.mes,ses:[],total:0,cob:0,pag:0,pen:0};
-    monMap[key].ses.push(s);
-    monMap[key].total+=s.monto;
+    monMap[key].ses.push(s);monMap[key].total+=s.monto;
     if(s.estado==='Cobrado')monMap[key].cob+=s.monto;
     else if(s.estado==='Pagado')monMap[key].pag+=s.monto;
     else if(s.estado==='Pendiente')monMap[key].pen+=s.monto;
@@ -460,12 +458,10 @@ function renderResumen(){
     const label=d.mes[0].toUpperCase()+d.mes.slice(1)+' '+d.yr;
     return`<tr><td style="font-weight:500">${label}</td><td style="color:var(--text3)">${d.ses.length}</td><td style="font-family:var(--mono)">$${fmt(d.total)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(d.cob)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(d.pag)}</td><td style="color:var(--red);font-family:var(--mono)">$${fmt(d.pen)}</td></tr>`;
   }).join('');
-
   const total=all.reduce((a,s)=>a+s.monto,0);
   const cob=all.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
   const pag=all.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
   const pen=all.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0);
-
   const pRows=Object.values(pts).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(p=>{
     const t=p.ses.reduce((a,s)=>a+s.monto,0);
     const c=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
@@ -473,7 +469,6 @@ function renderResumen(){
     const altaBadge=p.alta?'<span class="badge b-alta" style="margin-left:6px">Alta</span>':'';
     return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(pg)}</td></tr>`;
   }).join('');
-
   document.getElementById('main-body').innerHTML=`
     <div class="tabs"><button class="tab active" onclick="switchTab(this,'tm')">Por mes</button><button class="tab" onclick="switchTab(this,'tp')">Por paciente</button></div>
     <div id="tm"><div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th><th style="color:var(--red)">Pendiente</th></tr></thead>
@@ -489,17 +484,14 @@ function renderConfig(){
   const yr=String(CUR_YEAR);
   const tarifaRows=PREV_LIST.map(p=>{
     const val=tarifas[p]?.[yr]||'';
-    return`<div class="tarifa-row">
-      <div class="tarifa-name">${p}</div>
-      <div class="tarifa-year">${yr}</div>
-      <input class="fi2" style="text-align:right;font-family:var(--mono)" type="number" value="${val}" placeholder="Monto" oninput="saveTarifa('${p}',this.value)">
-    </div>`;}).join('');
+    return`<div class="tarifa-row"><div class="tarifa-name">${p}</div><div class="tarifa-year">${yr}</div><input class="fi2" style="text-align:right;font-family:var(--mono)" type="number" value="${val}" placeholder="Monto" oninput="saveTarifa('${p}',this.value)"></div>`;
+  }).join('');
   const themes=[{id:'blue',name:'Azul marino',sb:'#1b3f6e',main:'#f5f7fa'},{id:'green',name:'Verde salud',sb:'#1a5c3a',main:'#f0f9f4'},{id:'dark',name:'Oscuro',sb:'#0f0f23',main:'#111120'}];
   const themeCards=themes.map(t=>`<div class="theme-card ${curTheme===t.id?'active':''}" onclick="applyTheme('${t.id}');renderConfig()"><div class="theme-preview"><div class="tp-sb" style="background:${t.sb}"></div><div class="tp-main" style="background:${t.main};border:1px solid #e0e6ef"></div></div><div class="theme-name">${t.name}</div></div>`).join('');
   document.getElementById('main-body').innerHTML=`
     <div class="settings-card">
       <h4>Tarifas por previsión — ${yr}</h4>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Se cargan automáticamente al registrar una sesión. Puedes modificar el monto en cada sesión si es necesario.</p>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Se cargan automáticamente al registrar una sesión según el año en curso.</p>
       ${tarifaRows}
     </div>
     <div class="settings-card">
@@ -508,7 +500,7 @@ function renderConfig(){
     </div>
     <div class="settings-card">
       <h4>Respaldo y sesión</h4>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Descarga una copia de todos tus datos en formato JSON. Guárdala en un lugar seguro como respaldo manual.</p>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Descarga una copia de todos tus datos como respaldo manual.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-success" onclick="downloadBackup()">⬇ Descargar respaldo</button>
         <button class="btn btn-danger" onclick="doLogout()">Cerrar sesión</button>
@@ -522,13 +514,11 @@ async function downloadBackup(){
   try{
     const{data:pats}=await sb.from('pacientes').select('*').order('nombre');
     const{data:sess}=await sb.from('sesiones').select('*').order('created_at');
-    const backup={fecha:new Date().toISOString(),pacientes:pats,sesiones:sess};
-    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const blob=new Blob([JSON.stringify({fecha:new Date().toISOString(),pacientes:pats,sesiones:sess},null,2)],{type:'application/json'});
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=`consulta_respaldo_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();URL.revokeObjectURL(url);
-    sync('ok');
+    const a=document.createElement('a');a.href=url;
+    a.download=`consulta_respaldo_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();URL.revokeObjectURL(url);sync('ok');
   }catch(e){sync('error');}
 }
 
@@ -543,14 +533,10 @@ function renderPatient(id){
     <button class="btn btn-primary btn-sm" onclick="showAddSes('${esc(id)}')">+ Sesión</button>
     ${altaBtn}
     <button class="btn btn-danger btn-sm" onclick="delPatient('${esc(id)}')">Eliminar</button>`;
-
   const total=p.ses.reduce((a,s)=>a+s.monto,0);
   const cob=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
   const pag=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
-
   const rows=p.ses.map((s,i)=>`<tr><td style="color:var(--text3)">${i+1}</td><td style="font-family:var(--mono);font-size:12px">${s.fecha}</td><td style="color:var(--text3)">${s.mes||'—'}</td><td><span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${s.prevision||'—'}</span></td><td style="font-family:var(--mono)">$${fmt(s.monto)}</td><td>${badge(s.estado)}</td><td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3)">${s.observaciones||'—'}</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditSes('${esc(id)}','${esc(s.id)}')">Editar</button><button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="delSes('${esc(id)}','${esc(s.id)}')">×</button></td></tr>`).join('');
-
-  // Por mes ordenado con año
   const mT={};
   p.ses.forEach(s=>{
     const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
@@ -560,9 +546,7 @@ function renderPatient(id){
     mT[key].total+=s.monto;
   });
   const mSum=Object.keys(mT).sort().map(k=>`<div class="mrow"><span style="color:var(--text3)">${mT[k].label}</span><span style="font-family:var(--mono)">$${fmt(mT[k].total)}</span></div>`).join('');
-
   const altaNote=p.alta?`<div style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--orange);margin-bottom:16px">✓ Paciente dado de alta — sus datos se incluyen en todos los cálculos</div>`:'';
-
   document.getElementById('main-body').innerHTML=`
     ${altaNote}
     <div class="metric-grid" style="margin-bottom:18px">
@@ -662,11 +646,7 @@ async function delPatient(id){
 }
 function closeModal(){document.getElementById('modal-root').innerHTML='';}
 
-// ── NECESARIO: columna 'alta' en Supabase ─────────────
-// Ejecuta esto en el SQL Editor de Supabase si da error:
-// ALTER TABLE pacientes ADD COLUMN IF NOT EXISTS alta boolean DEFAULT false;
-
-checkLogin();
+checkSession();
 </script>
 </body>
 </html>
