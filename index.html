@@ -258,6 +258,12 @@ tbody tr:hover{background:var(--sb-pale)}
   .m-value{font-size:16px}
   .m-label{font-size:10px;margin-bottom:4px}
 }
+
+/* iPad portrait — fix navy metric padding */
+@media only screen and (min-width:768px) and (max-width:1024px) and (orientation:portrait){
+  .metric.navy{padding:18px 24px !important}
+  .metric.navy .m-value{font-size:19px}
+}
 </style>
 </head>
 <body>
@@ -901,6 +907,12 @@ async function generatePdf(){
   th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}
   thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
   tbody tr:hover{background:#eaf0f9}
+
+/* iPad portrait — fix navy metric padding */
+@media only screen and (min-width:768px) and (max-width:1024px) and (orientation:portrait){
+  .metric.navy{padding:18px 24px !important}
+  .metric.navy .m-value{font-size:19px}
+}
 </style>
 </head><body>
 
