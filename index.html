@@ -478,10 +478,10 @@ function renderDashboard(){
   const nAlta=Object.values(pts).filter(p=>p.alta).length;
   document.getElementById('main-body').innerHTML=`
     <div class="metric-grid">
-      <div class="metric navy"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} ses. · ${nActivos} activos${nAlta?` · ${nAlta} alta`:''}</div></div>
-      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cobrado)}</div></div>
-      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pagado)}</div></div>
-      <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(pendiente)}</div></div>
+      <div class="metric navy" style="padding:18px 20px"><div class="m-label">Total facturado</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${all.length} ses. · ${nActivos} activos${nAlta?` · ${nAlta} alta`:''}</div></div>
+      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cobrado)}</div><div class="m-sub">${all.filter(s=>s.estado==='Cobrado').length} sesiones</div></div>
+      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pagado)}</div><div class="m-sub">${all.filter(s=>s.estado==='Pagado').length} sesiones</div></div>
+      <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(pendiente)}</div><div class="m-sub">${all.filter(s=>s.estado==='Pendiente').length} sesiones</div></div>
     </div>
     <div style="margin-bottom:24px"><div class="stitle">Ingresos por mes</div><div class="chart">${bars||'<span style="color:var(--text3);font-size:12px">Sin datos aún</span>'}</div></div>
     <div class="stitle">Por previsión</div>
@@ -619,10 +619,10 @@ function renderPatient(id){
   document.getElementById('main-body').innerHTML=`
     ${altaNote}
     <div class="metric-grid" style="margin-bottom:18px">
-      <div class="metric navy"><div class="m-label">Total</div><div class="m-value">$${fmt(total)}</div></div>
-      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cob)}</div></div>
-      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pag)}</div></div>
-      <div class="metric"><div class="m-label">Sesiones</div><div class="m-value">${p.ses.length}</div></div>
+      <div class="metric navy" style="padding:18px 20px"><div class="m-label">Total</div><div class="m-value">$${fmt(total)}</div><div class="m-sub">${p.ses.length} sesiones</div></div>
+      <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cob)}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Cobrado').length} sesiones</div></div>
+      <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pag)}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Pagado').length} sesiones</div></div>
+      <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(p.ses.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0))}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Pendiente').length} sesiones</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 170px;gap:16px;align-items:start" class="pdg">
       <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr><th>#</th><th>Fecha</th><th>Mes</th><th>Previsión</th><th>Monto</th><th>Estado</th><th class="col-obs">Observaciones</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
