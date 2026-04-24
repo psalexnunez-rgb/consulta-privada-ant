@@ -190,21 +190,38 @@ tbody tr:hover{background:var(--sb-pale)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sb-overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:49}
 
+/* OBSERVATION POPUP */
+.obs-popup{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;animation:fi .15s ease}
+.obs-box{background:var(--surface);border-radius:14px;padding:22px;width:100%;max-width:340px;box-shadow:var(--sh-md)}
+.obs-box h4{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.obs-box p{font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap}
+.obs-box .obs-empty{color:var(--text3);font-style:italic}
+.obs-close{margin-top:16px;width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;color:var(--text2)}
+.obs-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;border-radius:4px;transition:background .15s;line-height:1}
+.obs-btn:hover{background:var(--surface2)}
+
 @media(max-width:768px){
-  :root{--sw:255px}
+  :root{--sw:88vw}
   .sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.25)}
+  .sidebar.open{transform:translateX(0);box-shadow:6px 0 32px rgba(0,0,0,.3)}
   .sb-overlay-bg.visible{display:block}
   .hamburger{display:flex}
-  .main-body{padding:14px}
-  .metric-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .main-body{padding:12px}
+  .metric-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .metric{padding:12px 14px}
+  .m-value{font-size:18px}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr!important}
   .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
   .h-actions .btn-danger{display:none}
+  /* Hide obs column on mobile — replaced by icon */
+  .col-obs{display:none}
+  /* Compact table on mobile */
+  td,th{padding:8px 8px}
+  .h-title{font-size:14px}
 }
-@media(max-width:400px){.m-value{font-size:17px}}
+@media(max-width:400px){.m-value{font-size:16px};.metric{padding:10px 11px}}
 </style>
 </head>
 <body>
@@ -537,7 +554,24 @@ function renderPatient(id){
   const total=p.ses.reduce((a,s)=>a+s.monto,0);
   const cob=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
   const pag=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
-  const rows=p.ses.map((s,i)=>`<tr><td style="color:var(--text3)">${i+1}</td><td style="font-family:var(--mono);font-size:12px">${s.fecha}</td><td style="color:var(--text3)">${s.mes||'—'}</td><td><span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${s.prevision||'—'}</span></td><td style="font-family:var(--mono)">$${fmt(s.monto)}</td><td>${badge(s.estado)}</td><td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3)">${s.observaciones||'—'}</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="showEditSes('${esc(id)}','${esc(s.id)}')">Editar</button><button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="delSes('${esc(id)}','${esc(s.id)}')">×</button></td></tr>`).join('');
+  const rows=p.ses.map((s,i)=>{
+    const hasObs=s.observaciones&&s.observaciones.trim();
+    const obsIcon=`<button class="obs-btn" onclick="showObs('${esc(s.observaciones||'')}','${esc(s.fecha)}')" title="${hasObs?s.observaciones:'Sin observaciones'}">${hasObs?'💬':'💬'}</button>`;
+    const obsStyle=hasObs?'':'opacity:.25';
+    return`<tr>
+      <td style="color:var(--text3)">${i+1}</td>
+      <td style="font-family:var(--mono);font-size:12px">${s.fecha}</td>
+      <td style="color:var(--text3)">${s.mes||'—'}</td>
+      <td><span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${s.prevision||'—'}</span></td>
+      <td style="font-family:var(--mono)">$${fmt(s.monto)}</td>
+      <td>${badge(s.estado)}</td>
+      <td class="col-obs" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text3)">${s.observaciones||'—'}</td>
+      <td style="white-space:nowrap;text-align:center">
+        <span style="${obsStyle}">${obsIcon}</span>
+        <button class="btn btn-sm" style="margin-left:4px" onclick="showEditSes('${esc(id)}','${esc(s.id)}')">Editar</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="delSes('${esc(id)}','${esc(s.id)}')">×</button>
+      </td>
+    </tr>`;}).join('');
   const mT={};
   p.ses.forEach(s=>{
     const yr=s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR);
@@ -557,7 +591,7 @@ function renderPatient(id){
       <div class="metric"><div class="m-label">Sesiones</div><div class="m-value">${p.ses.length}</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 170px;gap:16px;align-items:start" class="pdg">
-      <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr><th>#</th><th>Fecha</th><th>Mes</th><th>Previsión</th><th>Monto</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
+      <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr><th>#</th><th>Fecha</th><th>Mes</th><th>Previsión</th><th>Monto</th><th>Estado</th><th class="col-obs">Observaciones</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
       <div><div class="stitle">Por mes</div><div class="msummary">${mSum||'<div style="font-size:12px;color:var(--text3)">Sin datos</div>'}<div class="mtotal"><span>Total</span><span style="font-family:var(--mono)">$${fmt(total)}</span></div></div></div>
     </div>`;
 }
@@ -646,6 +680,18 @@ async function delPatient(id){
   delete pts[id];sync('ok');showView('dashboard');
 }
 function closeModal(){document.getElementById('modal-root').innerHTML='';}
+
+
+function showObs(obs, fecha){
+  const text = obs && obs.trim() ? obs : null;
+  document.getElementById('modal-root').innerHTML=`<div class="obs-popup" onclick="if(event.target===this)closeModal()"><div class="obs-box">
+    <h4>💬 Observación — ${fecha}</h4>
+    ${text
+      ? `<p>${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>`
+      : '<p class="obs-empty">Sin observaciones registradas.</p>'}
+    <button class="obs-close" onclick="closeModal()">Cerrar</button>
+  </div></div>`;
+}
 
 checkSession();
 // ── PDF EXPORT ────────────────────────────────────────
