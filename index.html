@@ -427,7 +427,7 @@ async function loadData(){
     const{data:sess,error:e2}=await sb.from('sesiones').select('*').order('created_at');
     if(e2)throw e2;
     pts={};
-    pats.forEach(p=>{pts[p.id]={id:p.id,nombre:p.nombre,prevision:p.prevision,alta:p.alta||false,ses:[]};});
+    pats.forEach(p=>{pts[p.id]={id:p.id,nombre:p.nombre,prevision:p.prevision,alta:p.alta||false,modalidad:p.modalidad||'Presencial',ses:[]};});
     sess.forEach(s=>{if(pts[s.paciente_id])pts[s.paciente_id].ses.push(s);});
     sync('ok');renderNav();renderDashboard();
   }catch(e){
@@ -558,7 +558,8 @@ function renderResumen(){
     const c=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
     const pg=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
     const altaBadge=p.alta?'<span class="badge b-alta" style="margin-left:6px">Alta</span>':'';
-    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(pg)}</td></tr>`;
+    const modBadge=`<span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${p.modalidad==='En línea'?'💻':'🏢'} ${p.modalidad||'Presencial'}</span>`;
+    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td>${modBadge}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(pg)}</td></tr>`;
   }).join('');
   document.getElementById('main-body').innerHTML=`
     <div class="tabs"><button class="tab active" onclick="switchTab(this,'tm')">Por mes</button><button class="tab" onclick="switchTab(this,'tp')">Por paciente</button></div>
@@ -583,7 +584,7 @@ function renderResumen(){
       <td style="color:var(--text3);font-family:var(--mono);font-weight:600">-$${fmt(totalCosto)}</td>
       <td style="font-family:var(--mono);font-weight:700;font-size:14px;color:${totalLiquido>=0?'var(--navy)':'var(--red)'};background:${totalLiquido>=0?'var(--sb-pale)':'var(--red-bg)'}">$${fmt(totalLiquido)}</td>
     </tr></tbody></table></div></div>
-    <div id="tp" style="display:none"><div class="tw"><table><thead><tr><th>Paciente</th><th>Previsión</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th></tr></thead><tbody>${pRows}</tbody></table></div></div>`;
+    <div id="tp" style="display:none"><div class="tw"><table><thead><tr><th>Paciente</th><th>Previsión</th><th>Modalidad</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th></tr></thead><tbody>${pRows}</tbody></table></div></div>`;
 }
 function switchTab(btn,id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');['tm','tp'].forEach(t=>{const el=document.getElementById(t);if(el)el.style.display='none';});document.getElementById(id).style.display='';}
 
@@ -739,17 +740,18 @@ async function toggleAlta(id,alta){
 
 // ── MODALS ────────────────────────────────────────────
 function showAddPatient(){
-  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>Nuevo paciente</h3><div class="fg"><label class="fl">Nombre completo</label><input class="fi2" id="np-n" type="text" placeholder="Ej: María García" autofocus></div><div class="fg"><label class="fl">Previsión</label><select class="fs" id="np-p">${PREV_LIST.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Crear paciente</button></div></div></div>`;
+  document.getElementById('modal-root').innerHTML=`<div class="overlay"><div class="modal"><h3>Nuevo paciente</h3><div class="fg"><label class="fl">Nombre completo</label><input class="fi2" id="np-n" type="text" placeholder="Ej: María García" autofocus></div><div class="fg"><label class="fl">Previsión</label><select class="fs" id="np-p">${PREV_LIST.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="fg"><label class="fl">Modalidad</label><select class="fs" id="np-m"><option value="Presencial">🏢 Presencial</option><option value="En línea">💻 En línea</option></select></div><div class="mf"><button class="btn" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Crear paciente</button></div></div></div>`;
 }
 async function addPatient(){
   const nombre=document.getElementById('np-n').value.trim();
   const prevision=document.getElementById('np-p').value;
+  const modalidad=document.getElementById('np-m').value;
   if(!nombre){alert('Ingresa el nombre');return;}
   if(Object.values(pts).find(p=>p.nombre===nombre)){alert('Ya existe este paciente');return;}
   sync('saving');
-  const{data,error}=await sb.from('pacientes').insert({nombre,prevision,alta:false}).select().single();
+  const{data,error}=await sb.from('pacientes').insert({nombre,prevision,alta:false,modalidad}).select().single();
   if(error){sync('error');alert('Error al guardar');return;}
-  pts[data.id]={id:data.id,nombre,prevision,alta:false,ses:[]};
+  pts[data.id]={id:data.id,nombre,prevision,alta:false,modalidad,ses:[]};
   sync('ok');closeModal();renderNav();showPatient(data.id);
 }
 
@@ -824,6 +826,16 @@ function showObs(obs, fecha){
   </div></div>`;
 }
 
+
+
+async function toggleModalidad(id){
+  const p=pts[id];
+  const nueva=p.modalidad==='En línea'?'Presencial':'En línea';
+  sync('saving');
+  const{error}=await sb.from('pacientes').update({modalidad:nueva}).eq('id',id);
+  if(error){sync('error');return;}
+  pts[id].modalidad=nueva;sync('ok');renderPatient(id);
+}
 
 function sortSessions(col){
   if(sortCol===col){sortDir*=-1;}
