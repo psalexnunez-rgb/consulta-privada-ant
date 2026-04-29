@@ -336,6 +336,7 @@ const CUR_YEAR=new Date().getFullYear();
 const DEFAULT_TARIFAS={Fonasa:{[CUR_YEAR]:20980},Colmena:{[CUR_YEAR]:16850},'Cruz Blanca':{[CUR_YEAR]:24598},Particular:{[CUR_YEAR]:35000},'Particular Acuerdo':{[CUR_YEAR]:30000}};
 
 let pts={},view='dashboard',pid=null,sbOpen=false,showAlta=false;
+let sortCol='fecha',sortDir=1;
 let tarifas=JSON.parse(JSON.stringify(DEFAULT_TARIFAS));
 let curTheme='blue';
 
@@ -656,7 +657,26 @@ function renderPatient(id){
   const total=p.ses.reduce((a,s)=>a+s.monto,0);
   const cob=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
   const pag=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
-  const rows=p.ses.map((s,i)=>{
+  // Sort sessions
+const sorted=[...p.ses].sort((a,b)=>{
+  let va,vb;
+  if(sortCol==='fecha'){
+    const pa=a.fecha?a.fecha.split('/').reverse().join(''):'';
+    const pb=b.fecha?b.fecha.split('/').reverse().join(''):'';
+    va=pa;vb=pb;
+  } else if(sortCol==='mes'){
+    va=MESES.indexOf(a.mes);vb=MESES.indexOf(b.mes);
+  } else if(sortCol==='monto'){
+    va=a.monto||0;vb=b.monto||0;
+  } else if(sortCol==='estado'){
+    const order={'Cobrado':1,'Pagado':2,'Pendiente':3,'':4};
+    va=order[a.estado]||4;vb=order[b.estado]||4;
+  }
+  if(va<vb)return -sortDir;
+  if(va>vb)return sortDir;
+  return 0;
+});
+const rows=sorted.map((s,i)=>{
     const hasObs=s.observaciones&&s.observaciones.trim();
     const obsIcon=`<button class="obs-btn" onclick="showObs('${esc(s.observaciones||'')}','${esc(s.fecha)}')" title="${hasObs?s.observaciones:'Sin observaciones'}">${hasObs?'💬':'💬'}</button>`;
     const obsStyle=hasObs?'':'opacity:.25';
@@ -693,7 +713,16 @@ function renderPatient(id){
       <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(p.ses.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0))}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Pendiente').length} sesiones</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 170px;gap:16px;align-items:start" class="pdg">
-      <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr><th>#</th><th>Fecha</th><th>Mes</th><th>Previsión</th><th>Monto</th><th>Estado</th><th class="col-obs">Observaciones</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
+      <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr>
+  <th style="cursor:default">#</th>
+  <th style="cursor:pointer;user-select:none" onclick="sortSessions('fecha')">Fecha ${sortCol==='fecha'?(sortDir===1?'↑':'↓'):'↕'}</th>
+  <th style="cursor:pointer;user-select:none" onclick="sortSessions('mes')">Mes ${sortCol==='mes'?(sortDir===1?'↑':'↓'):'↕'}</th>
+  <th>Previsión</th>
+  <th>Monto</th>
+  <th style="cursor:pointer;user-select:none" onclick="sortSessions('estado')">Estado ${sortCol==='estado'?(sortDir===1?'↑':'↓'):'↕'}</th>
+  <th class="col-obs">Observaciones</th>
+  <th></th>
+</tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">📋</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
       <div><div class="stitle">Por mes</div><div class="msummary">${mSum||'<div style="font-size:12px;color:var(--text3)">Sin datos</div>'}<div class="mtotal"><span>Total</span><span style="font-family:var(--mono)">$${fmt(total)}</span></div></div></div>
     </div>`;
 }
@@ -793,6 +822,13 @@ function showObs(obs, fecha){
       : '<p class="obs-empty">Sin observaciones registradas.</p>'}
     <button class="obs-close" onclick="closeModal()">Cerrar</button>
   </div></div>`;
+}
+
+
+function sortSessions(col){
+  if(sortCol===col){sortDir*=-1;}
+  else{sortCol=col;sortDir=1;}
+  renderPatient(pid);
 }
 
 checkSession();
