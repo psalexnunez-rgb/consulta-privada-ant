@@ -558,7 +558,7 @@ function renderResumen(){
     const c=p.ses.filter(s=>s.estado==='Cobrado').reduce((a,s)=>a+s.monto,0);
     const pg=p.ses.filter(s=>s.estado==='Pagado').reduce((a,s)=>a+s.monto,0);
     const altaBadge=p.alta?'<span class="badge b-alta" style="margin-left:6px">Alta</span>':'';
-    const modBadge=`<span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)">${p.modalidad==='En línea'?'💻':'🏢'} ${p.modalidad||'Presencial'}</span>`;
+    const modBadge=`<span style="font-size:11px;background:var(--surface2);padding:2px 7px;border-radius:4px;color:var(--text2)"style="color:${p.modalidad==='En línea'?'#1a7a5a':'#b86000'}"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.modalidad==='En línea'?'#1a7a5a':'#b86000'};margin-right:5px;vertical-align:middle"></span>${p.modalidad||'Presencial'}</span>`;
     return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td>${modBadge}</td><td style="color:var(--text3)">${p.ses.length}</td><td style="font-family:var(--mono)">$${fmt(t)}</td><td style="color:var(--green);font-family:var(--mono)">$${fmt(c)}</td><td style="color:var(--blue);font-family:var(--mono)">$${fmt(pg)}</td></tr>`;
   }).join('');
   document.getElementById('main-body').innerHTML=`
@@ -712,7 +712,7 @@ const rows=sorted.map((s,i)=>{
       <div class="metric"><div class="m-label">Cobrado</div><div class="m-value" style="color:var(--green)">$${fmt(cob)}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Cobrado').length} sesiones</div></div>
       <div class="metric"><div class="m-label">Pagado</div><div class="m-value" style="color:var(--blue)">$${fmt(pag)}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Pagado').length} sesiones</div></div>
       <div class="metric"><div class="m-label">Pendiente</div><div class="m-value" style="color:var(--red)">$${fmt(p.ses.filter(s=>s.estado==='Pendiente').reduce((a,s)=>a+s.monto,0))}</div><div class="m-sub">${p.ses.filter(s=>s.estado==='Pendiente').length} sesiones</div></div>
-      <div class="metric"><div class="m-label">Modalidad</div><div class="m-value" style="font-size:14px">${p.modalidad==='En l\xednea'?'💻 En l\xednea':'🏢 Presencial'}</div><div class="m-sub" style="margin-top:8px"><button class="btn btn-sm" style="padding:3px 10px;font-size:11px" onclick="toggleModalidad('${esc(p.id)}')">Cambiar</button></div></div>
+      <div class="metric"><div class="m-label">Modalidad</div><div class="m-value" style="font-size:14px"><span style="color:${p.modalidad==='En l\xednea'?'#1a7a5a':'#b86000'}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.modalidad==='En l\xednea'?'#1a7a5a':'#b86000'};margin-right:6px;vertical-align:middle"></span>${p.modalidad==='En l\xednea'?'En l\xednea':'Presencial'}</span></div><div class="m-sub" style="margin-top:8px"><button class="btn btn-sm" style="padding:3px 10px;font-size:11px" onclick="toggleModalidad('${esc(p.id)}')">Cambiar</button></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 170px;gap:16px;align-items:start" class="pdg">
       <div><div class="stitle">Sesiones</div>${p.ses.length?`<div class="tw"><table><thead><tr>
