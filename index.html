@@ -267,6 +267,23 @@ tbody tr:hover{background:var(--sb-pale)}
   .metric.navy .m-value{font-size:20px}
   .m-value{font-size:20px}
 }
+
+/* iPad split view / medium widths */
+@media(min-width:600px) and (max-width:900px){
+  .metric-grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .metric{padding:12px 14px}
+  .m-value{font-size:16px;word-break:break-word}
+  .m-label{font-size:10px}
+  .m-sub{font-size:10px}
+  .metric.navy{padding:12px 14px}
+  .metric.navy .m-value{font-size:16px}
+}
+@media(min-width:500px) and (max-width:599px){
+  .metric-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .metric{padding:10px 12px}
+  .m-value{font-size:15px;word-break:break-word}
+  .metric.navy .m-value{font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -1024,6 +1041,23 @@ async function generatePdf(){
   .metric.navy{padding:18px 22px}
   .metric.navy .m-value{font-size:20px}
   .m-value{font-size:20px}
+}
+
+/* iPad split view / medium widths */
+@media(min-width:600px) and (max-width:900px){
+  .metric-grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .metric{padding:12px 14px}
+  .m-value{font-size:16px;word-break:break-word}
+  .m-label{font-size:10px}
+  .m-sub{font-size:10px}
+  .metric.navy{padding:12px 14px}
+  .metric.navy .m-value{font-size:16px}
+}
+@media(min-width:500px) and (max-width:599px){
+  .metric-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .metric{padding:10px 12px}
+  .m-value{font-size:15px;word-break:break-word}
+  .metric.navy .m-value{font-size:15px}
 }
 </style>
 </head><body>
