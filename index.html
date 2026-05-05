@@ -31,6 +31,7 @@
   --blur:blur(24px);
   --font:-apple-system,'Inter',sans-serif;--mono:'SF Mono','Fira Mono',monospace;
   --sw:228px;
+  --fs-base:14px;--fs-sm:12px;--fs-xs:11px;--fs-xl:20px;
 }
 [data-theme="green"]{
   --sb0:#0a2318;--sb1:#1a5c3a;--sb2:#27804f;
@@ -52,7 +53,7 @@
   --sh-dark:0 12px 40px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:var(--fs-base);-webkit-font-smoothing:antialiased}
 .app{display:flex;height:100vh;height:100dvh}
 
 /* LOGIN */
@@ -83,7 +84,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .sync-pill.error{background:rgba(248,113,113,.15);color:#fca5a5;border-color:rgba(248,113,113,.2)}
 .sb-section{padding:14px 10px 4px}
 .sb-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.11em;padding:0 8px 7px}
-.nb{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;color:rgba(255,255,255,.5);font-family:var(--font);font-size:12.5px;border-radius:9px;cursor:pointer;text-align:left;transition:all .15s}
+.nb{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;color:rgba(255,255,255,.5);font-family:var(--font);font-size:var(--fs-sm);border-radius:9px;cursor:pointer;text-align:left;transition:all .15s}
 .nb:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
 .nb.active{background:rgba(255,255,255,.13);color:#fff;font-weight:500;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 .nb.alta{opacity:.45;font-style:italic}
@@ -133,9 +134,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .metric.navy .m-label{color:rgba(255,255,255,.45)}
 .metric.navy .m-value{color:#fff}
 .metric.navy .m-sub{color:rgba(255,255,255,.3)}
-.m-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
-.m-value{font-size:20px;font-weight:600;line-height:1.1;color:var(--text)}
-.m-sub{font-size:10px;color:var(--text3);margin-top:4px}
+.m-label{font-size:var(--fs-xs);color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.m-value{font-size:var(--fs-xl);font-weight:600;line-height:1.1;color:var(--text)}
+.m-sub{font-size:var(--fs-xs);color:var(--text3);margin-top:4px}
 
 /* ALERTS */
 .alert-section{margin-bottom:16px}
@@ -349,7 +350,7 @@ tbody tr:hover{background:rgba(26,63,110,.04)}
   .metric-grid{grid-template-columns:repeat(4,1fr);gap:6px}
   .metric{padding:8px 10px}
   .m-value{font-size:16px}
-  .m-label{font-size:10px;margin-bottom:4px}
+  .m-label{font-size:var(--fs-xs);margin-bottom:4px}
 }
 
 /* Split view */
@@ -394,15 +395,16 @@ tbody tr:hover{background:rgba(26,63,110,.04)}
     </div>
     <div class="sb-section">
       <div class="sb-label">Vistas</div>
-      <button class="nb active" id="nav-dashboard" onclick="showView('dashboard')">◈ &nbsp;Dashboard</button>
-      <button class="nb" id="nav-resumen" onclick="showView('resumen')">≋ &nbsp;Resumen general</button>
-      <button class="nb" id="nav-config" onclick="showView('config')">⚙ &nbsp;Configuración</button>
+      <button class="nb active" id="nav-dashboard" onclick="showView('dashboard')"><strong>Dashboard</strong></button>
+      <button class="nb" id="nav-resumen" onclick="showView('resumen')"><strong>Resumen general</strong></button>
+      <button class="nb" id="nav-config" onclick="showView('config')"><strong>Configuración</strong></button>
     </div>
     <div class="sb-section" style="padding-bottom:0"><div class="sb-label">Pacientes</div></div>
     <div class="search-wrap"><input type="search" class="search-input" id="search-input" placeholder="Buscar paciente..." oninput="renderNav()" autocomplete="off"></div>
+    <div style="padding:4px 10px 2px"><button class="add-btn" onclick="showAddPatient()">+ Nuevo paciente</button></div>
     <button class="filter-toggle" id="filter-toggle" onclick="toggleAltaFilter()">👁 Mostrar dados de alta</button>
     <div class="pat-scroll" id="patient-nav"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="sb-footer"><button class="add-btn" onclick="showAddPatient()">+ Nuevo paciente</button></div>
+    <div class="sb-footer" style="padding:6px 10px"><div style="font-size:10px;color:rgba(255,255,255,.25);text-align:center">✓ Sync automático</div></div>
   </div>
 
   <div class="main">
@@ -450,6 +452,7 @@ const IMPUESTO=0.1525;
 const PIE_COLORS=['#1b3f6e','#1a7a5a','#b86000','#1a5fa8','#7c3aed'];
 
 let pts={},view='dashboard',pid=null,sbOpen=false,showAlta=false;
+let curFontSize='normal';
 let sortCol='fecha',sortDir=1;
 let tarifas={};
 let costoConsulta=60000;
@@ -496,10 +499,23 @@ function applyTheme(t){
   if(mc){const m={blue:'#f5f7fa',green:'#f0f9f4',dark:'#0a0a14'};mc.content=m[t]||'#f5f7fa';}
 }
 function loadTheme(){applyTheme(localStorage.getItem('cp_theme')||'blue');}
+function applyFontSize(s){
+  curFontSize=s;
+  const m={normal:['14px','20px','12px','11px'],medium:['16px','23px','14px','12px'],large:['18px','26px','16px','14px'],xlarge:['20px','30px','18px','16px']};
+  const v=m[s]||m.normal;
+  const r=document.documentElement;
+  r.style.setProperty('--fs-base',v[0]);
+  r.style.setProperty('--fs-xl',v[1]);
+  r.style.setProperty('--fs-sm',v[2]);
+  r.style.setProperty('--fs-xs',v[3]);
+  localStorage.setItem('cp_fontsize',s);
+  if(view==='config')renderConfig();
+}
 function loadLocal(){
   try{const s=localStorage.getItem('cp_tarifas');if(s)tarifas=JSON.parse(s);}catch(e){}
   try{const c=localStorage.getItem('cp_costo');if(c)costoConsulta=parseInt(c)||60000;}catch(e){}
   try{const w=localStorage.getItem('cp_weeks');if(w)inactiveWeeks=parseInt(w)||6;}catch(e){}
+  try{const f=localStorage.getItem('cp_fontsize');if(f){curFontSize=f;applyFontSize(f);}}catch(e){}
 }
 function saveTarifasLocal(){localStorage.setItem('cp_tarifas',JSON.stringify(tarifas));}
 function saveCosto(val){costoConsulta=parseInt(val)||60000;localStorage.setItem('cp_costo',String(costoConsulta));}
@@ -876,7 +892,28 @@ function buildMesTab(all,yr){
   const totalImp=Math.round(total*IMPUESTO);
   const totalCosto=costoConsulta*nM;
   const totalLiq=total-totalImp-totalCosto;
-  return`<div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th><th style="color:var(--red)">Pendiente</th><th style="color:var(--orange)">Impuesto</th><th>Consulta</th><th style="color:var(--sb)">Líquido</th></tr></thead>
+  // Pie by prevision
+  const prevPie2={};
+  yrSes.forEach(s=>{prevPie2[s.prevision]=(prevPie2[s.prevision]||0)+1;});
+  const pe2=Object.entries(prevPie2).sort((a,b)=>b[1]-a[1]);
+  const tot2=pe2.reduce((a,[,v])=>a+v,0)||1;
+  let cum2=0;
+  const svg2=pe2.map(([p,v],i)=>{
+    const pct=v/tot2;
+    const s1=polarToCart(50,50,40,cum2*360);
+    cum2+=pct;
+    const e1=polarToCart(50,50,40,cum2*360);
+    const lg=pct>.5?1:0;
+    return '<path d="M50,50 L'+s1.x+','+s1.y+' A40,40 0 '+lg+',1 '+e1.x+','+e1.y+' Z" fill="'+PIE_COLORS[i%PIE_COLORS.length]+'" opacity=".85"/>';
+  }).join('');
+  const leg2=pe2.map(([p,v],i)=>'<div class="pie-leg-item"><div class="pie-dot" style="background:'+PIE_COLORS[i%PIE_COLORS.length]+'"></div><span>'+p+'</span><span style="margin-left:auto;font-weight:600">'+v+'</span></div>').join('');
+  const pieCard2='<div class="glass" style="padding:16px"><div class="stitle" style="margin-bottom:10px">Sesiones por previsión — '+yr+'</div><div class="pie-wrap"><svg viewBox="0 0 100 100" width="90" height="90" style="flex-shrink:0">'+svg2+'<circle cx="50" cy="50" r="22" fill="var(--glass)"/><text x="50" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">'+yrSes.length+'</text></svg><div class="pie-legend">'+leg2+'</div></div></div>';
+  const sumCard2='<div class="glass" style="padding:16px"><div class="stitle" style="margin-bottom:10px">Resumen '+yr+'</div><div style="display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Total</span><span style="font-weight:600">'+pv('$'+fmt(total))+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--green)">Cobrado</span><span style="color:var(--green);font-weight:600">'+pv('$'+fmt(cob))+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--blue)">Pagado</span><span style="color:var(--blue);font-weight:600">'+pv('$'+fmt(pag))+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--red)">Pendiente</span><span style="color:var(--red);font-weight:600">'+pv('$'+fmt(pen))+'</span></div><div style="height:1px;background:var(--border);margin:2px 0"></div><div style="display:flex;justify-content:space-between"><span style="color:var(--orange)">Impuesto</span><span style="color:var(--orange);font-weight:600">'+pv('-$'+fmt(totalImp))+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Consulta</span><span style="font-weight:600">'+pv('-$'+fmt(totalCosto))+'</span></div><div style="height:1px;background:var(--border);margin:2px 0"></div><div style="display:flex;justify-content:space-between"><span style="font-weight:600;color:var(--sb1)">Líquido</span><span style="font-weight:700;color:'+(totalLiq>=0?'var(--sb1)':'var(--red)')+'">'+pv('$'+fmt(totalLiq))+'</span></div></div></div>';
+
+
+  const topGrid='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px" class="chart-row-mobile">'+pieCard2+sumCard2+'</div>';
+
+  return topGrid+`<div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th><th style="color:var(--red)">Pendiente</th><th style="color:var(--orange)">Impuesto</th><th>Consulta</th><th style="color:var(--sb)">Líquido</th></tr></thead>
   <tbody>${rows}<tr style="background:var(--surface2);border-top:2px solid var(--border2)"><td style="font-weight:600">Total ${yr}</td><td style="color:var(--text3)">${yrSes.length}</td><td style="font-family:var(--mono);font-weight:600">${pv('$'+fmt(total))}</td><td style="color:var(--green);font-family:var(--mono);font-weight:600">${pv('$'+fmt(cob))}</td><td style="color:var(--blue);font-family:var(--mono);font-weight:600">${pv('$'+fmt(pag))}</td><td style="color:var(--red);font-family:var(--mono);font-weight:600">${pv('$'+fmt(pen))}</td><td style="color:var(--orange);font-family:var(--mono);font-weight:600">${pv('-$'+fmt(totalImp))}</td><td style="font-family:var(--mono);font-weight:600">${pv('-$'+fmt(totalCosto))}</td><td style="font-family:var(--mono);font-weight:700;color:${totalLiq>=0?'var(--sb)':'var(--red)'}">${pv('$'+fmt(totalLiq))}</td></tr></tbody></table></div>`;
 }
 
@@ -1055,6 +1092,17 @@ function renderConfig(){
       <h4>Alertas de inactividad</h4>
       <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Semanas sin sesión para marcar un paciente como inactivo (global). Puedes sobreescribirlo individualmente en cada ficha.</p>
       <div class="tarifa-row"><div class="tarifa-name">Semanas de inactividad</div><div class="tarifa-year">Global</div><input class="fi2" style="text-align:right;font-family:var(--mono);max-width:80px" type="number" value="${inactiveWeeks}" min="1" max="52" oninput="saveWeeks(this.value)"></div>
+    </div>
+    <div class="settings-card">
+      <h4>Tamaño de fuente</h4>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:14px">Se aplica en toda la aplicación.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        ${[['normal','Normal'],['medium','Mediana'],['large','Grande'],['xlarge','Muy grande']].map(([s,label],idx2)=>{
+          const szMap={normal:'14px',medium:'16px',large:'18px',xlarge:'20px'};
+          const active=curFontSize===s;
+          return`<div onclick="applyFontSize('${s}')" style="cursor:pointer;border:2px solid ${active?'var(--sb1)':'var(--border)'};border-radius:10px;padding:12px 8px;text-align:center;background:${active?'rgba(27,63,110,.1)':'var(--glass)'};backdrop-filter:var(--blur);transition:all .2s"><div style="font-size:${szMap[s]};font-weight:700;color:${active?'var(--sb1)':'var(--text)'};margin-bottom:5px">Aa</div><div style="font-size:11px;color:${active?'var(--sb1)':'var(--text3)'};font-weight:${active?'600':'400'}">${label}</div></div>`;
+        }).join('')}
+      </div>
     </div>
     <div class="settings-card">
       <h4>Tema visual</h4>
