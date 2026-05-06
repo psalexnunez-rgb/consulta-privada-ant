@@ -897,53 +897,95 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
 }
 
 /* MOBILE */
-@media(max-width:768px){
-  /* Prevent ALL horizontal overflow */
-  html,body{overflow-x:hidden;max-width:100vw}
-  .app{grid-template-columns:1fr;overflow-x:hidden;max-width:100vw}
-  .main,.page,.topbar{overflow-x:hidden;width:100%;box-sizing:border-box;max-width:100vw}
-  .page{padding:10px 12px 80px}
-  .topbar{padding:10px 14px}
 
-  /* Sidebar */
-  .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;transform:translateX(-100%);z-index:100}
+
+@media(max-width:1280px){
+  .kpis{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr}
+  .kpi-value{font-size:22px}
+  .kpi.primary .kpi-value{font-size:24px}
+}
+
+@media(max-width:768px){
+  /* ── PREVENT ALL HORIZONTAL OVERFLOW ── */
+  *{max-width:100%;box-sizing:border-box}
+  html,body{overflow-x:hidden;width:100%;max-width:100vw}
+  .app{grid-template-columns:1fr;width:100%;overflow-x:hidden}
+  .main{overflow-x:hidden;width:100%}
+  .page{padding:10px 12px 80px;overflow-x:hidden}
+  .topbar{padding:10px 14px;overflow-x:hidden}
+
+  /* ── SIDEBAR ── */
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;
+    transform:translateX(-100%);z-index:100;max-width:85vw}
   .sidebar.open{transform:translateX(0)}
   .hamburger{display:flex !important}
 
-  /* KPI: Total facturado + Promedio on top row (2 cols, square-ish)
-     Cobrado / Pagado / Pendiente / Liquido on second row (4 cols, short) */
+  /* ── KPI LAYOUT ──
+     Row 1: Total facturado [col 1] + Cobrado [col 2]  → square, taller
+     Row 2: Pagado + Pendiente + Líquido                → rectangular, shorter
+     Row 3: Promedio (hidden or small)
+  */
   .kpis{
     display:grid;
     grid-template-columns:1fr 1fr;
     grid-template-rows:auto auto;
-    gap:0;
+    gap:1px;
+    background:var(--rule);
     border-radius:10px;overflow:hidden;
-    width:100%;max-width:100%;box-sizing:border-box;
+    width:100%;
   }
-  /* Row 1: Total (span 2 full width) + Promedio beside it → 
-     Actually: Total full top, then 4 small below */
-  .kpi{padding:10px 12px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-width:0;overflow:hidden;box-sizing:border-box}
-  .kpi:nth-child(even){border-right:0}
+  .kpi{
+    background:var(--paper);
+    padding:14px 12px;
+    border:none;min-width:0;overflow:hidden;
+  }
   .kpi .spark{display:none}
-  /* Total facturado spans full width, taller */
-  .kpi:nth-child(1){grid-column:1/3;border-right:0;padding:14px 16px}
-  /* Cobrado, Pagado, Pendiente, Liquido: 2 per row, shorter */
-  .kpi:nth-child(2),.kpi:nth-child(3){border-bottom:1px solid var(--rule)}
-  .kpi:nth-child(4),.kpi:nth-child(5),.kpi:nth-child(6){border-bottom:0}
-  /* Promedio goes at end, spans full if odd */
-  .kpi:last-child{grid-column:1/3;border-right:0;border-bottom:0;padding:8px 12px}
+
+  /* kpi[1] = Total facturado: col 1, row 1, square */
+  .kpi:nth-child(1){
+    grid-column:1; grid-row:1;
+    padding:16px 14px;
+  }
+  /* kpi[2] = Cobrado: col 2, row 1, square (same height as Total) */
+  .kpi:nth-child(2){
+    grid-column:2; grid-row:1;
+    padding:16px 14px;
+  }
+  /* kpi[3] = Pagado: col 1, row 2, rectangular (shorter) */
+  .kpi:nth-child(3){
+    grid-column:1; grid-row:2;
+    padding:10px 12px;
+  }
+  /* kpi[4] = Pendiente: col 2, row 2, rectangular */
+  .kpi:nth-child(4){
+    grid-column:2; grid-row:2;
+    padding:10px 12px;
+  }
+  /* kpi[5] = Líquido: spans both cols, row 3, rectangular */
+  .kpi:nth-child(5){
+    grid-column:1/3; grid-row:3;
+    padding:10px 14px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .kpi:nth-child(5) .kpi-label{margin-bottom:0;white-space:nowrap}
+  .kpi:nth-child(5) .kpi-value{margin-top:0}
+  .kpi:nth-child(5) .kpi-sub{margin-top:0;margin-left:auto}
+  /* kpi[6] = Promedio: hidden on mobile */
+  .kpi:nth-child(6){display:none}
+
   /* Font sizes */
-  .kpi-value{font-size:15px !important;word-break:break-word;line-height:1.2}
-  .kpi:nth-child(1) .kpi-value{font-size:20px !important}
+  .kpi-value{font-size:16px !important;line-height:1.2;word-break:break-word}
+  .kpi:nth-child(1) .kpi-value,
+  .kpi:nth-child(2) .kpi-value{font-size:18px !important}
   .kpi-label{font-size:9px !important;letter-spacing:.04em}
   .kpi-sub{font-size:9px !important}
   .delta{font-size:9px;padding:1px 4px}
 
-  /* All grids → single column */
-  .grid{grid-template-columns:1fr !important;margin-top:14px;gap:12px}
+  /* ── GRIDS ALL SINGLE COL ── */
+  .grid{grid-template-columns:1fr !important;margin-top:12px;gap:10px}
   .grid2{grid-template-columns:1fr !important}
-  .donut-row{grid-template-columns:100px 1fr;gap:12px}
-  .donut-svg{width:100px;height:100px}
+  .donut-row{grid-template-columns:90px 1fr;gap:10px}
+  .donut-svg{width:90px;height:90px}
   .bottom-nav{display:flex !important}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr}
@@ -953,49 +995,58 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
   .h-actions .btn-danger{display:none}
   .col-obs{display:none}
 
-  /* Tables: scroll internally, NEVER push page width */
-  .card,.card-inner,.sched,.alerts-list{overflow:hidden;max-width:100%;box-sizing:border-box}
-  .card table,.sched table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;white-space:nowrap}
-  td,th{padding:6px 8px;font-size:10px}
-  td:first-child,th:first-child{padding-left:10px}
+  /* ── TABLES: internal scroll, never overflow page ── */
+  .card{overflow:hidden}
+  .card table,table{
+    display:block;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    width:100%;
+    white-space:nowrap;
+    font-size:10px;
+  }
+  td,th{padding:6px 8px}
 
-  /* Chart */
-  .chart-wrap{padding:10px 6px;overflow:hidden}
-  .chart,.chart-wrap svg{max-width:100% !important;width:100% !important;height:auto !important}
+  /* ── CHART ── */
+  .chart-wrap{padding:10px 4px;overflow:hidden}
+  .chart,.chart-wrap svg{
+    width:100% !important;
+    max-width:100% !important;
+    height:160px !important;
+    overflow:hidden;
+  }
 
-  /* Alert list — fix overlap */
-  .alerts-list{overflow:hidden}
-  .alert{grid-template-columns:48px 1fr auto;gap:8px;padding:8px 10px;overflow:hidden}
-  .alert .num{font-size:9px;padding:1px 5px;min-width:0}
-  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* ── ALERTS: fix overflow and overlap ── */
+  .alerts-list{overflow:hidden;width:100%}
+  .alert{
+    display:grid;
+    grid-template-columns:46px 1fr;
+    gap:8px;padding:8px 10px;
+    overflow:hidden;width:100%;
+  }
   .alert .right{display:none}
+  .alert .num{font-size:9px;padding:2px 5px;width:auto;margin-left:0}
+  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* Prev rows in donut card */
+  /* ── PREV ROWS ── */
   .prev-rows{gap:5px}
   .prev-row{font-size:10px;gap:6px}
   .prev-row .amt{min-width:60px;font-size:10px}
 
-  /* Chips wrap */
-  .h-actions{flex-wrap:wrap;gap:4px}
-
-  /* Page header */
+  /* ── PAGE HEAD ── */
   .page-head h1{font-size:18px}
   .head-right{display:none}
+  .page-head{margin-bottom:14px}
 }
 @media(max-width:375px){
-  .kpi-value{font-size:13px !important}
-  .kpi:nth-child(1) .kpi-value{font-size:17px !important}
-  .kpi{padding:8px 10px}
+  .kpi-value{font-size:14px !important}
+  .kpi:nth-child(1) .kpi-value,
+  .kpi:nth-child(2) .kpi-value{font-size:16px !important}
+  .kpi{padding:10px 10px}
   .page{padding:8px 10px 80px}
   td,th{padding:5px 6px;font-size:9px}
 }
-@media(max-width:1280px){
-  .kpis{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr}
-  .kpi-value{font-size:22px}
-  .kpi.primary .kpi-value{font-size:24px}
-}
-
 </style>
 </head>
 <body>
@@ -1080,8 +1131,8 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
       <button class="hamburger" onclick="toggleSb()">☰</button>
       <div class="h-title" id="view-title">Dashboard</div>
       <div class="h-actions" id="header-actions">
-        <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)">${_EYE}</button>
-        <button class="btn btn-icon" onclick="openSearch()" title="Búsqueda global (Cmd+F)">${_SEARCH}</button>
+        <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg></button>
+        <button class="btn btn-icon" onclick="openSearch()" title="Búsqueda global (Cmd+F)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg></button>
       </div>
     </div>
     <div class="main-body" id="main-body">
@@ -1095,7 +1146,7 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
         <div class="bn-icon">≋</div><span>Resumen</span>
       </div>
       <div class="bn-item" id="bn-pacientes" onclick="openSearch()">
-        <div class="bn-icon">${_SEARCH}</div><span>Buscar</span>
+        <div class="bn-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg></div><span>Buscar</span>
       </div>
       <div class="bn-item" id="bn-config" onclick="showView('config');updateBN('config')">
         <div class="bn-icon">⚙</div><span>Config</span>
@@ -2296,7 +2347,149 @@ async function generatePdf(){
       </table>
     </div>`;
   }).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Consulta Privada ${year}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;color:#1a2035;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:0;size:A4}table{border-collapse:collapse;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}</style></head><body>
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Consulta Privada ${year}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;color:#1a2035;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:0;size:A4}table{border-collapse:collapse;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}@media(max-width:768px){
+  /* ── PREVENT ALL HORIZONTAL OVERFLOW ── */
+  *{max-width:100%;box-sizing:border-box}
+  html,body{overflow-x:hidden;width:100%;max-width:100vw}
+  .app{grid-template-columns:1fr;width:100%;overflow-x:hidden}
+  .main{overflow-x:hidden;width:100%}
+  .page{padding:10px 12px 80px;overflow-x:hidden}
+  .topbar{padding:10px 14px;overflow-x:hidden}
+
+  /* ── SIDEBAR ── */
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;
+    transform:translateX(-100%);z-index:100;max-width:85vw}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:flex !important}
+
+  /* ── KPI LAYOUT ──
+     Row 1: Total facturado [col 1] + Cobrado [col 2]  → square, taller
+     Row 2: Pagado + Pendiente + Líquido                → rectangular, shorter
+     Row 3: Promedio (hidden or small)
+  */
+  .kpis{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto;
+    gap:1px;
+    background:var(--rule);
+    border-radius:10px;overflow:hidden;
+    width:100%;
+  }
+  .kpi{
+    background:var(--paper);
+    padding:14px 12px;
+    border:none;min-width:0;overflow:hidden;
+  }
+  .kpi .spark{display:none}
+
+  /* kpi[1] = Total facturado: col 1, row 1, square */
+  .kpi:nth-child(1){
+    grid-column:1; grid-row:1;
+    padding:16px 14px;
+  }
+  /* kpi[2] = Cobrado: col 2, row 1, square (same height as Total) */
+  .kpi:nth-child(2){
+    grid-column:2; grid-row:1;
+    padding:16px 14px;
+  }
+  /* kpi[3] = Pagado: col 1, row 2, rectangular (shorter) */
+  .kpi:nth-child(3){
+    grid-column:1; grid-row:2;
+    padding:10px 12px;
+  }
+  /* kpi[4] = Pendiente: col 2, row 2, rectangular */
+  .kpi:nth-child(4){
+    grid-column:2; grid-row:2;
+    padding:10px 12px;
+  }
+  /* kpi[5] = Líquido: spans both cols, row 3, rectangular */
+  .kpi:nth-child(5){
+    grid-column:1/3; grid-row:3;
+    padding:10px 14px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .kpi:nth-child(5) .kpi-label{margin-bottom:0;white-space:nowrap}
+  .kpi:nth-child(5) .kpi-value{margin-top:0}
+  .kpi:nth-child(5) .kpi-sub{margin-top:0;margin-left:auto}
+  /* kpi[6] = Promedio: hidden on mobile */
+  .kpi:nth-child(6){display:none}
+
+  /* Font sizes */
+  .kpi-value{font-size:16px !important;line-height:1.2;word-break:break-word}
+  .kpi:nth-child(1) .kpi-value,
+  .kpi:nth-child(2) .kpi-value{font-size:18px !important}
+  .kpi-label{font-size:9px !important;letter-spacing:.04em}
+  .kpi-sub{font-size:9px !important}
+  .delta{font-size:9px;padding:1px 4px}
+
+  /* ── GRIDS ALL SINGLE COL ── */
+  .grid{grid-template-columns:1fr !important;margin-top:12px;gap:10px}
+  .grid2{grid-template-columns:1fr !important}
+  .donut-row{grid-template-columns:90px 1fr;gap:10px}
+  .donut-svg{width:90px;height:90px}
+  .bottom-nav{display:flex !important}
+  .fr{grid-template-columns:1fr}
+  .pdg{grid-template-columns:1fr}
+  .chart-row-mobile{grid-template-columns:1fr !important}
+  .tarifa-row{grid-template-columns:1fr 110px}
+  .tarifa-year{display:none}
+  .h-actions .btn-danger{display:none}
+  .col-obs{display:none}
+
+  /* ── TABLES: internal scroll, never overflow page ── */
+  .card{overflow:hidden}
+  .card table,table{
+    display:block;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    width:100%;
+    white-space:nowrap;
+    font-size:10px;
+  }
+  td,th{padding:6px 8px}
+
+  /* ── CHART ── */
+  .chart-wrap{padding:10px 4px;overflow:hidden}
+  .chart,.chart-wrap svg{
+    width:100% !important;
+    max-width:100% !important;
+    height:160px !important;
+    overflow:hidden;
+  }
+
+  /* ── ALERTS: fix overflow and overlap ── */
+  .alerts-list{overflow:hidden;width:100%}
+  .alert{
+    display:grid;
+    grid-template-columns:46px 1fr;
+    gap:8px;padding:8px 10px;
+    overflow:hidden;width:100%;
+  }
+  .alert .right{display:none}
+  .alert .num{font-size:9px;padding:2px 5px;width:auto;margin-left:0}
+  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* ── PREV ROWS ── */
+  .prev-rows{gap:5px}
+  .prev-row{font-size:10px;gap:6px}
+  .prev-row .amt{min-width:60px;font-size:10px}
+
+  /* ── PAGE HEAD ── */
+  .page-head h1{font-size:18px}
+  .head-right{display:none}
+  .page-head{margin-bottom:14px}
+}
+@media(max-width:375px){
+  .kpi-value{font-size:14px !important}
+  .kpi:nth-child(1) .kpi-value,
+  .kpi:nth-child(2) .kpi-value{font-size:16px !important}
+  .kpi{padding:10px 10px}
+  .page{padding:8px 10px 80px}
+  td,th{padding:5px 6px;font-size:9px}
+}
+</style></head><body>
   <div style="padding:40px;font-family:Arial,sans-serif">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid #1b3f6e">
       <div style="width:52px;height:52px;background:#1b3f6e;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;font-family:serif;font-weight:700">\u03C8</div>
