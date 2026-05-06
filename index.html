@@ -1181,7 +1181,7 @@ const PREV_LIST=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuer
 const ESTADOS=['','Cobrado','Pagado','Pendiente'];
 const CUR_YEAR=new Date().getFullYear();
 const IMPUESTO=0.1525;
-const PIE_COLORS=['oklch(0.30 0.12 268)','oklch(0.50 0.14 220)','oklch(0.62 0.13 165)','oklch(0.52 0.16 290)','oklch(0.60 0.13 75)'];
+const PIE_COLORS=['#1e3a6e','#2d6fa8','#2d8c5e','#6b3fa0','#a06b1e'];
 
 let pts={},view='dashboard',pid=null,sbOpen=false,showAlta=false;
 let curFontSize='normal';
@@ -1433,6 +1433,11 @@ function weeksAgo(fechaStr){
 
 // ── DASHBOARD ─────────────────────────────────────────
 function setActiveChart(t){activeChart=t;renderDashboard();}
+
+function polarToCart(cx,cy,r,deg){
+  const rad=(deg-90)*Math.PI/180;
+  return{x:(cx+r*Math.cos(rad)).toFixed(3),y:(cy+r*Math.sin(rad)).toFixed(3)};
+}
 
 function renderDashboard(){
   document.getElementById('view-title').textContent='Dashboard';
@@ -1732,27 +1737,48 @@ function renderResumen(){
   document.getElementById('view-title').textContent='Resumen general';
   document.getElementById('header-actions').innerHTML=`
     <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado">${privateMode?_EYE_OFF:_EYE}</button>
-    <button class="btn btn-icon" onclick="openSearch()">\uD83D\uDD0D</button>`;
+    <button class="btn btn-icon" onclick="openSearch()" title="Buscar">${_SEARCH}</button>`;
+  updateBN('resumen');
 
   const all=allSessions();
   const years=[...new Set(all.map(s=>s.fecha?s.fecha.split('/')[2]:String(CUR_YEAR)))].filter(Boolean).sort();
+  if(!years.includes(yearFilter)) yearFilter=String(CUR_YEAR);
   const prevYear=String(parseInt(yearFilter)-1);
 
   document.getElementById('main-body').innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <select class="fs" style="width:auto;padding:6px 10px" onchange="yearFilter=this.value;renderResumen()">${years.map(y=>`<option value="${y}" ${y===yearFilter?'selected':''}>${y}</option>`).join('')}</select>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <select class="fs" style="width:auto;padding:6px 10px" onchange="yearFilter=this.value;renderResumen()">
+        ${years.map(y=>`<option value="${y}" ${y===yearFilter?'selected':''}>${y}</option>`).join('')}
+      </select>
+      <div style="display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden">
+        <button onclick="resumenPeriod='anual';renderResumen()" style="border:none;padding:5px 12px;font-family:var(--font);font-size:var(--fs-xs);cursor:pointer;background:${resumenPeriod==='anual'?'oklch(0.40 0.16 265)':'transparent'};color:${resumenPeriod==='anual'?'#fff':'var(--ink-3)'}">Anual</button>
+        <button onclick="resumenPeriod='semestral';renderResumen()" style="border:none;border-left:1px solid var(--rule);border-right:1px solid var(--rule);padding:5px 12px;font-family:var(--font);font-size:var(--fs-xs);cursor:pointer;background:${resumenPeriod==='semestral'?'oklch(0.40 0.16 265)':'transparent'};color:${resumenPeriod==='semestral'?'#fff':'var(--ink-3)'}">Semestral</button>
+        <button onclick="resumenPeriod='trimestral';renderResumen()" style="border:none;padding:5px 12px;font-family:var(--font);font-size:var(--fs-xs);cursor:pointer;background:${resumenPeriod==='trimestral'?'oklch(0.40 0.16 265)':'transparent'};color:${resumenPeriod==='trimestral'?'#fff':'var(--ink-3)'}">Trimestral</button>
+      </div>
     </div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab(this,'tm')">Por mes</button>
-      <button class="tab" onclick="switchTab(this,'tp')">Por paciente</button>
-      <button class="tab" onclick="switchTab(this,'tc')">Comparativa</button>
-      <button class="tab" onclick="switchTab(this,'tprev')">Por previsión</button>
+    <div class="tabs" id="resumen-tabs">
+      <button class="tab active" onclick="switchResTab('tm')">Por mes</button>
+      <button class="tab" onclick="switchResTab('tp')">Por paciente</button>
+      <button class="tab" onclick="switchResTab('tc')">Comparativa</button>
+      <button class="tab" onclick="switchResTab('tprev')">Por previsión</button>
     </div>
     <div id="tm">${buildMesTab(all,yearFilter)}</div>
     <div id="tp" style="display:none">${buildPatTab(all,yearFilter)}</div>
     <div id="tc" style="display:none">${buildComparativa(all,yearFilter,prevYear)}</div>
     <div id="tprev" style="display:none">${buildPrevTab(all,yearFilter,prevYear)}</div>`;
 }
+
+function switchResTab(id){
+  const ids=['tm','tp','tc','tprev'];
+  document.querySelectorAll('#resumen-tabs .tab').forEach((t,i)=>{
+    t.classList.toggle('active', ids[i]===id);
+  });
+  ids.forEach(t=>{
+    const el=document.getElementById(t);
+    if(el) el.style.display=t===id?'':'none';
+  });
+}
+
 
 function buildMesTab(all,yr){
   const monMap={};
