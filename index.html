@@ -45,10 +45,10 @@
     --radius:   12px;
     --radius-sm: 7px;
     --fs-base: 13px;
-    --fs-sm: 12px;
-    --fs-xs: 11px;
+    --fs-sm: 11.5px;
+    --fs-xs: 10.5px;
     --fs-xl: 24px;
-    --fs-xl-primary: 28px;
+    --fs-xl-p: 28px;
   }
 
   *{ box-sizing: border-box; }
@@ -398,7 +398,7 @@
       linear-gradient(160deg, oklch(0.22 0.09 268) 0%, oklch(0.16 0.08 270) 100%);
     color: oklch(0.96 0.01 250);
     position: relative;
-    border-right: 1px solid oklch(1 0 0 / 0.1) !important;
+    border-right: 1px solid oklch(1 0 0 / 0.1);
   }
   .kpi.primary::before{
     content:""; position: absolute; inset: 0;
@@ -426,7 +426,7 @@
     margin-top: 6px;
     font-feature-settings: "tnum";
   }
-  .kpi.primary .kpi-value{ color: oklch(0.99 0 0); font-size: var(--fs-xl-primary); }
+  .kpi.primary .kpi-value{ color: oklch(0.99 0 0); font-size: var(--fs-xl-p); }
   .kpi-value.pos{ color: var(--pos); }
   .kpi-value.neg{ color: var(--neg); }
   .kpi-value.acc{ background: linear-gradient(135deg, oklch(0.55 0.18 255), oklch(0.65 0.16 230)); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -534,13 +534,12 @@
   .alerts-list{ padding: 6px 0 4px; }
   .alert{
     display: grid;
-    grid-template-columns: 52px 1fr auto;
+    grid-template-columns: 52px 1fr auto; overflow:hidden;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
+    gap: 12px;
+    padding: 11px 18px;
     border-bottom: 1px solid var(--rule-2);
     cursor: pointer;
-    overflow: hidden;
   }
   .alert:last-child{ border-bottom: 0; }
   .alert:hover{ background: var(--rule-2); }
@@ -556,8 +555,8 @@
     width: max-content;
     margin-left: auto;
   }
-  .alert .name{ color: var(--ink); font-weight: 500; font-size: var(--fs-base); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .alert .why{ color: var(--ink-3); font-size: var(--fs-sm); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .alert .name{ color: var(--ink); font-weight: 500; font-size: var(--fs-base); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .alert .why{ color: var(--ink-3); font-size: var(--fs-sm); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top: 1px; }
   .alert .right{ font-size: 11.5px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; }
   .alert.this-week .num{ color: var(--accent); background: color-mix(in oklch, var(--accent) 10%, transparent); border-color: color-mix(in oklch, var(--accent) 25%, transparent); }
 
@@ -899,75 +898,97 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
 
 /* MOBILE */
 @media(max-width:768px){
-  /* Layout — prevent ALL horizontal overflow */
+  /* Prevent ALL horizontal overflow */
   html,body{overflow-x:hidden;max-width:100vw}
-  .app{grid-template-columns:1fr;overflow-x:hidden;width:100%;max-width:100vw}
-  .main{overflow-x:hidden;width:100%;max-width:100vw}
-  .page,.main-body,.topbar{overflow-x:hidden;max-width:100vw;box-sizing:border-box}
-  .page{padding:10px 12px 24px}
+  .app{grid-template-columns:1fr;overflow-x:hidden;max-width:100vw}
+  .main,.page,.topbar{overflow-x:hidden;width:100%;box-sizing:border-box;max-width:100vw}
+  .page{padding:10px 12px 80px}
   .topbar{padding:10px 14px}
 
   /* Sidebar */
-  .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;transform:translateX(-100%)}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;transform:translateX(-100%);z-index:100}
   .sidebar.open{transform:translateX(0)}
   .hamburger{display:flex !important}
 
-  /* KPI strip — 2×3 grid, all inside screen */
+  /* KPI: Total facturado + Promedio on top row (2 cols, square-ish)
+     Cobrado / Pagado / Pendiente / Liquido on second row (4 cols, short) */
   .kpis{
+    display:grid;
     grid-template-columns:1fr 1fr;
-    border-radius:8px;overflow:hidden;
+    grid-template-rows:auto auto;
+    gap:0;
+    border-radius:10px;overflow:hidden;
     width:100%;max-width:100%;box-sizing:border-box;
   }
-  .kpi{
-    padding:10px 12px;border-right:0;
-    border-bottom:1px solid var(--rule);
-    min-width:0;overflow:hidden;box-sizing:border-box;
-  }
-  .kpi:last-child{border-bottom:0}
-  .kpi:nth-child(1){grid-column:span 2;border-right:0}
+  /* Row 1: Total (span 2 full width) + Promedio beside it → 
+     Actually: Total full top, then 4 small below */
+  .kpi{padding:10px 12px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-width:0;overflow:hidden;box-sizing:border-box}
+  .kpi:nth-child(even){border-right:0}
   .kpi .spark{display:none}
-  /* Scale down all KPI text to fit */
-  .kpi-value{font-size:16px !important;word-break:break-word;line-height:1.15}
-  .kpi.primary .kpi-value{font-size:19px !important}
-  .kpi-label{font-size:9px !important;letter-spacing:.05em}
+  /* Total facturado spans full width, taller */
+  .kpi:nth-child(1){grid-column:1/3;border-right:0;padding:14px 16px}
+  /* Cobrado, Pagado, Pendiente, Liquido: 2 per row, shorter */
+  .kpi:nth-child(2),.kpi:nth-child(3){border-bottom:1px solid var(--rule)}
+  .kpi:nth-child(4),.kpi:nth-child(5),.kpi:nth-child(6){border-bottom:0}
+  /* Promedio goes at end, spans full if odd */
+  .kpi:last-child{grid-column:1/3;border-right:0;border-bottom:0;padding:8px 12px}
+  /* Font sizes */
+  .kpi-value{font-size:15px !important;word-break:break-word;line-height:1.2}
+  .kpi:nth-child(1) .kpi-value{font-size:20px !important}
+  .kpi-label{font-size:9px !important;letter-spacing:.04em}
   .kpi-sub{font-size:9px !important}
   .delta{font-size:9px;padding:1px 4px}
 
-  /* Grids all single column */
-  .grid{grid-template-columns:1fr;margin-top:14px;gap:12px}
+  /* All grids → single column */
+  .grid{grid-template-columns:1fr !important;margin-top:14px;gap:12px}
   .grid2{grid-template-columns:1fr !important}
-  .donut-row{grid-template-columns:1fr}
-  .donut-svg{width:100px;height:100px;margin:0 auto}
-
-  /* Bottom nav */
+  .donut-row{grid-template-columns:100px 1fr;gap:12px}
+  .donut-svg{width:100px;height:100px}
   .bottom-nav{display:flex !important}
-
-  /* Other */
-  .metric-grid{grid-template-columns:1fr 1fr !important}
-  .metric.navy{grid-column:span 2}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr}
-  .chart-row-mobile{grid-template-columns:1fr}
+  .chart-row-mobile{grid-template-columns:1fr !important}
   .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
   .h-actions .btn-danger{display:none}
   .col-obs{display:none}
-  td,th{padding:7px 8px;font-size:11px}
-  /* Tables scroll internally, not whole page */
-  .card{overflow:hidden;max-width:100%}
-  .sched table,.card table{overflow-x:auto;display:block;white-space:nowrap}
-  /* Chart wrap */
-  .chart-wrap{padding:12px 8px;overflow:hidden}
-  .chart-wrap svg,.chart{max-width:100%;height:auto}
-  /* Alert cards */
-  .alerts-list .alert{padding:8px 12px;gap:8px}
-  .alert .num{font-size:10px;padding:2px 5px}
+
+  /* Tables: scroll internally, NEVER push page width */
+  .card,.card-inner,.sched,.alerts-list{overflow:hidden;max-width:100%;box-sizing:border-box}
+  .card table,.sched table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;white-space:nowrap}
+  td,th{padding:6px 8px;font-size:10px}
+  td:first-child,th:first-child{padding-left:10px}
+
+  /* Chart */
+  .chart-wrap{padding:10px 6px;overflow:hidden}
+  .chart,.chart-wrap svg{max-width:100% !important;width:100% !important;height:auto !important}
+
+  /* Alert list — fix overlap */
+  .alerts-list{overflow:hidden}
+  .alert{grid-template-columns:48px 1fr auto;gap:8px;padding:8px 10px;overflow:hidden}
+  .alert .num{font-size:9px;padding:1px 5px;min-width:0}
+  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alert .right{display:none}
+
+  /* Prev rows in donut card */
+  .prev-rows{gap:5px}
+  .prev-row{font-size:10px;gap:6px}
+  .prev-row .amt{min-width:60px;font-size:10px}
+
+  /* Chips wrap */
+  .h-actions{flex-wrap:wrap;gap:4px}
+
+  /* Page header */
+  .page-head h1{font-size:18px}
+  .head-right{display:none}
 }
-@media(max-width:390px){
-  .kpi-value{font-size:14px !important}
-  .kpi.primary .kpi-value{font-size:17px !important}
+@media(max-width:375px){
+  .kpi-value{font-size:13px !important}
+  .kpi:nth-child(1) .kpi-value{font-size:17px !important}
   .kpi{padding:8px 10px}
-  .page{padding:8px 10px 20px}
+  .page{padding:8px 10px 80px}
+  td,th{padding:5px 6px;font-size:9px}
 }
 @media(max-width:1280px){
   .kpis{grid-template-columns:1.4fr 1fr 1fr 1fr 1fr 1fr}
@@ -1004,8 +1025,8 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
       <div class="brand-mark">ψ</div>
       <div class="brand-name">
         <b>Consulta Privada</b>
-        <span style="font-size:11px;color:oklch(0.88 0.02 250);font-weight:400;line-height:1.2">Alex Núñez</span>
-        <span id="year-label" class="mono" style="font-size:10px;color:oklch(0.65 0.04 250)">2026</span>
+        <span style="font-size:11px;color:oklch(0.88 0.02 250);font-weight:400">Alex Núñez</span>
+        <span id="year-label" style="font-size:10px;color:oklch(0.65 0.04 250)">2026</span>
       </div>
       <span class="sync-pill" id="sync-pill">…</span>
     </div>
@@ -1059,8 +1080,8 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
       <button class="hamburger" onclick="toggleSb()">☰</button>
       <div class="h-title" id="view-title">Dashboard</div>
       <div class="h-actions" id="header-actions">
-        <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)">👁</button>
-        <button class="btn btn-icon" onclick="openSearch()" title="Búsqueda global (Cmd+F)">🔍</button>
+        <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)">${_EYE}</button>
+        <button class="btn btn-icon" onclick="openSearch()" title="Búsqueda global (Cmd+F)">${_SEARCH}</button>
       </div>
     </div>
     <div class="main-body" id="main-body">
@@ -1074,7 +1095,7 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
         <div class="bn-icon">≋</div><span>Resumen</span>
       </div>
       <div class="bn-item" id="bn-pacientes" onclick="openSearch()">
-        <div class="bn-icon">🔍</div><span>Buscar</span>
+        <div class="bn-icon">${_SEARCH}</div><span>Buscar</span>
       </div>
       <div class="bn-item" id="bn-config" onclick="showView('config');updateBN('config')">
         <div class="bn-icon">⚙</div><span>Config</span>
@@ -1088,6 +1109,9 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+const _EYE='<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>';
+const _EYE_OFF='<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/><line x1="2" y1="2" x2="14" y2="14"/></svg>';
+const _SEARCH='<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>';
 const SB_URL='https://ybztenzmpwufcvzvmwao.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlienRlbnptcHd1ZmN2enZtd2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzM0NzYsImV4cCI6MjA5MjUwOTQ3Nn0.bHC65JMkp6LSd9qWEVgZyhwtLlnOYzVjuEHV46LfVag';
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
@@ -1097,7 +1121,7 @@ const PREV_LIST=['Fonasa','Colmena','Cruz Blanca','Particular','Particular Acuer
 const ESTADOS=['','Cobrado','Pagado','Pendiente'];
 const CUR_YEAR=new Date().getFullYear();
 const IMPUESTO=0.1525;
-const PIE_COLORS=['oklch(0.32 0.12 268)','oklch(0.50 0.14 220)','oklch(0.62 0.13 165)','oklch(0.55 0.16 290)','oklch(0.65 0.13 75)'];
+const PIE_COLORS=['oklch(0.30 0.12 268)','oklch(0.50 0.14 220)','oklch(0.62 0.13 165)','oklch(0.52 0.16 290)','oklch(0.60 0.13 75)'];
 
 let pts={},view='dashboard',pid=null,sbOpen=false,showAlta=false;
 let curFontSize='normal';
@@ -1161,11 +1185,9 @@ function applyFontSize(s){
   const r=document.documentElement;
   r.style.setProperty('--fs-base',v[0]);
   r.style.setProperty('--fs-xl',v[1]);
-  r.style.setProperty('--fs-xl-primary',['20px','24px','28px','32px'][['normal','medium','large','xlarge'].indexOf(s)]||'28px');
+  r.style.setProperty('--fs-xl-p',{'normal':'28px','medium':'32px','large':'36px','xlarge':'40px'}[s]||'28px');
   r.style.setProperty('--fs-sm',v[2]);
   r.style.setProperty('--fs-xs',v[3]);
-  r.style.setProperty('--fs-sb',v[4]||v[0]);
-  r.style.setProperty('--fs-sblbl',v[5]||v[3]);
   localStorage.setItem('cp_fontsize',s);
   if(view==='config')renderConfig();
 }
@@ -1355,7 +1377,7 @@ function setActiveChart(t){activeChart=t;renderDashboard();}
 function renderDashboard(){
   document.getElementById('view-title').textContent='Dashboard';
   document.getElementById('header-actions').innerHTML=`
-    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)">${privateMode?'\uD83D\uDE48':'\uD83D\uDC41'}</button>
+    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado (Cmd+P)">${privateMode?_EYE_OFF:_EYE}</button>
     <button class="btn btn-icon" onclick="openSearch()" title="Búsqueda global (Cmd+F)">\uD83D\uDD0D</button>`;
 
   const all=allSessions();
@@ -1451,19 +1473,19 @@ function renderDashboard(){
   const avgY=H-PB-(avgV/maxV)*iH;
   const avgLine=avgV>0?`<line x1="${PL}" y1="${avgY.toFixed(1)}" x2="${W}" y2="${avgY.toFixed(1)}" stroke="var(--ink-3)" stroke-dasharray="3 4" stroke-width="1.1" opacity=".5"/>
 <text x="${W-2}" y="${(avgY-4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--ink-3)" opacity=".7">prom $${Math.round(avgV/1000)}k</text>`:'';
-  const chartVal=(m)=>activeChart==='cobrado'?m.cobrado:activeChart==='liquido'?m.liquido:m.total;
-  const maxVActive=Math.max(...sortedMKeys.map(k=>chartVal(monMap[k])),1);
-  const barColor=activeChart==='cobrado'?'oklch(0.62 0.13 165)':activeChart==='liquido'?'oklch(0.45 0.16 265)':'oklch(0.38 0.14 268)';
+  const _chartVal=(m)=>activeChart==='cobrado'?m.cobrado:activeChart==='liquido'?m.liquido:m.total;
+  const _maxVA=Math.max(...sortedMKeys.map(k=>_chartVal(monMap[k])),1);
+  const _bColor=activeChart==='cobrado'?'oklch(0.62 0.13 165)':activeChart==='liquido'?'oklch(0.40 0.16 265)':'oklch(0.35 0.13 268)';
   const bars=sortedMKeys.map((k,i)=>{
     const m=monMap[k];
-    const v=chartVal(m);
+    const v=_chartVal(m);
     const cx=PL+i*xStep+xStep/2;
     const bx=cx-bW/2;
-    const hV=Math.max((v/maxVActive)*iH,v>0?2:0);
+    const hV=Math.max((v/_maxVA)*iH,v>0?2:0);
     const yV=H-PB-hV;
     const lbl=privateMode?'':`<text x="${cx.toFixed(1)}" y="${(yV-4).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--ink-3)">$${Math.round(v/1000)}k</text>`;
     return`<g>
-  <rect x="${bx.toFixed(1)}" y="${yV.toFixed(1)}" width="${bW}" height="${hV.toFixed(1)}" fill="${barColor}" rx="3" opacity=".85"/>
+  <rect x="${bx.toFixed(1)}" y="${yV.toFixed(1)}" width="${bW}" height="${hV.toFixed(1)}" fill="${_bColor}" rx="3" opacity=".85"/>
   ${lbl}
   <text x="${cx.toFixed(1)}" y="${H-PB+14}" text-anchor="middle" font-size="10" fill="var(--ink-4)">${m.label}</text>
 </g>`;
@@ -1649,7 +1671,7 @@ ${kpisHtml}
 function renderResumen(){
   document.getElementById('view-title').textContent='Resumen general';
   document.getElementById('header-actions').innerHTML=`
-    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado">${privateMode?'\uD83D\uDE48':'\uD83D\uDC41'}</button>
+    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()" title="Modo privado">${privateMode?_EYE_OFF:_EYE}</button>
     <button class="btn btn-icon" onclick="openSearch()">\uD83D\uDD0D</button>`;
 
   const all=allSessions();
@@ -1966,7 +1988,7 @@ function renderPatient(id){
     ?`<button class="btn btn-success btn-sm" onclick="toggleAlta('${esc(id)}',false)">↩ Reactivar</button>`
     :`<button class="btn btn-warning btn-sm" onclick="toggleAlta('${esc(id)}',true)">\u2713 Dar de alta</button>`;
   document.getElementById('header-actions').innerHTML=`
-    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()">${privateMode?'\uD83D\uDE48':'\uD83D\uDC41'}</button>
+    <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()">${privateMode?_EYE_OFF:_EYE}</button>
     <button class="btn btn-icon" onclick="openSearch()">\uD83D\uDD0D</button>
     <button class="btn btn-primary btn-sm" onclick="showAddSes('${esc(id)}')">+ Sesión</button>
     ${altaBtn}
