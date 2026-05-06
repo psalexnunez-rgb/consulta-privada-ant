@@ -905,87 +905,59 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
   .kpi.primary .kpi-value{font-size:24px}
 }
 
-@media(max-width:768px){
-  /* ── PREVENT ALL HORIZONTAL OVERFLOW ── */
-  *{max-width:100%;box-sizing:border-box}
-  html,body{overflow-x:hidden;width:100%;max-width:100vw}
-  .app{grid-template-columns:1fr;width:100%;overflow-x:hidden}
-  .main{overflow-x:hidden;width:100%}
-  .page{padding:10px 12px 80px;overflow-x:hidden}
-  .topbar{padding:10px 14px;overflow-x:hidden}
 
-  /* ── SIDEBAR ── */
+
+@media(max-width:768px){
+  /* Prevent horizontal overflow absolutely */
+  html,body{overflow-x:hidden;width:100vw;max-width:100vw}
+  .app{grid-template-columns:1fr;overflow:hidden;width:100vw;max-width:100vw}
+  .main,.page,.topbar,.card,.card-inner{overflow-x:hidden;max-width:100%;box-sizing:border-box}
+  .page{padding:10px 10px 80px}
+  .topbar{padding:9px 12px}
+
+  /* Sidebar */
   .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;
     transform:translateX(-100%);z-index:100;max-width:85vw}
   .sidebar.open{transform:translateX(0)}
   .hamburger{display:flex !important}
 
   /* ── KPI LAYOUT ──
-     Row 1: Total facturado [col 1] + Cobrado [col 2]  → square, taller
-     Row 2: Pagado + Pendiente + Líquido                → rectangular, shorter
-     Row 3: Promedio (hidden or small)
+     [Total facturado] [Cobrado]   ← square, taller
+     [Pagado]          [Pendiente] ← rectangle, shorter
+     [Líquido - full width inline] ← rectangle, short
+     [Promedio - hidden]
   */
   .kpis{
     display:grid;
     grid-template-columns:1fr 1fr;
-    grid-template-rows:auto auto;
     gap:1px;
     background:var(--rule);
-    border-radius:10px;overflow:hidden;
+    border-radius:10px;
+    overflow:hidden;
     width:100%;
   }
-  .kpi{
-    background:var(--paper);
-    padding:14px 12px;
-    border:none;min-width:0;overflow:hidden;
-  }
+  .kpi{background:var(--paper);border:none;min-width:0;overflow:hidden;padding:12px 10px}
   .kpi .spark{display:none}
-
-  /* kpi[1] = Total facturado: col 1, row 1, square */
-  .kpi:nth-child(1){
-    grid-column:1; grid-row:1;
-    padding:16px 14px;
-  }
-  /* kpi[2] = Cobrado: col 2, row 1, square (same height as Total) */
-  .kpi:nth-child(2){
-    grid-column:2; grid-row:1;
-    padding:16px 14px;
-  }
-  /* kpi[3] = Pagado: col 1, row 2, rectangular (shorter) */
-  .kpi:nth-child(3){
-    grid-column:1; grid-row:2;
-    padding:10px 12px;
-  }
-  /* kpi[4] = Pendiente: col 2, row 2, rectangular */
-  .kpi:nth-child(4){
-    grid-column:2; grid-row:2;
-    padding:10px 12px;
-  }
-  /* kpi[5] = Líquido: spans both cols, row 3, rectangular */
+  .kpi:nth-child(1){grid-column:1;grid-row:1;padding:16px 12px}
+  .kpi:nth-child(2){grid-column:2;grid-row:1;padding:16px 12px}
+  .kpi:nth-child(3){grid-column:1;grid-row:2;padding:10px 10px}
+  .kpi:nth-child(4){grid-column:2;grid-row:2;padding:10px 10px}
   .kpi:nth-child(5){
-    grid-column:1/3; grid-row:3;
-    padding:10px 14px;
-    display:flex;align-items:center;gap:12px;
+    grid-column:1/3;grid-row:3;padding:8px 12px;
+    display:flex;align-items:center;gap:10px
   }
-  .kpi:nth-child(5) .kpi-label{margin-bottom:0;white-space:nowrap}
-  .kpi:nth-child(5) .kpi-value{margin-top:0}
-  .kpi:nth-child(5) .kpi-sub{margin-top:0;margin-left:auto}
-  /* kpi[6] = Promedio: hidden on mobile */
+  .kpi:nth-child(5) .kpi-label,.kpi:nth-child(5) .kpi-value,.kpi:nth-child(5) .kpi-sub{margin:0}
+  .kpi:nth-child(5) .kpi-sub{margin-left:auto}
   .kpi:nth-child(6){display:none}
-
-  /* Font sizes */
-  .kpi-value{font-size:16px !important;line-height:1.2;word-break:break-word}
-  .kpi:nth-child(1) .kpi-value,
-  .kpi:nth-child(2) .kpi-value{font-size:18px !important}
-  .kpi-label{font-size:9px !important;letter-spacing:.04em}
+  .kpi-value{font-size:15px !important;line-height:1.2;word-break:break-word}
+  .kpi:nth-child(1) .kpi-value,.kpi:nth-child(2) .kpi-value{font-size:17px !important}
+  .kpi-label{font-size:9px !important;letter-spacing:.03em;margin-bottom:4px}
   .kpi-sub{font-size:9px !important}
-  .delta{font-size:9px;padding:1px 4px}
+  .delta{font-size:9px;padding:1px 3px}
 
-  /* ── GRIDS ALL SINGLE COL ── */
+  /* Grids */
   .grid{grid-template-columns:1fr !important;margin-top:12px;gap:10px}
   .grid2{grid-template-columns:1fr !important}
-  .donut-row{grid-template-columns:90px 1fr;gap:10px}
-  .donut-svg{width:90px;height:90px}
   .bottom-nav{display:flex !important}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr}
@@ -993,59 +965,96 @@ tbody tr:hover{background:rgba(26,63,110,.03)}
   .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
   .h-actions .btn-danger{display:none}
-  .col-obs{display:none}
 
-  /* ── TABLES: internal scroll, never overflow page ── */
-  .card{overflow:hidden}
-  .card table,table{
-    display:block;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    width:100%;
-    white-space:nowrap;
-    font-size:10px;
-  }
-  td,th{padding:6px 8px}
-
-  /* ── CHART ── */
-  .chart-wrap{padding:10px 4px;overflow:hidden}
-  .chart,.chart-wrap svg{
+  /* ── CHART: scale SVG to fit ── */
+  .chart-wrap{padding:12px 6px 8px;overflow:hidden}
+  .chart{
     width:100% !important;
+    height:auto !important;
     max-width:100% !important;
-    height:160px !important;
+    display:block;
+  }
+
+  /* ── TABLES: no horizontal scroll, hide less critical cols ── */
+  .col-obs{display:none}
+  /* Ingreso por mes - hide Impuesto and Consulta cols */
+  .hide-mobile{display:none !important}
+  /* All tables: compact, no overflow */
+  table{
+    width:100% !important;
+    table-layout:fixed;
+    font-size:10px;
+    word-break:break-word;
+  }
+  th,td{
+    padding:5px 6px;
+    white-space:normal;
+    word-break:break-word;
     overflow:hidden;
   }
+  /* First col slightly wider */
+  th:first-child,td:first-child{padding-left:8px}
 
-  /* ── ALERTS: fix overflow and overlap ── */
+  /* Próximas sesiones: hide Previsión and Tarifa cols */
+  .sched-prevision,.sched-tarifa{display:none}
+
+  /* ── ALERTS: compact, no overflow ── */
   .alerts-list{overflow:hidden;width:100%}
   .alert{
-    display:grid;
-    grid-template-columns:46px 1fr;
-    gap:8px;padding:8px 10px;
-    overflow:hidden;width:100%;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 8px;
+    overflow:hidden;
+    width:100%;
   }
+  .alert .num{
+    font-size:9px;padding:2px 5px;
+    flex-shrink:0;width:auto;min-width:0;
+    white-space:nowrap;margin:0
+  }
+  .alert .name{
+    font-size:11px;flex:1;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  }
+  .alert .why{display:none}
   .alert .right{display:none}
-  .alert .num{font-size:9px;padding:2px 5px;width:auto;margin-left:0}
-  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alert>div{min-width:0;flex:1;overflow:hidden}
+  .alert>div .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* ── PREV ROWS ── */
-  .prev-rows{gap:5px}
-  .prev-row{font-size:10px;gap:6px}
-  .prev-row .amt{min-width:60px;font-size:10px}
+  /* ── DONUT / POR PREVISIÓN ── */
+  .donut-row{grid-template-columns:80px 1fr;gap:10px;padding:12px 12px 14px}
+  .donut-svg{width:80px;height:80px}
+  .prev-rows{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .prev-row{
+    display:flex;align-items:center;gap:4px;
+    font-size:10px;min-width:0;
+  }
+  .prev-row .sw{flex-shrink:0}
+  .prev-row .lab{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .prev-row .pct{flex-shrink:0;font-size:10px;white-space:nowrap}
+  .prev-row .amt{display:none}
 
-  /* ── PAGE HEAD ── */
+  /* Page head */
   .page-head h1{font-size:18px}
   .head-right{display:none}
-  .page-head{margin-bottom:14px}
+  .page-head{margin-bottom:12px}
 }
 @media(max-width:375px){
-  .kpi-value{font-size:14px !important}
-  .kpi:nth-child(1) .kpi-value,
-  .kpi:nth-child(2) .kpi-value{font-size:16px !important}
-  .kpi{padding:10px 10px}
-  .page{padding:8px 10px 80px}
-  td,th{padding:5px 6px;font-size:9px}
+  .kpi-value{font-size:13px !important}
+  .kpi:nth-child(1) .kpi-value,.kpi:nth-child(2) .kpi-value{font-size:15px !important}
+  .kpi{padding:9px 8px}
+  .kpi:nth-child(1),.kpi:nth-child(2){padding:13px 10px}
+  .page{padding:8px 8px 80px}
+  th,td{padding:4px 5px;font-size:9px}
+}
+
+/* Por mes in patient view */
+.por-mes-mobile-only{display:none}
+@media(max-width:768px){
+  .por-mes-col{display:none}
+  .por-mes-mobile-only{display:block}
+  .pdg{grid-template-columns:1fr !important}
 }
 </style>
 </head>
@@ -1542,7 +1551,7 @@ function renderDashboard(){
 </g>`;
   }).join('');
   const chartSvg=sortedMKeys.length
-    ?`<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${yGrid}${avgLine}${bars}</svg>`
+    ?`<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block">${yGrid}${avgLine}${bars}</svg>`
     :`<div style="height:200px;display:flex;align-items:center;justify-content:center;color:var(--ink-4);font-size:13px">Sin datos para ${CUR_YEAR}</div>`;
 
   // ── Donut by previsión ────────────────────────────────────────────────────
@@ -1639,9 +1648,9 @@ function renderDashboard(){
     return`<tr>
       <td class="t">${p.nextSession}</td>
       <td class="p">${p.nombre}</td>
-      <td>${prevTag(p.prevision)}</td>
+      <td class="sched-prevision">${prevTag(p.prevision)}</td>
       <td><span class="status-dot ${dot}"></span>${pend>0?'Pendiente':'Al día'}</td>
-      <td class="amt">${pv('$'+fmt(getTarifa(p.prevision)||0))}</td>
+      <td class="sched-tarifa amt">${pv('$'+fmt(getTarifa(p.prevision)||0))}</td>
     </tr>`;
   }).join(''):`<tr><td colspan="5" style="text-align:center;color:var(--ink-4);padding:28px 18px;font-size:12.5px">Sin sesiones en los próximos 14 días</td></tr>`;
 
@@ -1692,7 +1701,7 @@ ${kpisHtml}
         <div class="h-actions"><button class="btn btn-sm" onclick="showView('resumen')">Ver resumen</button></div>
       </div>
       <table>
-        <thead><tr><th>Fecha</th><th>Paciente</th><th>Previsión</th><th>Estado</th><th style="text-align:right">Tarifa</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Paciente</th><th class="sched-prevision">Previsión</th><th>Estado</th><th class="sched-tarifa" style="text-align:right">Tarifa</th></tr></thead>
         <tbody>${schedRows}</tbody>
       </table>
     </div>
@@ -1760,7 +1769,7 @@ function buildMesTab(all,yr){
     const d=monMap[k];
     const imp=Math.round(d.total*IMPUESTO);
     const liq=d.total-imp-costoConsulta;
-    return`<tr><td style="font-weight:500">${d.mes[0].toUpperCase()+d.mes.slice(1)} ${yr}</td><td style="color:var(--text3)">${d.ses.length}</td><td style="font-family:var(--mono)">${pv('$'+fmt(d.total))}</td><td style="color:var(--green);font-family:var(--mono)">${pv('$'+fmt(d.cob))}</td><td style="color:var(--blue);font-family:var(--mono)">${pv('$'+fmt(d.pag))}</td><td style="color:var(--red);font-family:var(--mono)">${pv('$'+fmt(d.pen))}</td><td style="color:var(--orange);font-family:var(--mono);font-size:12px">${pv('-$'+fmt(imp))}</td><td style="color:var(--text3);font-family:var(--mono);font-size:12px">${pv('-$'+fmt(costoConsulta))}</td><td style="font-family:var(--mono);font-weight:600;color:${liq>=0?'var(--sb)':'var(--red)'}">${pv('$'+fmt(liq))}</td></tr>`;
+    return`<tr><td style="font-weight:500">${d.mes[0].toUpperCase()+d.mes.slice(1)} ${yr}</td><td style="color:var(--ink-3)">${d.ses.length}</td><td style="font-family:"Geist Mono",monospace">${pv('$'+fmt(d.total))}</td><td style="color:var(--pos);font-family:"Geist Mono",monospace">${pv('$'+fmt(d.cob))}</td><td style="color:var(--accent);font-family:"Geist Mono",monospace">${pv('$'+fmt(d.pag))}</td><td style="color:var(--neg);font-family:"Geist Mono",monospace">${pv('$'+fmt(d.pen))}</td><td style="color:var(--warn);font-family:"Geist Mono",monospace;font-size:12px">${pv('-$'+fmt(imp))}</td><td style="color:var(--ink-3);font-family:"Geist Mono",monospace;font-size:12px">${pv('-$'+fmt(costoConsulta))}</td><td style="font-family:"Geist Mono",monospace;font-weight:600;color:${liq>=0?'var(--accent)':'var(--neg)'}">${pv('$'+fmt(liq))}</td></tr>`;
   }).join('');
   const yrSes=all.filter(s=>s.fecha&&s.fecha.split('/')[2]===yr);
   const total=yrSes.reduce((a,s)=>a+s.monto,0);
@@ -1789,22 +1798,22 @@ function buildMesTab(all,yr){
   const pieCard2='<div class="glass" style="padding:16px"><div class="stitle" style="margin-bottom:10px">Sesiones por previsión — '+yr+'</div><div class="pie-wrap"><svg viewBox="0 0 100 100" width="90" height="90" style="flex-shrink:0">'+svg2+'<circle cx="50" cy="50" r="22" fill="var(--glass)"/><text x="50" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">'+yrSes.length+'</text></svg><div class="pie-legend">'+leg2+'</div></div></div>';
   const rowStyle='display:flex;justify-content:space-between;font-size:var(--fs-sm);padding:1px 0';
   const sumCard2='<div class="glass" style="padding:16px"><div class="stitle" style="margin-bottom:10px">Resumen '+yr+'</div><div style="display:flex;flex-direction:column;gap:6px">'
-    +'<div style="'+rowStyle+'"><span style="color:var(--text3)">Total</span><span style="font-weight:600">'+pv('$'+fmt(total))+'</span></div>'
-    +'<div style="'+rowStyle+'"><span style="color:var(--green)">Cobrado</span><span style="color:var(--green);font-weight:600">'+pv('$'+fmt(cob))+'</span></div>'
-    +'<div style="'+rowStyle+'"><span style="color:var(--blue)">Pagado</span><span style="color:var(--blue);font-weight:600">'+pv('$'+fmt(pag))+'</span></div>'
-    +'<div style="'+rowStyle+'"><span style="color:var(--red)">Pendiente</span><span style="color:var(--red);font-weight:600">'+pv('$'+fmt(pen))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--ink-3)">Total</span><span style="font-weight:600">'+pv('$'+fmt(total))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--pos)">Cobrado</span><span style="color:var(--pos);font-weight:600">'+pv('$'+fmt(cob))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--accent)">Pagado</span><span style="color:var(--accent);font-weight:600">'+pv('$'+fmt(pag))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--neg)">Pendiente</span><span style="color:var(--neg);font-weight:600">'+pv('$'+fmt(pen))+'</span></div>'
     +'<div style="height:1px;background:var(--border);margin:2px 0"></div>'
-    +'<div style="'+rowStyle+'"><span style="color:var(--orange)">Impuesto</span><span style="color:var(--orange);font-weight:600">'+pv('-$'+fmt(totalImp))+'</span></div>'
-    +'<div style="'+rowStyle+'"><span style="color:var(--text3)">Consulta</span><span style="font-weight:600">'+pv('-$'+fmt(totalCosto))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--warn)">Impuesto</span><span style="color:var(--warn);font-weight:600">'+pv('-$'+fmt(totalImp))+'</span></div>'
+    +'<div style="'+rowStyle+'"><span style="color:var(--ink-3)">Consulta</span><span style="font-weight:600">'+pv('-$'+fmt(totalCosto))+'</span></div>'
     +'<div style="height:1px;background:var(--border);margin:2px 0"></div>'
-    +'<div style="'+rowStyle+';font-size:var(--fs-base)"><span style="font-weight:600;color:var(--sb1)">Líquido</span><span style="font-weight:700;color:'+(totalLiq>=0?'var(--sb1)':'var(--red)')+'">'+pv('$'+fmt(totalLiq))+'</span></div>'
+    +'<div style="'+rowStyle+';font-size:var(--fs-base)"><span style="font-weight:600;color:var(--sb1)">Líquido</span><span style="font-weight:700;color:'+(totalLiq>=0?'var(--sb1)':'var(--neg)')+'">'+pv('$'+fmt(totalLiq))+'</span></div>'
     +'</div></div>';
 
 
   const topGrid='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px" class="chart-row-mobile">'+pieCard2+sumCard2+'</div>';
 
-  return topGrid+`<div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--green)">Cobrado</th><th style="color:var(--blue)">Pagado</th><th style="color:var(--red)">Pendiente</th><th style="color:var(--orange)">Impuesto</th><th>Consulta</th><th style="color:var(--sb)">Líquido</th></tr></thead>
-  <tbody>${rows}<tr style="background:var(--surface2);border-top:2px solid var(--border2)"><td style="font-weight:600">Total ${yr}</td><td style="color:var(--text3)">${yrSes.length}</td><td style="font-family:var(--mono);font-weight:600">${pv('$'+fmt(total))}</td><td style="color:var(--green);font-family:var(--mono);font-weight:600">${pv('$'+fmt(cob))}</td><td style="color:var(--blue);font-family:var(--mono);font-weight:600">${pv('$'+fmt(pag))}</td><td style="color:var(--red);font-family:var(--mono);font-weight:600">${pv('$'+fmt(pen))}</td><td style="color:var(--orange);font-family:var(--mono);font-weight:600">${pv('-$'+fmt(totalImp))}</td><td style="font-family:var(--mono);font-weight:600">${pv('-$'+fmt(totalCosto))}</td><td style="font-family:var(--mono);font-weight:700;color:${totalLiq>=0?'var(--sb)':'var(--red)'}">${pv('$'+fmt(totalLiq))}</td></tr></tbody></table></div>`;
+  return topGrid+`<div class="tw"><table><thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th style="color:var(--pos)">Cobrado</th><th style="color:var(--accent)">Pagado</th><th style="color:var(--neg)">Pendiente</th><th class="hide-mobile" style="color:var(--warn)">Impuesto</th><th class="hide-mobile">Consulta</th><th style="color:var(--accent)">Líquido</th></tr></thead>
+  <tbody>${rows}<tr style="background:var(--surface2);border-top:2px solid var(--border2)"><td style="font-weight:600">Total ${yr}</td><td style="color:var(--ink-3)">${yrSes.length}</td><td style="font-family:"Geist Mono",monospace;font-weight:600">${pv('$'+fmt(total))}</td><td style="color:var(--pos);font-family:"Geist Mono",monospace;font-weight:600">${pv('$'+fmt(cob))}</td><td style="color:var(--accent);font-family:"Geist Mono",monospace;font-weight:600">${pv('$'+fmt(pag))}</td><td style="color:var(--neg);font-family:"Geist Mono",monospace;font-weight:600">${pv('$'+fmt(pen))}</td><td class="hide-mobile" style="color:var(--warn);font-family:"Geist Mono",monospace;font-weight:600">${pv('-$'+fmt(totalImp))}</td><td class="hide-mobile" style="font-family:"Geist Mono",monospace;font-weight:600">${pv('-$'+fmt(totalCosto))}</td><td style="font-family:"Geist Mono",monospace;font-weight:700;color:${totalLiq>=0?'var(--accent)':'var(--neg)'}">${pv('$'+fmt(totalLiq))}</td></tr></tbody></table></div>`;
 }
 
 function buildPatTab(all,yr){
@@ -1834,7 +1843,7 @@ function buildPatTab(all,yr){
     const pend=p.yrSes.filter(s=>s.estado==='Pendiente').length;
     const pendBadge=pend>=2?`<span class="badge b-pendiente" style="margin-left:4px">${pend}⚠</span>`:'';
     const avgM=p.yrSes.length>0?(p.yrSes.length/Math.max(new Set(p.yrSes.map(s=>s.mes)).size,1)).toFixed(1):'—';
-    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--sb);font-weight:500">${p.nombre}</a>${altaBadge}${pendBadge}</td><td>${modalBadge(p.modalidad)}</td><td style="color:var(--text3)">${p.prevision||'—'}</td><td style="color:var(--text3)">${p.yrSes.length}</td><td style="font-family:var(--mono)">${pv('$'+fmt(p.t))}</td><td style="color:var(--green);font-family:var(--mono)">${pv('$'+fmt(p.c))}</td><td style="color:var(--blue);font-family:var(--mono)">${pv('$'+fmt(p.pg))}</td></tr>`;
+    return`<tr><td><a href="#" onclick="showPatient('${esc(p.id)}');return false;" style="color:var(--accent);font-weight:500">${p.nombre}</a>${altaBadge}${pendBadge}</td><td>${modalBadge(p.modalidad)}</td><td style="color:var(--ink-3)">${p.prevision||'—'}</td><td style="color:var(--ink-3)">${p.yrSes.length}</td><td style="font-family:"Geist Mono",monospace">${pv('$'+fmt(p.t))}</td><td style="color:var(--pos);font-family:"Geist Mono",monospace">${pv('$'+fmt(p.c))}</td><td style="color:var(--accent);font-family:"Geist Mono",monospace">${pv('$'+fmt(p.pg))}</td></tr>`;
   }).join('');
 
   function sortIcon(col){return resumenSortCol===col?(resumenSortDir===1?'↑':'↓'):'↕';}
@@ -1845,8 +1854,8 @@ function buildPatTab(all,yr){
     <th>Modalidad</th><th>Previsión</th>
     <th class="sortable" ${sortFn('ses')}>Ses. ${sortIcon('ses')}</th>
     <th class="sortable" ${sortFn('total')}>Total ${sortIcon('total')}</th>
-    <th style="color:var(--green)">Cobrado</th>
-    <th style="color:var(--blue)">Pagado</th>
+    <th style="color:var(--pos)">Cobrado</th>
+    <th style="color:var(--accent)">Pagado</th>
   </tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -1871,7 +1880,7 @@ function buildComparativa(all,yr,prevYr){
     const hp=Math.max(Math.round((p/maxV)*80),p>0?2:0);
     const label=MESES[parseInt(k)-1].slice(0,3);
     return`<div class="bc2" style="gap:2px">
-      <div class="bbar" style="height:${hc}px;background:var(--sb)"></div>
+      <div class="bbar" style="height:${hc}px;background:var(--accent)"></div>
       <div class="bbar2" style="height:${hp}px"></div>
       <div class="blbl">${label}</div>
     </div>`;
@@ -1880,12 +1889,12 @@ function buildComparativa(all,yr,prevYr){
   const rows=allKeys.map(k=>{
     const c=curData[k]||0;const p=prevData[k]||0;
     const diff=c-p;const pct=p>0?Math.round((diff/p)*100):null;
-    const col=diff>=0?'var(--green)':'var(--red)';
+    const col=diff>=0?'var(--pos)':'var(--neg)';
     const arrow=diff>=0?'↑':'↓';
     return`<tr><td style="font-weight:500">${MESES[parseInt(k)-1][0].toUpperCase()+MESES[parseInt(k)-1].slice(1)}</td>
-      <td style="font-family:var(--mono)">${pv('$'+fmt(c))}</td>
-      <td style="font-family:var(--mono);color:var(--text3)">${p>0?pv('$'+fmt(p)):'—'}</td>
-      <td style="font-family:var(--mono);color:${col};font-weight:600">${diff!==0?arrow+' '+pv('$'+fmt(Math.abs(diff))):'—'}</td>
+      <td style="font-family:"Geist Mono",monospace">${pv('$'+fmt(c))}</td>
+      <td style="font-family:"Geist Mono",monospace;color:var(--ink-3)">${p>0?pv('$'+fmt(p)):'—'}</td>
+      <td style="font-family:"Geist Mono",monospace;color:${col};font-weight:600">${diff!==0?arrow+' '+pv('$'+fmt(Math.abs(diff))):'—'}</td>
       <td style="color:${col};font-weight:600">${pct!==null?pct+'%':'—'}</td>
     </tr>`;
   }).join('');
@@ -1894,19 +1903,19 @@ function buildComparativa(all,yr,prevYr){
   const totPrev=Object.values(prevData).reduce((a,v)=>a+v,0);
   const totDiff=totCur-totPrev;
   const totPct=totPrev>0?Math.round((totDiff/totPrev)*100):null;
-  const totCol=totDiff>=0?'var(--green)':'var(--red)';
+  const totCol=totDiff>=0?'var(--pos)':'var(--neg)';
 
   return`<div style="margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div style="width:12px;height:12px;background:var(--sb);border-radius:2px"></div>${yr}</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div style="width:12px;height:12px;background:var(--green-bg);border:1px solid var(--green);border-radius:2px"></div>${prevYr}</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div style="width:12px;height:12px;background:var(--accent);border-radius:2px"></div>${yr}</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div style="width:12px;height:12px;background:var(--green-bg);border:1px solid var(--pos);border-radius:2px"></div>${prevYr}</div>
     </div>
     <div class="chart" style="height:90px">${bars}</div>
   </div>
   <div class="tw"><table><thead><tr><th>Mes</th><th>${yr}</th><th>${prevYr}</th><th>Diferencia</th><th>Variación</th></tr></thead>
   <tbody>${rows}<tr style="background:var(--surface2);font-weight:600;border-top:2px solid var(--border2)">
-    <td>Total</td><td style="font-family:var(--mono)">${pv('$'+fmt(totCur))}</td><td style="font-family:var(--mono);color:var(--text3)">${pv('$'+fmt(totPrev))}</td>
-    <td style="font-family:var(--mono);color:${totCol}">${totDiff!==0?(totDiff>0?'↑':'↓')+' '+pv('$'+fmt(Math.abs(totDiff))):'—'}</td>
+    <td>Total</td><td style="font-family:"Geist Mono",monospace">${pv('$'+fmt(totCur))}</td><td style="font-family:"Geist Mono",monospace;color:var(--ink-3)">${pv('$'+fmt(totPrev))}</td>
+    <td style="font-family:"Geist Mono",monospace;color:${totCol}">${totDiff!==0?(totDiff>0?'↑':'↓')+' '+pv('$'+fmt(Math.abs(totDiff))):'—'}</td>
     <td style="color:${totCol}">${totPct!==null?totPct+'%':'—'}</td>
   </tr></tbody></table></div>`;
 }
@@ -1924,8 +1933,8 @@ function buildPrevTab(all,yr,prevYr){
   const rows=prevs.map(p=>{
     const c=curData[p]||0;const prev=prevData[p]||0;
     const diff=c-prev;const pct=prev>0?Math.round((diff/prev)*100):null;
-    const col=diff>=0?'var(--green)':'var(--red)';
-    return`<tr><td style="font-weight:500">${p}</td><td style="font-family:var(--mono)">${pv('$'+fmt(c))}</td><td style="font-family:var(--mono);color:var(--text3)">${prev>0?pv('$'+fmt(prev)):'—'}</td><td style="color:${col};font-weight:600">${pct!==null?pct+'%':'—'}</td></tr>`;
+    const col=diff>=0?'var(--pos)':'var(--neg)';
+    return`<tr><td style="font-weight:500">${p}</td><td style="font-family:"Geist Mono",monospace">${pv('$'+fmt(c))}</td><td style="font-family:"Geist Mono",monospace;color:var(--ink-3)">${prev>0?pv('$'+fmt(prev)):'—'}</td><td style="color:${col};font-weight:600">${pct!==null?pct+'%':'—'}</td></tr>`;
   }).join('');
   return`<div class="tw"><table><thead><tr><th>Previsión</th><th>${yr}</th><th>${prevYr}</th><th>Variación</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -2040,7 +2049,6 @@ function renderPatient(id){
     :`<button class="btn btn-warning btn-sm" onclick="toggleAlta('${esc(id)}',true)">\u2713 Dar de alta</button>`;
   document.getElementById('header-actions').innerHTML=`
     <button class="btn btn-icon" id="private-btn" onclick="togglePrivate()">${privateMode?_EYE_OFF:_EYE}</button>
-    <button class="btn btn-icon" onclick="openSearch()">\uD83D\uDD0D</button>
     <button class="btn btn-primary btn-sm" onclick="showAddSes('${esc(id)}')">+ Sesión</button>
     ${altaBtn}
     <button class="btn btn-danger btn-sm" onclick="delPatient('${esc(id)}')">Eliminar</button>`;
@@ -2146,8 +2154,9 @@ function renderPatient(id){
         <th class="sortable" onclick="sortSessions('estado')">Estado ${si('estado')}</th>
         <th class="col-obs">Observaciones</th><th></th>
       </tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="ei">\uD83D\uDCCB</div><p>Sin sesiones. Usa el botón + Sesión.</p></div>'}</div>
-      <div><div class="stitle">Por mes</div><div class="msummary">${mSum||'<div style="font-size:12px;color:var(--text3)">Sin datos</div>'}<div class="mtotal"><span>Total</span><span style="font-family:var(--mono)">${pv('$'+fmt(total))}</span></div></div></div>
-    </div>`;
+      <div class="por-mes-col"><div class="stitle">Por mes</div><div class="msummary">${mSum||'<div style="font-size:12px;color:var(--text3)">Sin datos</div>'}<div class="mtotal"><span>Total</span><span style="font-family:var(--mono)">${pv('$'+fmt(total))}</span></div></div></div>
+    </div>
+    <div class="por-mes-mobile-only"><div class="stitle" style="margin-top:14px">Por mes</div><div class="msummary">${mSum||'<div style="font-size:12px;color:var(--text3)">Sin datos</div>'}<div class="mtotal"><span>Total</span><span style="font-family:var(--mono)">${pv('$'+fmt(total))}</span></div></div></div>`;
 }
 
 async function setNextSession(id,opt){
@@ -2347,87 +2356,59 @@ async function generatePdf(){
       </table>
     </div>`;
   }).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Consulta Privada ${year}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;color:#1a2035;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:0;size:A4}table{border-collapse:collapse;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}@media(max-width:768px){
-  /* ── PREVENT ALL HORIZONTAL OVERFLOW ── */
-  *{max-width:100%;box-sizing:border-box}
-  html,body{overflow-x:hidden;width:100%;max-width:100vw}
-  .app{grid-template-columns:1fr;width:100%;overflow-x:hidden}
-  .main{overflow-x:hidden;width:100%}
-  .page{padding:10px 12px 80px;overflow-x:hidden}
-  .topbar{padding:10px 14px;overflow-x:hidden}
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Consulta Privada ${year}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;color:#1a2035;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:0;size:A4}table{border-collapse:collapse;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #e0e6ef}thead tr th{background:#1b3f6e;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:0.05em}
 
-  /* ── SIDEBAR ── */
+@media(max-width:768px){
+  /* Prevent horizontal overflow absolutely */
+  html,body{overflow-x:hidden;width:100vw;max-width:100vw}
+  .app{grid-template-columns:1fr;overflow:hidden;width:100vw;max-width:100vw}
+  .main,.page,.topbar,.card,.card-inner{overflow-x:hidden;max-width:100%;box-sizing:border-box}
+  .page{padding:10px 10px 80px}
+  .topbar{padding:9px 12px}
+
+  /* Sidebar */
   .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;
     transform:translateX(-100%);z-index:100;max-width:85vw}
   .sidebar.open{transform:translateX(0)}
   .hamburger{display:flex !important}
 
   /* ── KPI LAYOUT ──
-     Row 1: Total facturado [col 1] + Cobrado [col 2]  → square, taller
-     Row 2: Pagado + Pendiente + Líquido                → rectangular, shorter
-     Row 3: Promedio (hidden or small)
+     [Total facturado] [Cobrado]   ← square, taller
+     [Pagado]          [Pendiente] ← rectangle, shorter
+     [Líquido - full width inline] ← rectangle, short
+     [Promedio - hidden]
   */
   .kpis{
     display:grid;
     grid-template-columns:1fr 1fr;
-    grid-template-rows:auto auto;
     gap:1px;
     background:var(--rule);
-    border-radius:10px;overflow:hidden;
+    border-radius:10px;
+    overflow:hidden;
     width:100%;
   }
-  .kpi{
-    background:var(--paper);
-    padding:14px 12px;
-    border:none;min-width:0;overflow:hidden;
-  }
+  .kpi{background:var(--paper);border:none;min-width:0;overflow:hidden;padding:12px 10px}
   .kpi .spark{display:none}
-
-  /* kpi[1] = Total facturado: col 1, row 1, square */
-  .kpi:nth-child(1){
-    grid-column:1; grid-row:1;
-    padding:16px 14px;
-  }
-  /* kpi[2] = Cobrado: col 2, row 1, square (same height as Total) */
-  .kpi:nth-child(2){
-    grid-column:2; grid-row:1;
-    padding:16px 14px;
-  }
-  /* kpi[3] = Pagado: col 1, row 2, rectangular (shorter) */
-  .kpi:nth-child(3){
-    grid-column:1; grid-row:2;
-    padding:10px 12px;
-  }
-  /* kpi[4] = Pendiente: col 2, row 2, rectangular */
-  .kpi:nth-child(4){
-    grid-column:2; grid-row:2;
-    padding:10px 12px;
-  }
-  /* kpi[5] = Líquido: spans both cols, row 3, rectangular */
+  .kpi:nth-child(1){grid-column:1;grid-row:1;padding:16px 12px}
+  .kpi:nth-child(2){grid-column:2;grid-row:1;padding:16px 12px}
+  .kpi:nth-child(3){grid-column:1;grid-row:2;padding:10px 10px}
+  .kpi:nth-child(4){grid-column:2;grid-row:2;padding:10px 10px}
   .kpi:nth-child(5){
-    grid-column:1/3; grid-row:3;
-    padding:10px 14px;
-    display:flex;align-items:center;gap:12px;
+    grid-column:1/3;grid-row:3;padding:8px 12px;
+    display:flex;align-items:center;gap:10px
   }
-  .kpi:nth-child(5) .kpi-label{margin-bottom:0;white-space:nowrap}
-  .kpi:nth-child(5) .kpi-value{margin-top:0}
-  .kpi:nth-child(5) .kpi-sub{margin-top:0;margin-left:auto}
-  /* kpi[6] = Promedio: hidden on mobile */
+  .kpi:nth-child(5) .kpi-label,.kpi:nth-child(5) .kpi-value,.kpi:nth-child(5) .kpi-sub{margin:0}
+  .kpi:nth-child(5) .kpi-sub{margin-left:auto}
   .kpi:nth-child(6){display:none}
-
-  /* Font sizes */
-  .kpi-value{font-size:16px !important;line-height:1.2;word-break:break-word}
-  .kpi:nth-child(1) .kpi-value,
-  .kpi:nth-child(2) .kpi-value{font-size:18px !important}
-  .kpi-label{font-size:9px !important;letter-spacing:.04em}
+  .kpi-value{font-size:15px !important;line-height:1.2;word-break:break-word}
+  .kpi:nth-child(1) .kpi-value,.kpi:nth-child(2) .kpi-value{font-size:17px !important}
+  .kpi-label{font-size:9px !important;letter-spacing:.03em;margin-bottom:4px}
   .kpi-sub{font-size:9px !important}
-  .delta{font-size:9px;padding:1px 4px}
+  .delta{font-size:9px;padding:1px 3px}
 
-  /* ── GRIDS ALL SINGLE COL ── */
+  /* Grids */
   .grid{grid-template-columns:1fr !important;margin-top:12px;gap:10px}
   .grid2{grid-template-columns:1fr !important}
-  .donut-row{grid-template-columns:90px 1fr;gap:10px}
-  .donut-svg{width:90px;height:90px}
   .bottom-nav{display:flex !important}
   .fr{grid-template-columns:1fr}
   .pdg{grid-template-columns:1fr}
@@ -2435,59 +2416,88 @@ async function generatePdf(){
   .tarifa-row{grid-template-columns:1fr 110px}
   .tarifa-year{display:none}
   .h-actions .btn-danger{display:none}
-  .col-obs{display:none}
 
-  /* ── TABLES: internal scroll, never overflow page ── */
-  .card{overflow:hidden}
-  .card table,table{
-    display:block;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    width:100%;
-    white-space:nowrap;
-    font-size:10px;
-  }
-  td,th{padding:6px 8px}
-
-  /* ── CHART ── */
-  .chart-wrap{padding:10px 4px;overflow:hidden}
-  .chart,.chart-wrap svg{
+  /* ── CHART: scale SVG to fit ── */
+  .chart-wrap{padding:12px 6px 8px;overflow:hidden}
+  .chart{
     width:100% !important;
+    height:auto !important;
     max-width:100% !important;
-    height:160px !important;
+    display:block;
+  }
+
+  /* ── TABLES: no horizontal scroll, hide less critical cols ── */
+  .col-obs{display:none}
+  /* Ingreso por mes - hide Impuesto and Consulta cols */
+  .hide-mobile{display:none !important}
+  /* All tables: compact, no overflow */
+  table{
+    width:100% !important;
+    table-layout:fixed;
+    font-size:10px;
+    word-break:break-word;
+  }
+  th,td{
+    padding:5px 6px;
+    white-space:normal;
+    word-break:break-word;
     overflow:hidden;
   }
+  /* First col slightly wider */
+  th:first-child,td:first-child{padding-left:8px}
 
-  /* ── ALERTS: fix overflow and overlap ── */
+  /* Próximas sesiones: hide Previsión and Tarifa cols */
+  .sched-prevision,.sched-tarifa{display:none}
+
+  /* ── ALERTS: compact, no overflow ── */
   .alerts-list{overflow:hidden;width:100%}
   .alert{
-    display:grid;
-    grid-template-columns:46px 1fr;
-    gap:8px;padding:8px 10px;
-    overflow:hidden;width:100%;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 8px;
+    overflow:hidden;
+    width:100%;
   }
+  .alert .num{
+    font-size:9px;padding:2px 5px;
+    flex-shrink:0;width:auto;min-width:0;
+    white-space:nowrap;margin:0
+  }
+  .alert .name{
+    font-size:11px;flex:1;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  }
+  .alert .why{display:none}
   .alert .right{display:none}
-  .alert .num{font-size:9px;padding:2px 5px;width:auto;margin-left:0}
-  .alert .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .alert .why{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alert>div{min-width:0;flex:1;overflow:hidden}
+  .alert>div .name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* ── PREV ROWS ── */
-  .prev-rows{gap:5px}
-  .prev-row{font-size:10px;gap:6px}
-  .prev-row .amt{min-width:60px;font-size:10px}
+  /* ── DONUT / POR PREVISIÓN ── */
+  .donut-row{grid-template-columns:80px 1fr;gap:10px;padding:12px 12px 14px}
+  .donut-svg{width:80px;height:80px}
+  .prev-rows{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .prev-row{
+    display:flex;align-items:center;gap:4px;
+    font-size:10px;min-width:0;
+  }
+  .prev-row .sw{flex-shrink:0}
+  .prev-row .lab{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .prev-row .pct{flex-shrink:0;font-size:10px;white-space:nowrap}
+  .prev-row .amt{display:none}
 
-  /* ── PAGE HEAD ── */
+  /* Page head */
   .page-head h1{font-size:18px}
   .head-right{display:none}
-  .page-head{margin-bottom:14px}
+  .page-head{margin-bottom:12px}
 }
 @media(max-width:375px){
-  .kpi-value{font-size:14px !important}
-  .kpi:nth-child(1) .kpi-value,
-  .kpi:nth-child(2) .kpi-value{font-size:16px !important}
-  .kpi{padding:10px 10px}
-  .page{padding:8px 10px 80px}
-  td,th{padding:5px 6px;font-size:9px}
+  .kpi-value{font-size:13px !important}
+  .kpi:nth-child(1) .kpi-value,.kpi:nth-child(2) .kpi-value{font-size:15px !important}
+  .kpi{padding:9px 8px}
+  .kpi:nth-child(1),.kpi:nth-child(2){padding:13px 10px}
+  .page{padding:8px 8px 80px}
+  th,td{padding:4px 5px;font-size:9px}
 }
 </style></head><body>
   <div style="padding:40px;font-family:Arial,sans-serif">
