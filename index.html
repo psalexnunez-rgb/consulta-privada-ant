@@ -1290,6 +1290,25 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
         <div id="per-patient-list"></div>
         <div id="per-patient-totals" style="border-top:2px solid var(--rule);background:var(--rule-2)"></div>
       </div>
+      <!-- Líquido mensual -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Líquido mensual</div>
+          <div style="font-size:11px;color:var(--ink-4)">facturado − imp. − gastos</div>
+        </div>
+        <table class="resumen-table" style="width:100%">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Facturado</th>
+              <th>Impuesto</th>
+              <th>Gastos</th>
+              <th style="color:oklch(0.55 0.14 165)">Líquido</th>
+            </tr>
+          </thead>
+          <tbody id="liquido-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1885,41 +1904,19 @@ function renderDashboard() {
   document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Líquido del último mes con datos (no necesariamente calendario actual)
-  // Fórmula: bono_mes − impuesto_mes − gastos_fijos
-  const gastosFijos = Number(state.cfg.arriendo) || 0;
-  const impPct      = Number(state.cfg.impuesto)  || 15.25;
-
-  // Encontrar el mes más reciente con sesiones (de cualquier año)
-  let ultMes = -1, ultAno = -1;
-  state.sesiones.forEach(s => {
-    const y = fechaYear(s.fecha);
-    const m = fechaMonth(s.fecha);
-    if (y === null || m === null) return;
-    if (y > ultAno || (y === ultAno && m > ultMes)) {
-      ultAno = y; ultMes = m;
-    }
-  });
-
-  let liquidoMes = 0, bonoMes = 0;
-  if (ultMes >= 0) {
-    const sesMes = state.sesiones.filter(s =>
-      fechaYear(s.fecha) === ultAno && fechaMonth(s.fecha) === ultMes
-    );
-    bonoMes    = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
-    const impMes = Math.round(bonoMes * impPct / 100);
-    liquidoMes = bonoMes - impMes - gastosFijos;
-  }
-  document.getElementById('kpi-neto').textContent = fmt(liquidoMes);
-  // Update sub-label to show which month is being computed
+  // Líquido anual = total facturado año − impuesto − (gastos fijos × meses completados)
+  const gastosFijos  = Number(state.cfg.arriendo) || 0;
+  const impPct       = Number(state.cfg.impuesto)  || 15.25;
+  const mesHoy       = new Date().getMonth(); // 0-based (0=ene, 4=may)
+  // Meses completados = meses que ya terminaron en el año actual
+  // Si estamos en mayo (índice 4), hay 4 meses completados (ene-abr)
+  const mesesCompletados = mesHoy; // mesHoy = cantidad de meses ya cerrados
+  const impAnual     = Math.round(total * impPct / 100);
+  const gastosAnual  = gastosFijos * mesesCompletados;
+  const liquidoAnual = total - impAnual - gastosAnual;
+  document.getElementById('kpi-neto').textContent = fmt(liquidoAnual);
   const subEl = document.getElementById('kpi-neto-sub');
-  if (subEl) {
-    if (ultMes >= 0) {
-      subEl.textContent = `${MONTHS[ultMes]} ${ultAno}`;
-    } else {
-      subEl.textContent = 'sin datos';
-    }
-  }
+  if (subEl) subEl.textContent = `${mesesCompletados} mes${mesesCompletados!==1?'es':''} · ${year}`;
 
   // Bar chart
   const byMonth = Array(12).fill(0);
@@ -2295,6 +2292,50 @@ function renderResumen() {
         ${gP?`<span class="per-patient-pendiente">${fmt(gP)}</span>`:''}
       </div>
     </div>`;
+
+  // ── Tabla líquido mensual ──
+  const gastosFijosR  = Number(state.cfg.arriendo) || 0;
+  const impPctR       = Number(state.cfg.impuesto)  || 15.25;
+  const mesHoyR       = new Date().getMonth();
+  const anoHoyR       = new Date().getFullYear();
+
+  // Calcular por cada mes del año seleccionado
+  const liquidoRows = monthly.map((m, i) => {
+    if (!m.ses && !(isCurrentYear && i === curMonth)) return null;
+    const imp      = Math.round(m.total * impPctR / 100);
+    // Gastos fijos solo en meses completados (no el mes actual en curso)
+    const esMesCerrado = !(isCurrentYear && i === mesHoyR);
+    const gastos   = esMesCerrado ? gastosFijosR : 0;
+    const liquido  = m.total - imp - gastos;
+    const isCur    = isCurrentYear && i === curMonth;
+    return { mes: MONTHS_FULL[i], total: m.total, imp, gastos, liquido, isCur, esMesCerrado };
+  }).filter(r => r !== null);
+
+  // Totales
+  const totFact  = liquidoRows.reduce((a,r)=>a+r.total,0);
+  const totImp   = liquidoRows.reduce((a,r)=>a+r.imp,0);
+  // Gastos solo en meses cerrados
+  const totGast  = liquidoRows.filter(r=>r.esMesCerrado).length * gastosFijosR;
+  const totLiq   = totFact - totImp - totGast;
+
+  const liqTbody = document.getElementById('liquido-tbody');
+  if (liqTbody) {
+    liqTbody.innerHTML = liquidoRows.map(r => `
+      <tr class="${r.isCur?'current-month':''}">
+        <td>${r.mes}${!r.esMesCerrado?' <span style="font-size:10px;color:var(--ink-4)">(en curso)</span>':''}</td>
+        <td>${fmt(r.total)}</td>
+        <td style="color:var(--neg)">−${fmt(r.imp)}</td>
+        <td style="color:var(--warn)">${r.esMesCerrado?'−'+fmt(r.gastos):'—'}</td>
+        <td style="color:${r.liquido>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:600">${fmt(r.liquido)}</td>
+      </tr>`).join('') + `
+      <tr class="totals">
+        <td>Total ${year}</td>
+        <td>${fmt(totFact)}</td>
+        <td style="color:var(--neg)">−${fmt(totImp)}</td>
+        <td style="color:var(--warn)">−${fmt(totGast)}</td>
+        <td style="color:${totLiq>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:700">${fmt(totLiq)}</td>
+      </tr>`;
+  }
 }
 
 function toggleProvision(css) { document.getElementById(`prov-sub-${css}`)?.classList.toggle('open'); }
