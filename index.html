@@ -37,6 +37,7 @@
   --nav-h: 64px;
   --header-h: 56px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --fs: 1; /* font scale multiplier */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,6 +50,19 @@ html, body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
+
+
+/* ───── FONT SCALE (set via JS) ───── */
+/* font scale: --fs set by JS via style property */
+html { font-size: calc(15px * var(--fs, 1)); }
+.kpi-main-value   { font-size: calc(30px * var(--fs, 1)) !important; }
+.kpi-value-lg     { font-size: calc(22px * var(--fs, 1)) !important; }
+.kpi-value        { font-size: calc(18px * var(--fs, 1)) !important; }
+.patient-name     { font-size: calc(16px * var(--fs, 1)) !important; }
+.session-date, .session-amount { font-size: calc(13px * var(--fs, 1)) !important; }
+.per-patient-name { font-size: calc(15px * var(--fs, 1)) !important; }
+.nav-tab span     { font-size: calc(11px * var(--fs, 1)) !important; }
+.tag, .badge      { font-size: calc(11px * var(--fs, 1)) !important; }
 
 /* ───── AUTH SCREEN ───── */
 #auth-screen {
@@ -1056,12 +1070,13 @@ html, body {
           <span class="brand-psi">ψ</span>
           <div>
             <div class="brand-name">Consulta Privada</div>
+            <div id="brand-profesional" style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400"></div>
           </div>
           <span class="brand-year" id="current-year-brand"></span>
         </div>
         <div class="sync-pill ok" id="sync-pill">
           <div class="sync-dot"></div>
-          <span id="sync-text">ok</span>
+          <span id="sync-text">Sincronizado</span>
         </div>
       </div>
       <!-- KPI Main -->
@@ -1072,20 +1087,29 @@ html, body {
       </div>
       <!-- KPI Grid -->
       <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-label"><span class="dot" style="background:var(--pos)"></span>Cobrado</div>
-          <div class="kpi-value" id="kpi-cobrado">$0</div>
-          <div class="kpi-sub" id="kpi-cobrado-sub">0 sesiones</div>
+        <div class="kpi-card" style="border-color:oklch(0.62 0.13 165 / 0.35)">
+          <div class="kpi-label" style="color:var(--pos)"><span class="dot" style="background:var(--pos)"></span>Cobrado</div>
+          <div class="kpi-value kpi-value-lg" style="color:var(--pos)" id="kpi-cobrado">$0</div>
+          <div class="kpi-sub" style="color:var(--pos);opacity:0.7" id="kpi-cobrado-sub">0 sesiones</div>
         </div>
-        <div class="kpi-card">
-          <div class="kpi-label"><span class="dot" style="background:var(--accent)"></span>Pagado</div>
-          <div class="kpi-value" id="kpi-pagado">$0</div>
-          <div class="kpi-sub" id="kpi-pagado-sub">0 sesiones</div>
+        <div class="kpi-card" style="border-color:oklch(0.55 0.18 255 / 0.35)">
+          <div class="kpi-label" style="color:var(--accent)"><span class="dot" style="background:var(--accent)"></span>Pagado</div>
+          <div class="kpi-value kpi-value-lg" style="color:var(--accent)" id="kpi-pagado">$0</div>
+          <div class="kpi-sub" style="color:var(--accent);opacity:0.7" id="kpi-pagado-sub">0 sesiones</div>
         </div>
       </div>
-      <div class="kpi-full">
-        <div class="kpi-label"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
-        <div class="kpi-value" style="color:var(--neg)" id="kpi-pendiente">$0</div>
+      <div class="kpi-grid" style="margin-top:0">
+        <div class="kpi-full" style="margin-bottom:0">
+          <div class="kpi-label"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
+          <div class="kpi-value" style="color:var(--neg)" id="kpi-pendiente">$0</div>
+        </div>
+        <div class="kpi-full" style="margin-bottom:0;background:linear-gradient(135deg,oklch(0.22 0.09 165 / 0.85),oklch(0.18 0.07 170 / 0.95));border-color:oklch(0.62 0.13 165 / 0.3)">
+          <div>
+            <div class="kpi-label" style="color:oklch(0.80 0.08 165)"><span class="dot" style="background:oklch(0.75 0.12 165)"></span>Líquido</div>
+            <div style="font-size:10px;color:oklch(0.70 0.08 165);margin-top:1px">−imp. −gastos</div>
+          </div>
+          <div class="kpi-value" style="color:oklch(0.85 0.12 165)" id="kpi-liquido">$0</div>
+        </div>
       </div>
     </div>
     <div class="tab-body">
@@ -1117,6 +1141,13 @@ html, body {
           <div class="section-title">Requieren atención</div>
         </div>
         <div id="atencion-list"><div class="spinner"><span class="spin">↻</span> Cargando…</div></div>
+      </div>
+      <!-- Alertas de inactividad -->
+      <div class="section-card" id="inactividad-card">
+        <div class="section-header">
+          <div class="section-title">Inactividad de pacientes</div>
+        </div>
+        <div id="inactividad-list"></div>
       </div>
     </div>
     <!-- FABs -->
@@ -1246,13 +1277,75 @@ html, body {
       </div>
     </div>
     <div class="tab-body">
+      <!-- Profesional -->
       <div class="section-card" style="margin-top:4px">
+        <div class="section-header"><div class="section-title">Profesional</div></div>
+        <div class="config-section">
+          <div class="config-row">
+            <label class="config-label" for="cfg-nombre-prof">Nombre</label>
+            <input class="config-input" type="text" id="cfg-nombre-prof" placeholder="Tu nombre" style="width:180px;text-align:right;font-family:'DM Sans',sans-serif" onchange="saveConfigProfesional()">
+          </div>
+        </div>
+      </div>
+      <!-- Gastos mensuales -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">Gastos mensuales</div>
+          <span style="font-size:11px;color:var(--ink-4)">para líquido</span>
+        </div>
+        <div class="config-section" id="gastos-list">
+          <!-- rows injected by JS -->
+        </div>
+        <button onclick="addGasto()" style="width:calc(100% - 32px);margin:0 16px 14px;background:none;border:1px dashed var(--rule);border-radius:10px;padding:10px;font-size:13px;color:var(--ink-4);cursor:pointer;font-family:'DM Sans',sans-serif">
+          <i class="ti ti-plus"></i> Agregar gasto
+        </button>
+      </div>
+      <!-- Impuesto -->
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">Impuesto mensual</div></div>
+        <div class="config-section">
+          <div class="config-row">
+            <span class="config-label">Tasa impuesto (%)</span>
+            <input class="config-input" type="number" id="cfg-impuesto" value="15.25" step="0.01" min="0" max="100" onchange="saveConfigImpuesto()">
+          </div>
+        </div>
+      </div>
+      <!-- Tarifas -->
+      <div class="section-card">
         <div class="section-header">
           <div class="section-title">Tarifas por previsión</div>
           <div style="font-size:11px;color:var(--ink-4)" id="config-year"></div>
         </div>
         <div id="tarifas-list" class="config-section"></div>
       </div>
+      <!-- Tamaño de letra -->
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">Tamaño de letra</div></div>
+        <div class="config-section">
+          <div class="config-row" style="gap:8px">
+            <span class="config-label">Escala</span>
+            <div style="display:flex;gap:8px">
+              <button id="fs-btn-small" onclick="setFontScale('small')"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
+                Pequeña
+              </button>
+              <button id="fs-btn-normal" onclick="setFontScale('normal')"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:var(--accent);color:white">
+                Normal
+              </button>
+              <button id="fs-btn-large" onclick="setFontScale('large')"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
+                Grande
+              </button>
+              <button id="fs-btn-xlarge" onclick="setFontScale('xlarge')"
+                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
+                + Grande
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Cuenta -->
       <div class="section-card">
         <div class="section-header"><div class="section-title">Cuenta</div></div>
         <div class="config-section">
@@ -1415,19 +1508,27 @@ async function supa(path, opts={}) {
     return txt ? JSON.parse(txt) : [];
   } catch(e) { setSyncState('error'); throw e; }
 }
-const supaGet = (t,q='') => supa(`/rest/v1/${t}?${q}`, {method:'GET'});
-const supaPost = (t,b) => supa(`/rest/v1/${t}`, {method:'POST', body:JSON.stringify(b)});
-const supaPatch = (t,id,b) => supa(`/rest/v1/${t}?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(b)});
-const supaDelete = (t,id) => supa(`/rest/v1/${t}?id=eq.${id}`, {method:'DELETE'});
+const supaGet    = (t,q='') => supa(`/rest/v1/${t}?${q}`, {method:'GET'});
+const supaPost   = (t,b)    => supa(`/rest/v1/${t}`, {method:'POST', body:JSON.stringify(b)});
+const supaPatch  = (t,id,b) => supa(`/rest/v1/${t}?id=eq.${id}`, {method:'PATCH', body:JSON.stringify(b)});
+const supaDelete = (t,id)   => supa(`/rest/v1/${t}?id=eq.${id}`, {method:'DELETE'});
+
+// Configuracion table helpers
+async function cfgGet(id) {
+  const rows = await supaGet('configuracion', `id=eq.${id}`);
+  return rows && rows[0] ? rows[0].valor : null;
+}
+async function cfgSet(id, valor) {
+  return supa(`/rest/v1/configuracion?id=eq.${id}`, {
+    method:'PATCH',
+    body: JSON.stringify({ valor }),
+    headers: { ...hdrs(), 'Prefer': 'return=representation' }
+  });
+}
 
 // ═══════════════════════════════════════════
-// SCHEMA NOTES (real DB structure)
-// pacientes: id, nombre, prevision("Fonasa"|"Colmena"|"Cruz Blanca"|"Particular"),
-//            alta(boolean), modalidad, next_session(dd/mm/yyyy|null), created_at
-// sesiones:  id, paciente_id, fecha(dd/mm/yyyy), mes, prevision, monto(number),
-//            estado("Pagado"|"Cobrado"|"Alta"|""|null), observaciones, created_at
+// STATE
 // ═══════════════════════════════════════════
-
 const state = {
   token: null, user: null,
   pacientes: [], sesiones: [],
@@ -1435,49 +1536,40 @@ const state = {
   pacienteFilter: 'activos',
   searchQuery: '',
   editingSesionId: null,
+  // config cached from Supabase
+  cfg: { profesional:'', impuesto:15.25, gastos:[], fontScale:'small' }
 };
 
-// ── Helpers: parse fecha dd/mm/yyyy → Date ──
+// ── Helpers ──
 function parseFecha(f) {
   if (!f) return null;
-  // already ISO?
   if (f.includes('-') && f.length === 10) return new Date(f + 'T12:00');
-  const [d,m,y] = f.split('/');
-  if (!d||!m||!y) return null;
+  const parts = f.split('/');
+  if (parts.length !== 3) return null;
+  const [d,m,y] = parts;
   return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T12:00`);
 }
-function fechaYear(f) {
-  const d = parseFecha(f);
-  return d ? d.getFullYear() : null;
-}
-function fechaMonth(f) {
-  const d = parseFecha(f);
-  return d ? d.getMonth() : null; // 0-based
-}
-// normalize estado: DB stores "Pagado","Cobrado","Alta","" or null
+function fechaYear(f)  { const d=parseFecha(f); return d?d.getFullYear():null; }
+function fechaMonth(f) { const d=parseFecha(f); return d?d.getMonth():null; }
+
 function normEstado(e) {
   if (!e) return 'pendiente';
   const l = e.toLowerCase();
-  if (l==='pagado') return 'pagado';
-  if (l==='cobrado') return 'cobrado';
-  if (l==='alta') return 'alta';
+  if (l==='pagado')   return 'pagado';
+  if (l==='cobrado')  return 'cobrado';
+  if (l==='alta')     return 'alta';
   if (l==='agendado') return 'agendado';
   return 'pendiente';
 }
-// normalize prevision key for CSS class
 function prevKey(p) {
   if (!p) return 'particular';
   const l = p.toLowerCase().replace(/\s/g,'');
   if (l==='cruzblanca') return 'cruzblanca';
-  if (l==='colmena') return 'colmena';
-  if (l==='fonasa') return 'fonasa';
+  if (l==='colmena')    return 'colmena';
+  if (l==='fonasa')     return 'fonasa';
   return 'particular';
 }
-// display label
-function prevLabel(p) {
-  if (!p) return 'PARTICULAR';
-  return p.toUpperCase();
-}
+function prevLabel(p) { return p ? p.toUpperCase() : 'PARTICULAR'; }
 
 const AVATAR_COLORS = [
   'oklch(0.50 0.18 255)','oklch(0.55 0.16 158)','oklch(0.52 0.18 300)',
@@ -1485,31 +1577,27 @@ const AVATAR_COLORS = [
   'oklch(0.48 0.18 330)','oklch(0.56 0.15 180)',
 ];
 function avatarColor(name) {
-  let h=0; for(let c of name||'') h=(h*31+c.charCodeAt(0))&0xffff;
+  let h=0; for(let ch of name||'') h=(h*31+ch.charCodeAt(0))&0xffff;
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 function initials(name) {
   return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
-
 function fmt(n) {
   if (!n && n!==0) return '$0';
   return '$' + Math.round(n).toLocaleString('es-CL');
 }
-// Always display fecha as dd/mm/yyyy
 function fmtFecha(f) {
   if (!f) return '—';
-  if (f.includes('/')) return f; // already dd/mm/yyyy
+  if (f.includes('/')) return f;
   const [y,m,d] = f.split('-');
   return `${d}/${m}/${y}`;
 }
-// Convert html date input (yyyy-mm-dd) to dd/mm/yyyy for DB
 function isoToDdMm(iso) {
   if (!iso) return '';
   const [y,m,d] = iso.split('-');
   return `${d}/${m}/${y}`;
 }
-// Convert dd/mm/yyyy to yyyy-mm-dd for date input
 function ddMmToIso(s) {
   if (!s) return '';
   if (s.includes('-')) return s;
@@ -1517,7 +1605,7 @@ function ddMmToIso(s) {
   return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
 }
 
-const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTHS      = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const MONTHS_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // ═══════════════════════════════════════════
@@ -1529,8 +1617,28 @@ function setSyncState(s) {
     if (!el) return;
     el.className = `sync-pill ${s}`;
     const txt = el.querySelector('span');
-    if (txt) txt.textContent = s === 'saving' ? 'guardando' : s;
+    if (txt) txt.textContent = s==='saving'?'Guardando': s==='error'?'Error':'Sincronizado';
   });
+}
+
+// ═══════════════════════════════════════════
+// FONT SCALE
+// ═══════════════════════════════════════════
+const FS_MAP = { small:1, normal:1.08, large:1.16, xlarge:1.25 };
+function applyFontScale(scale) {
+  state.cfg.fontScale = scale;
+  const mult = FS_MAP[scale] || 1;
+  document.documentElement.style.setProperty('--fs', mult);
+  ['small','normal','large','xlarge'].forEach(s => {
+    const btn = document.getElementById(`fs-btn-${s}`);
+    if (!btn) return;
+    btn.style.background = (s===scale) ? 'var(--accent)' : 'var(--rule-2)';
+    btn.style.color       = (s===scale) ? 'white'         : 'var(--ink-3)';
+  });
+}
+async function setFontScale(scale) {
+  applyFontScale(scale);
+  try { await cfgSet('font_scale', scale); } catch(e) { /* non-critical */ }
 }
 
 // ═══════════════════════════════════════════
@@ -1538,7 +1646,7 @@ function setSyncState(s) {
 // ═══════════════════════════════════════════
 async function doLogin() {
   const email = document.getElementById('auth-email').value.trim();
-  const pw = document.getElementById('auth-password').value;
+  const pw    = document.getElementById('auth-password').value;
   document.getElementById('auth-error').textContent = '';
   try {
     const r = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
@@ -1549,7 +1657,7 @@ async function doLogin() {
     const d = await r.json();
     if (!r.ok) throw new Error(d.error_description || d.msg || 'Error de autenticación');
     state.token = d.access_token;
-    state.user = d.user;
+    state.user  = d.user;
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('config-email-display').textContent = email;
@@ -1572,22 +1680,132 @@ async function doSignOut() {
 
 function initYearLabels() {
   const y = state.currentYear;
-  document.getElementById('current-year-brand').textContent = y;
-  document.getElementById('resumen-year').textContent = y;
-  document.getElementById('dash-year-label').textContent = y;
-  document.getElementById('config-year').textContent = y;
+  ['current-year-brand','resumen-year','dash-year-label','config-year'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = y;
+  });
 }
 
 // ═══════════════════════════════════════════
-// LOAD DATA
+// LOAD CONFIG FROM SUPABASE
+// ═══════════════════════════════════════════
+async function loadConfig() {
+  try {
+    const rows = await supaGet('configuracion');
+    const map  = {};
+    (rows||[]).forEach(r => { map[r.id] = r.valor; });
+
+    state.cfg.profesional = map['profesional'] || '';
+    state.cfg.impuesto    = parseFloat(map['impuesto']) || 15.25;
+    state.cfg.gastos      = Array.isArray(map['gastos']) ? map['gastos'] : [];
+    state.cfg.fontScale   = map['font_scale'] || 'small';
+
+    applyConfigToUI();
+  } catch(e) { console.warn('Config load error', e); }
+}
+
+function applyConfigToUI() {
+  // Profesional name in header
+  const profEl = document.getElementById('brand-profesional');
+  if (profEl) profEl.textContent = state.cfg.profesional || '';
+
+  // Config inputs
+  const nomEl = document.getElementById('cfg-nombre-prof');
+  if (nomEl) nomEl.value = state.cfg.profesional || '';
+
+  const impEl = document.getElementById('cfg-impuesto');
+  if (impEl) impEl.value = state.cfg.impuesto;
+
+  // Font scale
+  applyFontScale(state.cfg.fontScale || 'small');
+
+  // Gastos
+  renderGastos();
+}
+
+// ── Save individual config keys ──
+async function saveConfigProfesional() {
+  const val = document.getElementById('cfg-nombre-prof').value;
+  state.cfg.profesional = val;
+  const profEl = document.getElementById('brand-profesional');
+  if (profEl) profEl.textContent = val;
+  try { await cfgSet('profesional', val); } catch(e) { showToast('Error guardando'); }
+  renderDashboard();
+}
+
+async function saveConfigImpuesto() {
+  const val = parseFloat(document.getElementById('cfg-impuesto').value) || 15.25;
+  state.cfg.impuesto = val;
+  try { await cfgSet('impuesto', val); } catch(e) { showToast('Error guardando'); }
+  renderDashboard();
+}
+
+async function saveGastos() {
+  try { await cfgSet('gastos', state.cfg.gastos); } catch(e) { showToast('Error guardando gastos'); }
+  renderDashboard();
+}
+
+function renderGastos() {
+  const el = document.getElementById('gastos-list');
+  if (!el) return;
+  const gastos = state.cfg.gastos || [];
+  el.innerHTML = gastos.map((g,i) => `
+    <div class="config-row" style="gap:8px">
+      <input style="flex:1;border:none;background:none;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none"
+        value="${g.nombre||''}" placeholder="Nombre del gasto"
+        onchange="updateGasto(${i},'nombre',this.value)">
+      <input class="config-input" type="number" style="width:110px"
+        value="${g.monto||''}" placeholder="$0"
+        onchange="updateGasto(${i},'monto',this.value)">
+      <button onclick="removeGasto(${i})" style="background:none;border:none;color:var(--neg);font-size:18px;cursor:pointer;padding:0 4px">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>`).join('');
+}
+
+function addGasto() {
+  if (!state.cfg.gastos) state.cfg.gastos = [];
+  state.cfg.gastos.push({nombre:'', monto:0});
+  renderGastos();
+}
+async function updateGasto(i, key, val) {
+  if (!state.cfg.gastos || !state.cfg.gastos[i]) return;
+  state.cfg.gastos[i][key] = key==='monto' ? (parseFloat(val)||0) : val;
+  await saveGastos();
+}
+async function removeGasto(i) {
+  if (!state.cfg.gastos) return;
+  state.cfg.gastos.splice(i,1);
+  renderGastos();
+  await saveGastos();
+}
+
+// ── Frecuencia individual: saved to pacientes.frecuencia_dias ──
+async function saveFrecuencia(pacId, days) {
+  const d = parseInt(days);
+  // Optimistic update in state
+  const pac = state.pacientes.find(p => p.id === pacId);
+  if (pac) pac.frecuencia_dias = d;
+  try {
+    await supaPatch('pacientes', pacId, { frecuencia_dias: d });
+    renderInactividad();
+  } catch(e) { showToast('Error guardando frecuencia'); }
+}
+function getFrecuencia(pac) {
+  return pac.frecuencia_dias || 14;
+}
+
+// ═══════════════════════════════════════════
+// LOAD ALL DATA
 // ═══════════════════════════════════════════
 async function loadAll() {
   const [pacs, sess] = await Promise.all([
     supaGet('pacientes', 'order=nombre.asc'),
-    supaGet('sesiones', 'order=created_at.desc')
+    supaGet('sesiones',  'order=created_at.desc'),
+    loadConfig()
   ]);
   state.pacientes = pacs || [];
-  state.sesiones = sess || [];
+  state.sesiones  = sess || [];
   renderAll();
 }
 
@@ -1605,10 +1823,11 @@ function setupRealtime() {
     try {
       const [pacs, sess] = await Promise.all([
         supaGet('pacientes', 'order=nombre.asc'),
-        supaGet('sesiones', 'order=created_at.desc')
+        supaGet('sesiones',  'order=created_at.desc'),
+        loadConfig()
       ]);
       state.pacientes = pacs || [];
-      state.sesiones = sess || [];
+      state.sesiones  = sess || [];
       renderAll();
     } catch(e) {}
   }, 20000);
@@ -1618,47 +1837,61 @@ function setupRealtime() {
 // DASHBOARD
 // ═══════════════════════════════════════════
 function renderDashboard() {
-  const year = state.currentYear;
-  // Filter by year using parseFecha
-  const sesYear = state.sesiones.filter(s => fechaYear(s.fecha) === year);
+  const year          = state.currentYear;
+  const isCurrentYear = year === new Date().getFullYear();
+  const curMonth      = new Date().getMonth();
+  const sesYear       = state.sesiones.filter(s => fechaYear(s.fecha) === year);
 
+  // KPI totals (all sesiones for year)
   let total=0, cobrado=0, cobradoSes=0, pagado=0, pagadoSes=0, pendiente=0;
   sesYear.forEach(s => {
-    const mo = Number(s.monto)||0;
+    const mo  = Number(s.monto)||0;
     const est = normEstado(s.estado);
     total += mo;
     if (est==='cobrado') { cobrado+=mo; cobradoSes++; }
-    if (est==='pagado')  { pagado+=mo;  pagadoSes++; }
+    if (est==='pagado')  { pagado+=mo;  pagadoSes++;  }
     if (est==='pendiente') pendiente+=mo;
   });
 
-  document.getElementById('kpi-total').textContent = fmt(total);
-  document.getElementById('kpi-total-sub').textContent = `${sesYear.length} sesiones este año`;
-  document.getElementById('kpi-cobrado').textContent = fmt(cobrado);
+  document.getElementById('kpi-total').textContent       = fmt(total);
+  document.getElementById('kpi-total-sub').textContent   = `${sesYear.length} sesiones este año`;
+  document.getElementById('kpi-cobrado').textContent     = fmt(cobrado);
   document.getElementById('kpi-cobrado-sub').textContent = `${cobradoSes} sesiones`;
-  document.getElementById('kpi-pagado').textContent = fmt(pagado);
-  document.getElementById('kpi-pagado-sub').textContent = `${pagadoSes} sesiones`;
-  document.getElementById('kpi-pendiente').textContent = fmt(pendiente);
+  document.getElementById('kpi-pagado').textContent      = fmt(pagado);
+  document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
+  document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Bar chart — by month
+  // Líquido: total facturado mes actual − gastos fijos − impuesto
+  const sesMes = sesYear.filter(s => fechaMonth(s.fecha) === curMonth);
+  const totalMes  = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
+  const gastosFij = (state.cfg.gastos||[]).reduce((a,g) => a+(Number(g.monto)||0), 0);
+  const impPct    = state.cfg.impuesto || 15.25;
+  const impuesto  = Math.round(totalMes * impPct / 100);
+  const liquido   = totalMes - gastosFij - impuesto;
+  document.getElementById('kpi-liquido').textContent = fmt(liquido);
+
+  // Profesional name
+  const profEl = document.getElementById('brand-profesional');
+  if (profEl) profEl.textContent = state.cfg.profesional || '';
+
+  // Bar chart
   const byMonth = Array(12).fill(0);
   sesYear.forEach(s => {
     const m = fechaMonth(s.fecha);
     if (m !== null) byMonth[m] += Number(s.monto)||0;
   });
-  const curMonth = new Date().getMonth();
   const max = Math.max(...byMonth, 1);
   document.getElementById('bar-chart').innerHTML = byMonth.map((v,i) => {
-    const h = Math.max(Math.round((v/max)*76), v>0?4:2);
-    const isCur = i===curMonth && year===new Date().getFullYear();
+    const h     = Math.max(Math.round((v/max)*76), v>0?4:2);
+    const isCur = i===curMonth && isCurrentYear;
     return `<div class="bar-col">
-      <div class="bar" style="height:${h}%;background:${isCur?'var(--accent)':'oklch(0.55 0.18 255 / 0.38)'};"></div>
+      <div class="bar" style="height:${h}px;background:${isCur?'var(--accent)':'oklch(0.55 0.18 255 / 0.38)'};"></div>
       <div class="bar-label">${MONTHS[i][0]}</div>
     </div>`;
   }).join('');
 
-  // Próximas sesiones — from next_session field on pacientes (activos)
-  const today = new Date(); today.setHours(0,0,0,0);
+  // Próximas sesiones
+  const today    = new Date(); today.setHours(0,0,0,0);
   const proximas = state.pacientes
     .filter(p => !p.alta && p.next_session)
     .map(p => ({ pac:p, d: parseFecha(p.next_session) }))
@@ -1689,7 +1922,7 @@ function renderDashboard() {
 
   // Requieren atención
   const pendienteSes = sesYear.filter(s => normEstado(s.estado)==='pendiente');
-  const sinAgendar = state.pacientes.filter(p => !p.alta && !p.next_session);
+  const sinAgendar   = state.pacientes.filter(p => !p.alta && !p.next_session);
   let html = '';
   if (pendienteSes.length) html += `<div class="alert-item">
     <span class="alert-badge">${pendienteSes.length}</span>
@@ -1701,6 +1934,62 @@ function renderDashboard() {
   </div>`;
   if (!html) html = `<div class="empty-state"><i class="ti ti-circle-check"></i>Todo en orden</div>`;
   document.getElementById('atencion-list').innerHTML = html;
+
+  renderInactividad();
+}
+
+// ═══════════════════════════════════════════
+// INACTIVIDAD
+// ═══════════════════════════════════════════
+function renderInactividad() {
+  const el = document.getElementById('inactividad-list');
+  if (!el) return;
+  const today   = new Date(); today.setHours(23,59,59,0);
+  const activos = state.pacientes.filter(p => !p.alta);
+
+  const alerts = [];
+  activos.forEach(p => {
+    const ses = state.sesiones
+      .filter(s => s.paciente_id === p.id && parseFecha(s.fecha))
+      .sort((a,b) => parseFecha(b.fecha) - parseFecha(a.fecha));
+
+    const lastDate  = ses.length ? parseFecha(ses[0].fecha) : null;
+    const freqDays  = getFrecuencia(p);
+    const diffDays  = lastDate ? Math.floor((today - lastDate) / 86400000) : 9999;
+
+    let level = null;
+    if      (diffDays >= 45) level = { color:'var(--neg)',  icon:'ti-alert-triangle',    label:'+45 días' };
+    else if (diffDays >= 30) level = { color:'var(--warn)', icon:'ti-clock-exclamation', label:'+30 días' };
+    else if (diffDays >= 15) level = { color:'oklch(0.68 0.12 75)', icon:'ti-clock',     label:'+15 días' };
+
+    if (level && diffDays >= freqDays) {
+      alerts.push({ pac:p, level, lastDate, diffDays, freqDays });
+    }
+  });
+
+  alerts.sort((a,b) => b.diffDays - a.diffDays);
+
+  if (!alerts.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:16px">
+      <i class="ti ti-heart-check" style="font-size:28px;opacity:0.35;display:block;margin-bottom:6px"></i>
+      Todos los pacientes al día
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = alerts.map(({pac, level, lastDate, diffDays, freqDays}) => {
+    const lastStr = lastDate
+      ? `Última ses. hace ${diffDays}d · frec. ${freqDays}d`
+      : `Sin sesiones registradas · frec. ${freqDays}d`;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rule-2)">
+      <i class="ti ${level.icon}" style="font-size:20px;color:${level.color};flex-shrink:0"></i>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
+        <div style="font-size:12px;color:var(--ink-4);margin-top:1px">${lastStr}</div>
+      </div>
+      <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:${level.color};color:white;white-space:nowrap">${level.label}</span>
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -1735,12 +2024,15 @@ function renderPacientes() {
   }
 
   listEl.innerHTML = pacs.map(p => {
-    const ses = state.sesiones.filter(s => s.paciente_id === p.id);
-    const total = ses.reduce((a,s) => a+(Number(s.monto)||0), 0);
-    const nextSes = p.next_session ? `<span>${p.next_session}</span>` : `<span style="color:var(--warn)">Sin agendar</span>`;
+    const ses    = state.sesiones.filter(s => s.paciente_id === p.id);
+    const total  = ses.reduce((a,s) => a+(Number(s.monto)||0), 0);
+    const nextSes = p.next_session
+      ? `<span>${p.next_session}</span>`
+      : `<span style="color:var(--warn)">Sin agendar</span>`;
     const estadoBadge = p.alta
       ? `<span class="badge cobrado">Alta</span>`
       : `<span class="badge agendado">Activo</span>`;
+    const freqVal = getFrecuencia(p);
 
     return `<div class="patient-card" id="pac-${p.id}">
       <div class="patient-row" onclick="togglePaciente('${p.id}')">
@@ -1761,11 +2053,22 @@ function renderPacientes() {
         <div class="session-panel-header">
           <span class="session-panel-title">${ses.length} ses. · ${fmt(total)}</span>
           <button class="btn-sm blue" onclick="openResumenPaciente('${p.id}');event.stopPropagation()">
-            <i class="ti ti-chart-bar"></i> Resumen $
+            <i class="ti ti-chart-bar"></i> $
           </button>
           <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()">
             <i class="ti ti-plus"></i>
           </button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:oklch(0.97 0.01 255);border-bottom:1px solid var(--rule-2)">
+          <i class="ti ti-clock" style="font-size:14px;color:var(--ink-4)"></i>
+          <span style="font-size:12px;color:var(--ink-4);flex:1">Frecuencia esperada</span>
+          <select onchange="saveFrecuencia('${p.id}',this.value)" onclick="event.stopPropagation()"
+            style="font-size:12px;padding:4px 8px;border:1px solid var(--rule);border-radius:7px;background:white;color:var(--ink);font-family:'DM Sans',sans-serif">
+            <option value="7"  ${freqVal===7?'selected':''}>Semanal (7d)</option>
+            <option value="14" ${freqVal===14?'selected':''}>Quincenal (14d)</option>
+            <option value="21" ${freqVal===21?'selected':''}>Cada 3 sem. (21d)</option>
+            <option value="30" ${freqVal===30?'selected':''}>Mensual (30d)</option>
+          </select>
         </div>
         <div class="session-table">${renderSessionRows(ses)}</div>
       </div>
@@ -1775,13 +2078,9 @@ function renderPacientes() {
 
 function renderSessionRows(ses) {
   if (!ses.length) return `<div class="empty-state" style="padding:16px">Sin sesiones registradas</div>`;
-  // Sort desc by fecha
-  const sorted = [...ses].sort((a,b) => {
-    const da = parseFecha(a.fecha), db = parseFecha(b.fecha);
-    return (db||0) - (da||0);
-  });
+  const sorted = [...ses].sort((a,b) => (parseFecha(b.fecha)||0) - (parseFecha(a.fecha)||0));
   return sorted.map(s => {
-    const est = normEstado(s.estado);
+    const est    = normEstado(s.estado);
     const isPaid = est==='pagado'||est==='cobrado';
     return `<div class="session-row ${isPaid?'paid':''}">
       <span class="session-date">${fmtFecha(s.fecha)}</span>
@@ -1794,56 +2093,55 @@ function renderSessionRows(ses) {
 }
 
 function togglePaciente(id) {
-  document.getElementById(`pac-${id}`).classList.toggle('expanded');
+  const card = document.getElementById(`pac-${id}`);
+  if (card) card.classList.toggle('expanded');
 }
 
 // ═══════════════════════════════════════════
 // RESUMEN
 // ═══════════════════════════════════════════
 function renderResumen() {
-  const year = state.currentYear;
+  const year          = state.currentYear;
   const isCurrentYear = year === new Date().getFullYear();
-  const curMonth = new Date().getMonth();
-  const sesYear = state.sesiones.filter(s => fechaYear(s.fecha) === year);
+  const curMonth      = new Date().getMonth();
+  const sesYear       = state.sesiones.filter(s => fechaYear(s.fecha) === year);
 
-  // monthly aggregates
   const monthly = Array(12).fill(null).map(() => ({ses:0,total:0,cobrado:0,pendiente:0}));
   sesYear.forEach(s => {
-    const m = fechaMonth(s.fecha);
+    const m   = fechaMonth(s.fecha);
     if (m===null) return;
-    const mo = Number(s.monto)||0;
+    const mo  = Number(s.monto)||0;
     const est = normEstado(s.estado);
     monthly[m].ses++;
     monthly[m].total += mo;
-    if (est==='cobrado'||est==='pagado') monthly[m].cobrado += mo;
-    if (est==='pendiente') monthly[m].pendiente += mo;
+    if (est==='cobrado'||est==='pagado') monthly[m].cobrado  += mo;
+    if (est==='pendiente')               monthly[m].pendiente += mo;
   });
 
-  // ── Bar chart ──
+  // Bar chart
   const maxBar = Math.max(...monthly.map(m=>m.total), 1);
   document.getElementById('resumen-bar-chart').innerHTML = monthly.map((m,i) => {
-    const hT = Math.max(Math.round((m.total/maxBar)*76), m.total>0?4:1);
-    const hC = Math.max(Math.round((m.cobrado/maxBar)*76), m.cobrado>0?3:0);
+    const hT    = Math.max(Math.round((m.total/maxBar)*76),   m.total>0?4:1);
+    const hC    = Math.max(Math.round((m.cobrado/maxBar)*76), m.cobrado>0?3:0);
     const isCur = isCurrentYear && i===curMonth;
-    const hasData = m.total > 0;
+    const has   = m.total > 0;
     return `<div class="bar-col">
       <div style="width:100%;height:76px;display:flex;align-items:flex-end;gap:1px">
-        <div style="flex:1;height:${hT}px;background:${isCur?'var(--accent)':'oklch(0.55 0.18 255/'+(hasData?'0.45':'0.14')+')'}; border-radius:3px 3px 0 0"></div>
-        <div style="flex:1;height:${hC}px;background:${isCur?'var(--pos)':'oklch(0.62 0.13 165/'+(hasData?'0.55':'0.10')+')'}; border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:${hT}px;background:${isCur?'var(--accent)':'oklch(0.55 0.18 255/'+(has?'0.45':'0.14')+')'}; border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:${hC}px;background:${isCur?'var(--pos)':'oklch(0.62 0.13 165/'+(has?'0.55':'0.10')+')'}; border-radius:3px 3px 0 0"></div>
       </div>
       <div class="bar-label">${MONTHS[i][0]}</div>
     </div>`;
   }).join('');
 
-  // ── Monthly table ──
+  // Monthly table
   let totSes=0,totTotal=0,totCob=0,totPend=0;
   document.getElementById('resumen-tbody').innerHTML = monthly.map((m,i) => {
     totSes+=m.ses; totTotal+=m.total; totCob+=m.cobrado; totPend+=m.pendiente;
     if (!m.ses && !(isCurrentYear && i===curMonth)) return '';
     const isCur = isCurrentYear && i===curMonth;
     return `<tr class="${isCur?'current-month':''}">
-      <td>${MONTHS_FULL[i]}</td>
-      <td>${m.ses||'—'}</td>
+      <td>${MONTHS_FULL[i]}</td><td>${m.ses||'—'}</td>
       <td>${m.total?fmt(m.total):'—'}</td>
       <td>${m.cobrado?fmt(m.cobrado):'—'}</td>
       <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td>
@@ -1853,55 +2151,40 @@ function renderResumen() {
     <td style="color:${totPend?'var(--neg)':'var(--pos)'}">${totPend?fmt(totPend):'Al día'}</td>
   </tr>`;
 
-  // ── By prevision ──
-  const PROVS = ['Fonasa','Colmena','Cruz Blanca','Particular'];
-  const provColors = {
-    'Fonasa':     'oklch(0.40 0.16 265)',
-    'Particular': 'oklch(0.55 0.13 195)',
-    'Colmena':    'oklch(0.50 0.14 220)',
-    'Cruz Blanca':'oklch(0.50 0.16 290)',
-  };
-  const provData = {};
-  PROVS.forEach(pv => {
-    provData[pv] = {ses:0,total:0,cobrado:0,pendiente:0, byMonth:Array(12).fill(null).map(()=>({ses:0,total:0,cobrado:0,pendiente:0}))};
-  });
+  // By provision
+  const PROVS      = ['Fonasa','Colmena','Cruz Blanca','Particular'];
+  const provColors = {'Fonasa':'oklch(0.40 0.16 265)','Particular':'oklch(0.55 0.13 195)','Colmena':'oklch(0.50 0.14 220)','Cruz Blanca':'oklch(0.50 0.16 290)'};
+  const provData   = {};
+  PROVS.forEach(pv => { provData[pv]={ses:0,total:0,cobrado:0,pendiente:0,byMonth:Array(12).fill(null).map(()=>({ses:0,total:0,cobrado:0,pendiente:0}))}; });
   sesYear.forEach(s => {
-    const pv = s.prevision || 'Particular';
-    if (!provData[pv]) { provData[pv]={ses:0,total:0,cobrado:0,pendiente:0,byMonth:Array(12).fill(null).map(()=>({ses:0,total:0,cobrado:0,pendiente:0}))}; }
-    const m = fechaMonth(s.fecha);
-    const mo = Number(s.monto)||0;
+    const pv  = s.prevision||'Particular';
+    if (!provData[pv]) return;
+    const m   = fechaMonth(s.fecha);
+    const mo  = Number(s.monto)||0;
     const est = normEstado(s.estado);
-    provData[pv].ses++;
-    provData[pv].total += mo;
-    if (est==='cobrado'||est==='pagado') provData[pv].cobrado += mo;
-    if (est==='pendiente') provData[pv].pendiente += mo;
+    provData[pv].ses++; provData[pv].total+=mo;
+    if (est==='cobrado'||est==='pagado') provData[pv].cobrado+=mo;
+    if (est==='pendiente')               provData[pv].pendiente+=mo;
     if (m!==null) {
-      provData[pv].byMonth[m].ses++;
-      provData[pv].byMonth[m].total += mo;
-      if (est==='cobrado'||est==='pagado') provData[pv].byMonth[m].cobrado += mo;
-      if (est==='pendiente') provData[pv].byMonth[m].pendiente += mo;
+      provData[pv].byMonth[m].ses++; provData[pv].byMonth[m].total+=mo;
+      if (est==='cobrado'||est==='pagado') provData[pv].byMonth[m].cobrado+=mo;
+      if (est==='pendiente')               provData[pv].byMonth[m].pendiente+=mo;
     }
   });
 
   const totalSesAll = Object.values(provData).reduce((a,v)=>a+v.ses,0)||1;
   document.getElementById('donut-total').textContent = String(totalSesAll);
 
-  // Donut SVG
-  const circumference = 2*Math.PI*38;
+  const circ = 2*Math.PI*38;
   let offset=0, donutHtml='';
   PROVS.forEach(pv => {
-    const pct = provData[pv].ses / totalSesAll;
-    const dash = pct * circumference;
-    donutHtml += `<circle cx="50" cy="50" r="38" fill="none"
-      stroke="${provColors[pv]}" stroke-width="12"
-      stroke-dasharray="${dash} ${circumference-dash}"
-      stroke-dashoffset="${-offset}"
-      transform="rotate(-90 50 50)"/>`;
-    offset += dash;
+    const pct  = provData[pv].ses/totalSesAll;
+    const dash = pct*circ;
+    donutHtml += `<circle cx="50" cy="50" r="38" fill="none" stroke="${provColors[pv]}" stroke-width="12"
+      stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 50 50)"/>`;
+    offset+=dash;
   });
   document.getElementById('donut-svg').innerHTML = donutHtml;
-
-  // Donut legend
   document.getElementById('donut-legend').innerHTML = PROVS.map(pv => {
     const d = provData[pv];
     return `<div class="donut-item">
@@ -1912,36 +2195,32 @@ function renderResumen() {
     </div>`;
   }).join('');
 
-  // Provision table with expandable months
   document.getElementById('provision-tbody').innerHTML = PROVS.map(pv => {
-    const d = provData[pv];
-    if (!d.ses) return '';
-    const css = prevKey(pv);
+    const d=provData[pv]; if (!d.ses) return '';
+    const css=prevKey(pv);
     return `<tr class="provision-toggle" onclick="toggleProvision('${css}')">
       <td><span class="tag ${css}">${pv.toUpperCase()}</span></td>
       <td>${d.ses}</td><td>${fmt(d.total)}</td><td>${fmt(d.cobrado)}</td>
       <td style="color:${d.pendiente?'var(--neg)':'var(--ink-4)'}">${d.pendiente?fmt(d.pendiente):'—'}</td>
     </tr>
     <tbody class="provision-sub-table" id="prov-sub-${css}">
-      ${d.byMonth.map((m,i) => {
-        if (!m.ses) return '';
-        return `<tr><td style="padding-left:20px">${MONTHS_FULL[i]}</td>
-          <td>${m.ses}</td><td>${fmt(m.total)}</td><td>${fmt(m.cobrado)}</td>
-          <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td></tr>`;
-      }).join('')}
+      ${d.byMonth.map((m,i)=>{if(!m.ses)return'';return`<tr>
+        <td style="padding-left:20px">${MONTHS_FULL[i]}</td>
+        <td>${m.ses}</td><td>${fmt(m.total)}</td><td>${fmt(m.cobrado)}</td>
+        <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td></tr>`;}).join('')}
     </tbody>`;
   }).join('');
 
   // Per patient
   const perPac = state.pacientes.map(p => {
-    const ses = sesYear.filter(s => s.paciente_id === p.id);
-    const total = ses.reduce((a,s)=>a+(Number(s.monto)||0),0);
-    const cobrado = ses.filter(s=>{ const e=normEstado(s.estado); return e==='cobrado'||e==='pagado'; }).reduce((a,s)=>a+(Number(s.monto)||0),0);
-    const pendiente = ses.filter(s=>normEstado(s.estado)==='pendiente').reduce((a,s)=>a+(Number(s.monto)||0),0);
-    return {...p, _ses:ses.length, _total:total, _cobrado:cobrado, _pendiente:pendiente};
+    const ses      = sesYear.filter(s=>s.paciente_id===p.id);
+    const total    = ses.reduce((a,s)=>a+(Number(s.monto)||0),0);
+    const cobrado  = ses.filter(s=>{const e=normEstado(s.estado);return e==='cobrado'||e==='pagado';}).reduce((a,s)=>a+(Number(s.monto)||0),0);
+    const pendiente= ses.filter(s=>normEstado(s.estado)==='pendiente').reduce((a,s)=>a+(Number(s.monto)||0),0);
+    return {...p,_ses:ses.length,_total:total,_cobrado:cobrado,_pendiente:pendiente};
   }).filter(p=>p._ses>0).sort((a,b)=>b._total-a._total);
 
-  document.getElementById('per-patient-list').innerHTML = perPac.map(p => `
+  document.getElementById('per-patient-list').innerHTML = perPac.map(p=>`
     <div class="per-patient-row">
       <div class="per-patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
       <div class="per-patient-info">
@@ -1950,14 +2229,12 @@ function renderResumen() {
       </div>
       <div class="per-patient-amounts">
         <span class="per-patient-total">${fmt(p._total)}</span>
-        ${p._cobrado ? `<span class="per-patient-cobrado">${fmt(p._cobrado)}</span>` : ''}
-        ${p._pendiente ? `<span class="per-patient-pendiente">${fmt(p._pendiente)}</span>` : `<span class="per-patient-aldia">Al día ✓</span>`}
+        ${p._cobrado?`<span class="per-patient-cobrado">${fmt(p._cobrado)}</span>`:''}
+        ${p._pendiente?`<span class="per-patient-pendiente">${fmt(p._pendiente)}</span>`:`<span class="per-patient-aldia">Al día ✓</span>`}
       </div>
     </div>`).join('');
 
-  const gT=perPac.reduce((a,p)=>a+p._total,0);
-  const gC=perPac.reduce((a,p)=>a+p._cobrado,0);
-  const gP=perPac.reduce((a,p)=>a+p._pendiente,0);
+  const gT=perPac.reduce((a,p)=>a+p._total,0), gC=perPac.reduce((a,p)=>a+p._cobrado,0), gP=perPac.reduce((a,p)=>a+p._pendiente,0);
   document.getElementById('per-patient-totals').innerHTML = `
     <div class="per-patient-row" style="font-weight:700">
       <div style="width:34px;height:34px;border-radius:50%;background:var(--rule);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-4);flex-shrink:0">Σ</div>
@@ -1973,24 +2250,19 @@ function renderResumen() {
     </div>`;
 }
 
-function toggleProvision(css) {
-  document.getElementById(`prov-sub-${css}`)?.classList.toggle('open');
-}
-
+function toggleProvision(css) { document.getElementById(`prov-sub-${css}`)?.classList.toggle('open'); }
 function changeYear(delta) {
   state.currentYear += delta;
-  document.getElementById('resumen-year').textContent = state.currentYear;
+  document.getElementById('resumen-year').textContent    = state.currentYear;
   document.getElementById('dash-year-label').textContent = state.currentYear;
-  renderResumen();
-  renderDashboard();
+  renderResumen(); renderDashboard();
 }
 
 // ═══════════════════════════════════════════
-// CONFIG
+// CONFIG RENDER
 // ═══════════════════════════════════════════
 function renderConfig() {
   const PROVS = ['Fonasa','Colmena','Cruz Blanca','Particular'];
-  // compute avg monto per prevision from sesiones
   document.getElementById('tarifas-list').innerHTML = PROVS.map(pv => {
     const ses = state.sesiones.filter(s=>s.prevision===pv && Number(s.monto)>0);
     const avg = ses.length ? Math.round(ses.reduce((a,s)=>a+(Number(s.monto)||0),0)/ses.length) : 0;
@@ -2000,6 +2272,7 @@ function renderConfig() {
       <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--ink-3)">${avg?fmt(avg)+' prom.':'sin datos'}</span>
     </div>`;
   }).join('');
+  applyConfigToUI();
 }
 
 // ═══════════════════════════════════════════
@@ -2009,10 +2282,10 @@ function openModal(id) {
   if (id === 'modal-sesion') {
     state.editingSesionId = null;
     document.getElementById('modal-sesion-title').textContent = 'Nueva sesión';
-    document.getElementById('sesion-id').value = '';
+    document.getElementById('sesion-id').value    = '';
     document.getElementById('sesion-fecha').value = new Date().toISOString().split('T')[0];
     document.getElementById('sesion-monto').value = '';
-    document.getElementById('sesion-estado').value = '';
+    document.getElementById('sesion-estado').value= '';
     document.getElementById('sesion-paciente').value = '';
     document.getElementById('btn-delete-sesion').classList.add('hidden');
     populatePacienteSelect('');
@@ -2027,7 +2300,6 @@ function openNewSesionForPaciente(pacId) {
     const pac = state.pacientes.find(p => p.id === pacId);
     if (pac) {
       document.getElementById('sesion-prevision').value = pac.prevision || 'Fonasa';
-      // prefill avg monto for this prevision
       const ses = state.sesiones.filter(s=>s.prevision===pac.prevision&&Number(s.monto)>0);
       if (ses.length) {
         const avg = Math.round(ses.reduce((a,s)=>a+(Number(s.monto)||0),0)/ses.length);
@@ -2042,11 +2314,11 @@ function openEditSesion(id) {
   if (!s) return;
   state.editingSesionId = id;
   document.getElementById('modal-sesion-title').textContent = 'Editar sesión';
-  document.getElementById('sesion-id').value = s.id;
+  document.getElementById('sesion-id').value    = s.id;
   document.getElementById('sesion-fecha').value = ddMmToIso(s.fecha);
   document.getElementById('sesion-prevision').value = s.prevision || 'Fonasa';
   document.getElementById('sesion-monto').value = s.monto || '';
-  document.getElementById('sesion-estado').value = s.estado || '';
+  document.getElementById('sesion-estado').value= s.estado || '';
   document.getElementById('btn-delete-sesion').classList.remove('hidden');
   populatePacienteSelect(s.paciente_id);
   document.getElementById('modal-sesion').classList.remove('hidden');
@@ -2060,42 +2332,25 @@ function populatePacienteSelect(selectedId) {
     ).join('');
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.add('hidden');
-}
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 document.querySelectorAll('.modal-overlay').forEach(ov => {
   ov.addEventListener('click', e => { if(e.target===ov) ov.classList.add('hidden'); });
 });
 
 async function saveSesion() {
-  const pacId  = document.getElementById('sesion-paciente').value;
+  const pacId    = document.getElementById('sesion-paciente').value;
   const fechaIso = document.getElementById('sesion-fecha').value;
-  const prev   = document.getElementById('sesion-prevision').value;
-  const monto  = document.getElementById('sesion-monto').value;
-  const estado = document.getElementById('sesion-estado').value;
+  const prev     = document.getElementById('sesion-prevision').value;
+  const monto    = document.getElementById('sesion-monto').value;
+  const estado   = document.getElementById('sesion-estado').value;
   if (!pacId||!fechaIso) { showToast('Completa paciente y fecha'); return; }
-
-  // Convert fecha to dd/mm/yyyy (DB format)
   const fechaDdMm = isoToDdMm(fechaIso);
-  const d = parseFecha(fechaDdMm);
+  const d         = parseFecha(fechaDdMm);
   const mesNombre = d ? MONTHS_FULL[d.getMonth()].toLowerCase() : '';
-
-  const body = {
-    paciente_id: pacId,
-    fecha: fechaDdMm,
-    mes: mesNombre,
-    prevision: prev,
-    monto: Number(monto)||0,
-    estado: estado||null
-  };
+  const body = { paciente_id:pacId, fecha:fechaDdMm, mes:mesNombre, prevision:prev, monto:Number(monto)||0, estado:estado||null };
   try {
-    if (state.editingSesionId) {
-      await supaPatch('sesiones', state.editingSesionId, body);
-      showToast('Sesión actualizada');
-    } else {
-      await supaPost('sesiones', body);
-      showToast('Sesión guardada');
-    }
+    if (state.editingSesionId) { await supaPatch('sesiones', state.editingSesionId, body); showToast('Sesión actualizada'); }
+    else { await supaPost('sesiones', body); showToast('Sesión guardada'); }
     closeModal('modal-sesion');
     await loadAll();
   } catch(e) { showToast('Error: '+e.message); }
@@ -2118,12 +2373,11 @@ async function savePaciente() {
   const modalidad = document.getElementById('pac-modalidad').value;
   const alta      = document.getElementById('pac-estado').value === 'alta';
   if (!nombre) { showToast('Ingresa el nombre'); return; }
-  const body = { nombre, prevision, modalidad, alta };
   try {
-    await supaPost('pacientes', body);
+    await supaPost('pacientes', { nombre, prevision, modalidad, alta });
     showToast('Paciente agregado');
     closeModal('modal-paciente');
-    ['pac-nombre'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('pac-nombre').value='';
     await loadAll();
   } catch(e) { showToast('Error: '+e.message); }
 }
@@ -2133,34 +2387,26 @@ function openResumenPaciente(pacId) {
   if (!pac) return;
   const ses = state.sesiones.filter(s=>s.paciente_id===pacId);
   document.getElementById('modal-resumen-pac-title').textContent = `Resumen — ${pac.nombre}`;
-
-  // Group by mes (nombre) + year derived from fecha
   const byMonth = {};
   ses.forEach(s => {
-    const d = parseFecha(s.fecha);
-    if (!d) return;
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    if (!byMonth[key]) byMonth[key]={total:0,cobrado:0,pendiente:0,ses:0};
-    const mo = Number(s.monto)||0;
-    const est = normEstado(s.estado);
-    byMonth[key].ses++;
-    byMonth[key].total += mo;
-    if (est==='cobrado'||est==='pagado') byMonth[key].cobrado += mo;
-    if (est==='pendiente') byMonth[key].pendiente += mo;
+    const d=parseFecha(s.fecha); if(!d) return;
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(!byMonth[key]) byMonth[key]={total:0,cobrado:0,pendiente:0,ses:0};
+    const mo=Number(s.monto)||0, est=normEstado(s.estado);
+    byMonth[key].ses++; byMonth[key].total+=mo;
+    if(est==='cobrado'||est==='pagado') byMonth[key].cobrado+=mo;
+    if(est==='pendiente') byMonth[key].pendiente+=mo;
   });
-
-  const keys = Object.keys(byMonth).sort().reverse();
+  const keys=Object.keys(byMonth).sort().reverse();
   document.getElementById('modal-resumen-pac-body').innerHTML = keys.length ? `
     <table class="resumen-table" style="width:100%">
       <thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th>Cobrado</th><th>Pend.</th></tr></thead>
-      <tbody>${keys.map(k=>{
-        const m=byMonth[k];
-        const [y,mon]=k.split('-');
-        return `<tr><td>${MONTHS_FULL[parseInt(mon)-1]} ${y}</td>
+      <tbody>${keys.map(k=>{const m=byMonth[k],[y,mon]=k.split('-');
+        return`<tr><td>${MONTHS_FULL[parseInt(mon)-1]} ${y}</td>
           <td>${m.ses}</td><td>${fmt(m.total)}</td><td>${fmt(m.cobrado)}</td>
-          <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td></tr>`;
-      }).join('')}</tbody>
-    </table>` : `<div class="empty-state" style="padding:24px">Sin sesiones registradas</div>`;
+          <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td></tr>`;}).join('')}
+      </tbody></table>` :
+    `<div class="empty-state" style="padding:24px">Sin sesiones registradas</div>`;
   document.getElementById('modal-resumen-pac').classList.remove('hidden');
 }
 
@@ -2173,6 +2419,7 @@ function switchTab(tab, btn) {
   document.getElementById(`tab-${tab}`).classList.add('active');
   btn.classList.add('active');
   if (tab==='resumen') renderResumen();
+  if (tab==='config')  renderConfig();
 }
 
 // ═══════════════════════════════════════════
