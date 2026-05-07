@@ -1112,9 +1112,9 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
             <div class="kpi-main-sub" id="kpi-total-sub">— sesiones este año</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.08 165);margin-bottom:3px">Neto est.</div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.08 165);margin-bottom:3px">Líquido</div>
             <div class="fs-target-kpilg" style="font-family:'DM Mono',monospace;font-weight:500;color:oklch(0.88 0.13 165)" id="kpi-neto">$0</div>
-            <div style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px">−imp. −gastos</div>
+            <div style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px">est. mensual</div>
           </div>
         </div>
       </div>
@@ -1308,10 +1308,14 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           <span style="font-size:11px;color:var(--ink-4)">para neto est.</span>
         </div>
         <div class="config-section">
-          <div class="config-row">
-            <span class="config-label">Arriendo / Gastos fijos ($)</span>
-            <input class="config-input" type="number" id="cfg-arriendo" placeholder="60000"
-              onchange="saveConfigArriendo()">
+          <div class="config-row" style="gap:8px">
+            <span class="config-label">Gastos fijos mensuales ($)</span>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input class="config-input" type="number" id="cfg-arriendo" placeholder="60000" style="width:110px">
+              <button onclick="saveConfigArriendo()" style="background:var(--accent);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0">
+                Guardar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1319,9 +1323,14 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       <div class="section-card">
         <div class="section-header"><div class="section-title">Impuesto mensual</div></div>
         <div class="config-section">
-          <div class="config-row">
+          <div class="config-row" style="gap:8px">
             <span class="config-label">Tasa impuesto (%)</span>
-            <input class="config-input" type="number" id="cfg-impuesto" value="15.25" step="0.01" min="0" max="100" onchange="saveConfigImpuesto()">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input class="config-input" type="number" id="cfg-impuesto" value="15.25" step="0.01" min="0" max="100" style="width:90px">
+              <button onclick="saveConfigImpuesto()" style="background:var(--accent);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;flex-shrink:0">
+                Guardar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1534,11 +1543,27 @@ async function cfgGet(id) {
   return rows && rows[0] ? rows[0].valor : null;
 }
 async function cfgSet(id, valor) {
-  return supa(`/rest/v1/configuracion?id=eq.${id}`, {
-    method:'PATCH',
-    body: JSON.stringify({ valor }),
-    headers: { ...hdrs(), 'Prefer': 'return=representation' }
-  });
+  // Usar fetch directo para evitar conflicto de headers en supa()
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/configuracion?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${state.token || SUPA_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ valor })
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      throw new Error(txt);
+    }
+    setSyncState('ok');
+  } catch(e) {
+    setSyncState('error');
+    throw e;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1702,17 +1727,22 @@ function initYearLabels() {
 // ═══════════════════════════════════════════
 // LOAD CONFIG FROM SUPABASE
 // ═══════════════════════════════════════════
-async function loadConfig() {
+async function loadConfig(applyUI = true) {
   try {
     const rows = await supaGet('configuracion');
     const map  = {};
     (rows||[]).forEach(r => { map[r.id] = r.valor; });
 
-    state.cfg.impuesto    = parseFloat(map['impuesto']) || 15.25;
-    state.cfg.arriendo    = parseFloat(map['arriendo'])  || 0;
-    state.cfg.fontScale   = map['font_scale'] || 'small';
+    state.cfg.impuesto  = parseFloat(map['impuesto']) || 15.25;
+    state.cfg.arriendo  = parseFloat(map['arriendo'])  || 0;
+    state.cfg.fontScale = map['font_scale'] || 'small';
 
-    applyConfigToUI();
+    if (applyUI) applyConfigToUI();
+    else {
+      // Solo aplicar font scale y recalcular dashboard, sin pisar inputs
+      applyFontScale(state.cfg.fontScale || 'small');
+      renderDashboard();
+    }
   } catch(e) { console.warn('Config load error', e); }
 }
 
@@ -1787,7 +1817,7 @@ function setupRealtime() {
   clearInterval(realtimeInterval);
   realtimeInterval = setInterval(async () => {
     try {
-      await loadConfig();
+      await loadConfig(false);
       const [pacs, sess] = await Promise.all([
         supaGet('pacientes', 'order=nombre.asc'),
         supaGet('sesiones',  'order=created_at.desc')
@@ -1827,12 +1857,19 @@ function renderDashboard() {
   document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Neto estimado: (total año − impuesto%) − gastos fijos mensuales
-  const arriendo  = Number(state.cfg.arriendo) || 0;
-  const impPct    = Number(state.cfg.impuesto)  || 15.25;
-  const impuesto  = Math.round(total * impPct / 100);
-  const neto      = (total - impuesto) - arriendo;
-  document.getElementById('kpi-neto').textContent = fmt(neto);
+  // Líquido mensual: bono_mes − impuesto_mes − gastos_fijos
+  const gastosFijos = Number(state.cfg.arriendo) || 0;
+  const impPct      = Number(state.cfg.impuesto)  || 15.25;
+  // Usar mes actual real siempre
+  const mesActual   = new Date().getMonth();
+  const anoActual   = new Date().getFullYear();
+  const sesMesActual = state.sesiones.filter(s =>
+    fechaYear(s.fecha) === anoActual && fechaMonth(s.fecha) === mesActual
+  );
+  const bonoMes    = sesMesActual.reduce((a,s) => a+(Number(s.monto)||0), 0);
+  const impMes     = Math.round(bonoMes * impPct / 100);
+  const liquidoMes = bonoMes - impMes - gastosFijos;
+  document.getElementById('kpi-neto').textContent = fmt(liquidoMes);
 
   // Bar chart
   const byMonth = Array(12).fill(0);
