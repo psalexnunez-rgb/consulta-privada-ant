@@ -39,6 +39,31 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* ───── PORTRAIT LOCK (phones only: max 480px wide in portrait) ───── */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: oklch(0.14 0.07 268);
+    z-index: 9999;
+  }
+  body::after {
+    content: 'Gira el dispositivo a posición vertical';
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    padding: 32px;
+    z-index: 10000;
+  }
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -52,42 +77,10 @@ html, body {
 
 
 /* ───── FONT SCALE (set via JS) ───── */
-/* ── FONT SCALE via data-fs on <html> ── */
-/* small (default) */
-.fs-target-name    { font-size: 16px !important; }
-.fs-target-nextname{ font-size: 16px !important; }
-.fs-target-kpimain { font-size: 30px !important; }
-.fs-target-kpilg   { font-size: 22px !important; }
-.fs-target-kpi     { font-size: 18px !important; }
-.fs-target-meta    { font-size: 13px !important; }
-.fs-target-sm      { font-size: 11px !important; }
-
-/* normal */
-html[data-fs="normal"] .fs-target-name    { font-size: 17px !important; }
-html[data-fs="normal"] .fs-target-nextname{ font-size: 17px !important; }
-html[data-fs="normal"] .fs-target-kpimain { font-size: 33px !important; }
-html[data-fs="normal"] .fs-target-kpilg   { font-size: 24px !important; }
-html[data-fs="normal"] .fs-target-kpi     { font-size: 20px !important; }
-html[data-fs="normal"] .fs-target-meta    { font-size: 14px !important; }
-html[data-fs="normal"] .fs-target-sm      { font-size: 12px !important; }
-
-/* large */
-html[data-fs="large"] .fs-target-name    { font-size: 19px !important; }
-html[data-fs="large"] .fs-target-nextname{ font-size: 19px !important; }
-html[data-fs="large"] .fs-target-kpimain { font-size: 36px !important; }
-html[data-fs="large"] .fs-target-kpilg   { font-size: 26px !important; }
-html[data-fs="large"] .fs-target-kpi     { font-size: 22px !important; }
-html[data-fs="large"] .fs-target-meta    { font-size: 15px !important; }
-html[data-fs="large"] .fs-target-sm      { font-size: 13px !important; }
-
-/* xlarge */
-html[data-fs="xlarge"] .fs-target-name    { font-size: 21px !important; }
-html[data-fs="xlarge"] .fs-target-nextname{ font-size: 21px !important; }
-html[data-fs="xlarge"] .fs-target-kpimain { font-size: 40px !important; }
-html[data-fs="xlarge"] .fs-target-kpilg   { font-size: 29px !important; }
-html[data-fs="xlarge"] .fs-target-kpi     { font-size: 25px !important; }
-html[data-fs="xlarge"] .fs-target-meta    { font-size: 16px !important; }
-html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
+/* ── FONT SCALE: controlado por body font-size ──
+   Pequeña=13px  Normal=15px  Grande=17px  MásGrande=19px
+   Todo el CSS usa rem, escala automáticamente             */
+html { font-size: 13px; }  /* base = pequeña */
 
 /* ───── AUTH SCREEN ───── */
 #auth-screen {
@@ -107,14 +100,14 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   opacity: 0.9;
 }
 .auth-title {
-  font-size: 22px;
+  font-size: 1.69rem;
   font-weight: 700;
   color: white;
   margin-bottom: 4px;
   letter-spacing: -0.3px;
 }
 .auth-sub {
-  font-size: 13px;
+  font-size: 1rem;
   color: oklch(0.85 0.04 255);
   margin-bottom: 40px;
 }
@@ -146,7 +139,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 10px;
   padding: 12px 14px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: 1.15rem;
   color: white;
   outline: none;
 }
@@ -203,6 +196,45 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   position: sticky; top: 0; z-index: 50;
   flex-shrink: 0;
 }
+/* ───── PRIVACY MODE ───── */
+.privacy-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid oklch(1 0 0 / 0.25);
+  background: oklch(1 0 0 / 0.08);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.privacy-btn:active { background: oklch(1 0 0 / 0.18); }
+.privacy-btn svg {
+  width: 18px; height: 18px;
+  stroke: oklch(0.88 0.06 255);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s;
+}
+.privacy-btn.active {
+  border-color: oklch(0.72 0.18 255 / 0.7);
+  background: oklch(0.55 0.18 255 / 0.18);
+}
+.privacy-btn.active svg { stroke: oklch(0.80 0.18 255); }
+
+/* Mask classes applied when privacy mode is on */
+body.privacy .private-val::after {
+  content: '••••';
+  letter-spacing: 2px;
+}
+body.privacy .private-val { color: transparent !important; text-shadow: 0 0 10px oklch(0.7 0 0 / 0.45); user-select:none; }
+body.privacy .private-name {
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+}
+
 .header-top {
   display: flex;
   align-items: center;
@@ -220,12 +252,12 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   opacity: 0.9;
 }
 .brand-name {
-  font-size: 15px;
+  font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: -0.2px;
 }
 .brand-year {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-family: 'DM Mono', monospace;
   opacity: 0.6;
   margin-left: 2px;
@@ -238,7 +270,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border: 1px solid oklch(1 0 0 / 0.18);
   border-radius: 20px;
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: white;
   transition: background 0.3s;
@@ -255,13 +287,13 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 .header-title {
-  font-size: 22px;
+  font-size: 1.69rem;
   font-weight: 700;
   color: white;
   letter-spacing: -0.3px;
 }
 .header-subtitle {
-  font-size: 12px;
+  font-size: 0.92rem;
   color: oklch(0.80 0.04 255);
   margin-top: 2px;
 }
@@ -300,7 +332,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   line-height: 1;
 }
 .nav-tab span {
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--ink-4);
   transition: color 0.15s;
@@ -318,7 +350,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   overflow: hidden;
 }
 .kpi-main-label {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.11em;
@@ -333,7 +365,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   letter-spacing: -0.5px;
 }
 .kpi-main-sub {
-  font-size: 13px;
+  font-size: 1rem;
   color: oklch(0.70 0.06 255);
   margin-top: 4px;
 }
@@ -352,7 +384,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   backdrop-filter: blur(10px);
 }
 .kpi-label {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.11em;
@@ -375,7 +407,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   letter-spacing: -0.3px;
 }
 .kpi-sub {
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--ink-4);
   margin-top: 3px;
 }
@@ -409,14 +441,14 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-bottom: 1px solid var(--rule-2);
 }
 .section-title {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.11em;
   color: var(--ink-3);
 }
 .section-action {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--accent);
   background: none;
@@ -429,7 +461,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 .tag {
   display: inline-flex;
   align-items: center;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 6px;
   padding: 2px 7px;
@@ -447,7 +479,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 .badge {
   display: inline-flex;
   align-items: center;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 6px;
   padding: 2px 8px;
@@ -483,6 +515,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 }
 .patient-info { flex: 1; min-width: 0; }
 .patient-name {
+  font-size: 1.23rem;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
@@ -490,7 +523,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   text-overflow: ellipsis;
 }
 .patient-meta {
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--ink-4);
   margin-top: 2px;
   display: flex;
@@ -530,7 +563,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   gap: 8px;
 }
 .session-panel-title {
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--ink-3);
   flex: 1;
@@ -558,13 +591,13 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   gap: 6px;
   padding: 9px 16px;
   border-bottom: 1px solid var(--rule-2);
-  font-size: 13px;
+  font-size: 1rem;
 }
 .session-row:last-child { border-bottom: none; }
 .session-row.paid { background: oklch(0.62 0.13 165 / 0.04); }
-.session-date { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink-2); }
-.session-amount { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink); text-align: right; }
-.session-edit { color: var(--ink-4); font-size: 16px; cursor: pointer; text-align: center; -webkit-tap-highlight-color: transparent; }
+.session-date { font-family: 'DM Mono', monospace; font-size: 1rem; color: var(--ink-2); }
+.session-amount { font-family: 'DM Mono', monospace; font-size: 1rem; color: var(--ink); text-align: right; }
+.session-edit { color: var(--ink-4); font-size: 1.23rem; cursor: pointer; text-align: center; -webkit-tap-highlight-color: transparent; }
 
 /* ───── SEARCH BAR ───── */
 .search-wrap {
@@ -578,7 +611,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 10px;
   padding: 9px 14px 9px 36px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 1.08rem;
   color: white;
   outline: none;
 }
@@ -599,7 +632,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   padding: 8px 16px 0;
 }
 .filter-tab {
-  font-size: 12px;
+  font-size: 0.92rem;
   font-weight: 600;
   border: 1px solid oklch(1 0 0 / 0.20);
   border-radius: 20px;
@@ -630,7 +663,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   gap: 5px;
   -webkit-tap-highlight-color: transparent;
 }
-.hdr-btn.green { background: oklch(0.55 0.16 158); color: white; box-shadow: 0 3px 10px oklch(0.55 0.16 158 / 0.4); }
+.hdr-btn.green { background: oklch(0.55 0.16 158); color: white; box-shadow: 0 3px 10px oklch(0.55 0.16 158 / 0.4); font-size: 1rem; }
 .hdr-btn.blue { background: oklch(0.52 0.18 255); color: white; box-shadow: 0 3px 10px oklch(0.52 0.18 255 / 0.4); }
 
 /* ───── FABs ───── */
@@ -685,7 +718,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   transition: height 0.4s ease;
 }
 .bar-label {
-  font-size: 9px;
+  font-size: 0.69rem;
   font-family: 'DM Mono', monospace;
   color: var(--ink-4);
   text-transform: uppercase;
@@ -698,7 +731,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   font-size: 13px;
 }
 .resumen-table th {
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -714,6 +747,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-bottom: 1px solid var(--rule-2);
   color: var(--ink);
   vertical-align: middle;
+  font-size: 1rem;
 }
 .resumen-table td:not(:first-child) { text-align: right; font-family: 'DM Mono', monospace; }
 .resumen-table tr.current-month td { background: oklch(0.55 0.18 255 / 0.05); }
@@ -752,12 +786,12 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 }
 .donut-center-num {
   font-family: 'DM Mono', monospace;
-  font-size: 18px;
+  font-size: 1.38rem;
   font-weight: 500;
   color: var(--ink);
 }
 .donut-center-lbl {
-  font-size: 10px;
+  font-size: 0.77rem;
   color: var(--ink-4);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -767,7 +801,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 1rem;
 }
 .donut-swatch {
   width: 10px; height: 10px;
@@ -775,8 +809,8 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   flex-shrink: 0;
 }
 .donut-item-name { flex: 1; color: var(--ink-2); font-weight: 500; }
-.donut-item-pct { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink-4); }
-.donut-item-amt { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink); }
+.donut-item-pct { font-family: 'DM Mono', monospace; font-size: 0.92rem; color: var(--ink-4); }
+.donut-item-amt { font-family: 'DM Mono', monospace; font-size: 0.92rem; color: var(--ink); }
 
 /* ───── PER-PATIENT ───── */
 .per-patient-row {
@@ -796,12 +830,12 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 }
 .per-patient-info { flex: 1; min-width: 0; }
 .per-patient-name { font-weight: 600; color: var(--ink); }
-.per-patient-meta { font-size: 12px; color: var(--ink-4); margin-top: 1px; }
+.per-patient-meta { font-size: 0.92rem; color: var(--ink-4); margin-top: 1px; }
 .per-patient-amounts { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
-.per-patient-total { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--ink); }
-.per-patient-cobrado { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
-.per-patient-pendiente { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--neg); }
-.per-patient-aldia { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--pos); }
+.per-patient-total { font-family: 'DM Mono', monospace; font-size: 1rem; font-weight: 500; color: var(--ink); }
+.per-patient-cobrado { font-family: 'DM Mono', monospace; font-size: 0.92rem; color: var(--accent); }
+.per-patient-pendiente { font-family: 'DM Mono', monospace; font-size: 0.92rem; color: var(--neg); }
+.per-patient-aldia { font-family: 'DM Mono', monospace; font-size: 0.92rem; color: var(--pos); }
 
 /* ───── CONFIG ───── */
 .config-section { padding: 0; }
@@ -815,10 +849,10 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   color: var(--ink);
 }
 .config-row:last-child { border-bottom: none; }
-.config-label { font-size: 14px; font-weight: 500; color: var(--ink); }
+.config-label { font-size: 1.08rem; font-weight: 500; color: var(--ink); }
 .config-input {
   font-family: 'DM Mono', monospace;
-  font-size: 14px;
+  font-size: 1.08rem;
   font-weight: 500;
   color: var(--ink);
   background: var(--rule-2);
@@ -851,7 +885,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   gap: 10px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--rule-2);
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--ink-2);
 }
 .alert-item:last-child { border-bottom: none; }
@@ -860,7 +894,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 10px;
   background: var(--warn);
   color: white;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   padding: 0 5px;
@@ -885,7 +919,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 }
 .year-val {
   font-family: 'DM Mono', monospace;
-  font-size: 16px;
+  font-size: 1.23rem;
   font-weight: 500;
   color: white;
 }
@@ -922,7 +956,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   margin: 12px auto 0;
 }
 .modal-title {
-  font-size: 17px;
+  font-size: 1.31rem;
   font-weight: 700;
   color: var(--ink);
   padding: 16px 20px 12px;
@@ -932,7 +966,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 .field { margin-bottom: 14px; }
 .field label {
   display: block;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.10em;
@@ -946,7 +980,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 10px;
   padding: 11px 14px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: 1.15rem;
   color: var(--ink);
   outline: none;
   appearance: none;
@@ -966,7 +1000,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 12px;
   padding: 14px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px oklch(0.52 0.18 255 / 0.40);
@@ -978,7 +1012,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   border-radius: 12px;
   padding: 14px 20px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: 1.15rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -1007,11 +1041,11 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   text-align: center;
   min-width: 40px;
 }
-.next-day { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--ink); line-height: 1; }
-.next-mon { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-4); }
+.next-day { font-family: 'DM Mono', monospace; font-size: 1.38rem; font-weight: 500; color: var(--ink); line-height: 1; }
+.next-mon { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-4); }
 .next-info { flex: 1; min-width: 0; }
-.next-name { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.next-meta { font-size: 13px; color: var(--ink-4); margin-top: 2px; }
+.next-name { font-size: 1.23rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next-meta { font-size: 1rem; color: var(--ink-4); margin-top: 2px; }
 
 /* ───── BODY SCROLL WRAPPER ───── */
 .tab-body { padding: 12px 16px 0; }
@@ -1023,7 +1057,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   justify-content: center;
   padding: 40px;
   color: var(--ink-4);
-  font-size: 13px;
+  font-size: 1rem;
   gap: 10px;
 }
 .spin { animation: spin 0.8s linear infinite; display: inline-block; }
@@ -1037,7 +1071,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   transform: translateX(-50%) translateY(100px);
   background: var(--ink);
   color: white;
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: 500;
   padding: 10px 18px;
   border-radius: 24px;
@@ -1054,7 +1088,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
   text-align: center;
   padding: 32px 16px;
   color: var(--ink-4);
-  font-size: 14px;
+  font-size: 1.08rem;
 }
 .empty-state i { font-size: 36px; display: block; margin-bottom: 8px; opacity: 0.4; }
 
@@ -1066,7 +1100,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
-  <div class="auth-logo"><i class="ti ti-brain"></i></div>
+  <div class="auth-logo">ψ</div>
   <div class="auth-title">Consulta Privada</div>
   <div class="auth-sub">Gestión de consulta psicológica</div>
   <div class="auth-card">
@@ -1098,23 +1132,32 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           </div>
           <span class="brand-year" id="current-year-brand"></span>
         </div>
-        <div class="sync-pill ok" id="sync-pill">
-          <div class="sync-dot"></div>
-          <span id="sync-text">Sincronizado</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="privacy-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar datos">
+            <svg viewBox="0 0 24 24" id="privacy-icon">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+              <circle cx="12" cy="12" r="3"/>
+              <line id="privacy-slash" x1="3" y1="3" x2="21" y2="21" style="display:none"/>
+            </svg>
+          </button>
+          <div class="sync-pill ok" id="sync-pill">
+            <div class="sync-dot"></div>
+            <span id="sync-text">Sincronizado</span>
+          </div>
         </div>
       </div>
       <!-- KPI Main -->
       <div class="kpi-main" id="kpi-main">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
           <div>
-            <div class="kpi-main-label">Total facturado</div>
-            <div class="kpi-main-value fs-target-kpimain" id="kpi-total">$0</div>
-            <div class="kpi-main-sub" id="kpi-total-sub">— sesiones este año</div>
+            <div class="kpi-main-label">Líquido</div>
+            <div class="kpi-main-value fs-target-kpimain private-val" id="kpi-neto">$0</div>
+            <div id="kpi-neto-sub" class="kpi-main-sub">—</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.08 165);margin-bottom:3px">Líquido</div>
-            <div class="fs-target-kpilg" style="font-family:'DM Mono',monospace;font-weight:500;color:oklch(0.88 0.13 165)" id="kpi-neto">$0</div>
-            <div id="kpi-neto-sub" style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px;font-family:'DM Mono',monospace">—</div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.06 255);margin-bottom:3px">Facturado</div>
+            <div class="fs-target-kpilg private-val" style="font-family:'DM Mono',monospace;font-weight:500;color:white" id="kpi-total">$0</div>
+            <div class="kpi-main-sub" id="kpi-total-sub" style="font-size:10px;color:oklch(0.65 0.08 255);margin-top:2px;font-family:'DM Mono',monospace">— sesiones este año</div>
           </div>
         </div>
       </div>
@@ -1122,18 +1165,18 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       <div class="kpi-grid">
         <div class="kpi-card" style="border-color:oklch(0.62 0.13 165 / 0.35)">
           <div class="kpi-label" style="color:var(--pos)"><span class="dot" style="background:var(--pos)"></span>Cobrado</div>
-          <div class="kpi-value kpi-value-lg fs-target-kpilg" style="color:var(--pos)" id="kpi-cobrado">$0</div>
+          <div class="kpi-value kpi-value-lg fs-target-kpilg private-val" style="color:var(--pos)" id="kpi-cobrado">$0</div>
           <div class="kpi-sub" style="color:var(--pos);opacity:0.7" id="kpi-cobrado-sub">0 sesiones</div>
         </div>
         <div class="kpi-card" style="border-color:oklch(0.55 0.18 255 / 0.35)">
           <div class="kpi-label" style="color:var(--accent)"><span class="dot" style="background:var(--accent)"></span>Pagado</div>
-          <div class="kpi-value kpi-value-lg fs-target-kpilg" style="color:var(--accent)" id="kpi-pagado">$0</div>
+          <div class="kpi-value kpi-value-lg fs-target-kpilg private-val" style="color:var(--accent)" id="kpi-pagado">$0</div>
           <div class="kpi-sub" style="color:var(--accent);opacity:0.7" id="kpi-pagado-sub">0 sesiones</div>
         </div>
       </div>
       <div class="kpi-full" style="margin-bottom:0;gap:8px">
         <div class="kpi-label" style="color:var(--neg)"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
-        <div class="kpi-value fs-target-kpi" style="color:var(--neg);flex-shrink:0" id="kpi-pendiente">$0</div>
+        <div class="kpi-value fs-target-kpi private-val" style="color:var(--neg);flex-shrink:0" id="kpi-pendiente">$0</div>
       </div>
     </div>
     <div class="tab-body">
@@ -1296,18 +1339,20 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           <div class="section-title">Líquido mensual</div>
           <div style="font-size:11px;color:var(--ink-4)">facturado − imp. − gastos</div>
         </div>
-        <table class="resumen-table" style="width:100%">
-          <thead>
-            <tr>
-              <th>Mes</th>
-              <th>Facturado</th>
-              <th>Impuesto</th>
-              <th>Gastos</th>
-              <th style="color:oklch(0.55 0.14 165)">Líquido</th>
-            </tr>
-          </thead>
-          <tbody id="liquido-tbody"></tbody>
-        </table>
+        <div style="overflow-x:auto">
+          <table class="resumen-table" style="min-width:420px;width:100%">
+            <thead>
+              <tr>
+                <th>Mes</th>
+                <th>Facturado</th>
+                <th>Impuesto</th>
+                <th>Gastos</th>
+                <th style="color:oklch(0.55 0.14 165)">Líquido</th>
+              </tr>
+            </thead>
+            <tbody id="liquido-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -1324,7 +1369,11 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       <div class="section-card">
         <div class="section-header">
           <div class="section-title">Gastos mensuales fijos</div>
-          <span style="font-size:11px;color:var(--ink-4)">para neto est.</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onclick="arriendoYearChange(-1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">‹</button>
+            <span style="font-size:0.92rem;font-family:'DM Mono',monospace;color:var(--ink-3);min-width:36px;text-align:center" id="arriendo-year-label"></span>
+            <button onclick="arriendoYearChange(1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">›</button>
+          </div>
         </div>
         <div class="config-section">
           <div class="config-row" style="gap:8px">
@@ -1340,7 +1389,14 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       </div>
       <!-- Impuesto -->
       <div class="section-card">
-        <div class="section-header"><div class="section-title">Impuesto mensual</div></div>
+        <div class="section-header">
+          <div class="section-title">Impuesto mensual</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onclick="impuestoYearChange(-1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">‹</button>
+            <span style="font-size:0.92rem;font-family:'DM Mono',monospace;color:var(--ink-3);min-width:36px;text-align:center" id="impuesto-year-label"></span>
+            <button onclick="impuestoYearChange(1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">›</button>
+          </div>
+        </div>
         <div class="config-section">
           <div class="config-row" style="gap:8px">
             <span class="config-label">Tasa impuesto (%)</span>
@@ -1357,35 +1413,17 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       <div class="section-card">
         <div class="section-header">
           <div class="section-title">Tarifas por previsión</div>
-          <div style="font-size:11px;color:var(--ink-4)" id="config-year"></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onclick="tarifaYearChange(-1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">‹</button>
+            <span style="font-size:0.92rem;font-family:'DM Mono',monospace;color:var(--ink-3);min-width:36px;text-align:center" id="tarifa-year-label"></span>
+            <button onclick="tarifaYearChange(1)" style="background:none;border:1px solid var(--rule);border-radius:6px;width:24px;height:24px;font-size:14px;cursor:pointer;color:var(--ink-3);display:flex;align-items:center;justify-content:center">›</button>
+          </div>
         </div>
         <div id="tarifas-list" class="config-section"></div>
-      </div>
-      <!-- Tamaño de letra -->
-      <div class="section-card">
-        <div class="section-header"><div class="section-title">Tamaño de letra</div></div>
-        <div class="config-section">
-          <div class="config-row" style="gap:8px">
-            <span class="config-label">Escala</span>
-            <div style="display:flex;gap:8px">
-              <button id="fs-btn-small" onclick="setFontScale('small')"
-                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
-                Pequeña
-              </button>
-              <button id="fs-btn-normal" onclick="setFontScale('normal')"
-                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:var(--accent);color:white">
-                Normal
-              </button>
-              <button id="fs-btn-large" onclick="setFontScale('large')"
-                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
-                Grande
-              </button>
-              <button id="fs-btn-xlarge" onclick="setFontScale('xlarge')"
-                style="padding:7px 12px;border-radius:8px;border:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;background:var(--rule-2);color:var(--ink-3)">
-                + Grande
-              </button>
-            </div>
-          </div>
+        <div style="padding:8px 16px 14px">
+          <button onclick="saveTarifas()" style="width:100%;background:var(--accent);color:white;border:none;border-radius:10px;padding:11px;font-size:1rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer">
+            Guardar tarifas
+          </button>
         </div>
       </div>
       <!-- Cuenta -->
@@ -1597,11 +1635,14 @@ const state = {
   token: null, user: null,
   pacientes: [], sesiones: [],
   currentYear: new Date().getFullYear(),
+  tarifaYear: new Date().getFullYear(),
+  arriendoYear: new Date().getFullYear(),
+  impuestoYear: new Date().getFullYear(),
   pacienteFilter: 'activos',
   searchQuery: '',
   editingSesionId: null,
   // config cached from Supabase
-  cfg: { impuesto:15.25, arriendo:0, fontScale:'small' }
+  cfg: { impuesto:15.25, impuestos:{}, arriendo:0, arriendos:{}, fontScale:'small', tarifas:{} }
 };
 
 // ── Helpers ──
@@ -1675,6 +1716,17 @@ const MONTHS_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','A
 // ═══════════════════════════════════════════
 // SYNC PILL
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// PRIVACY MODE
+// ═══════════════════════════════════════════
+function togglePrivacy() {
+  const isOn = document.body.classList.toggle('privacy');
+  const btn  = document.getElementById('privacy-btn');
+  const slash = document.getElementById('privacy-slash');
+  if (btn) btn.classList.toggle('active', isOn);
+  if (slash) slash.style.display = isOn ? '' : 'none';
+}
+
 function setSyncState(s) {
   ['sync-pill','sync-pill-2'].forEach(id => {
     const el = document.getElementById(id);
@@ -1690,7 +1742,9 @@ function setSyncState(s) {
 // ═══════════════════════════════════════════
 function applyFontScale(scale) {
   state.cfg.fontScale = scale;
-  document.documentElement.setAttribute('data-fs', scale);
+  // Cambiar font-size base en <html> — todo lo demás usa rem y escala solo
+  const sizes = { small: '13px', normal: '15px', large: '17px', xlarge: '19px' };
+  document.documentElement.style.fontSize = sizes[scale] || '13px';
   ['small','normal','large','xlarge'].forEach(s => {
     const btn = document.getElementById(`fs-btn-${s}`);
     if (!btn) return;
@@ -1742,7 +1796,7 @@ async function doSignOut() {
 
 function initYearLabels() {
   const y = state.currentYear;
-  ['current-year-brand','resumen-year','dash-year-label','config-year'].forEach(id => {
+  ['current-year-brand','resumen-year','dash-year-label'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = y;
   });
@@ -1763,11 +1817,29 @@ async function loadConfig(applyUI = true) {
       const v = parseFloat(map['impuesto']);
       if (!isNaN(v)) state.cfg.impuesto = v;
     }
+    if (map['impuestos'] && typeof map['impuestos'] === 'object') {
+      state.cfg.impuestos = map['impuestos'];
+    }
     if (map['arriendo'] !== undefined && map['arriendo'] !== null) {
-      const v = parseFloat(map['arriendo']);
-      if (!isNaN(v)) state.cfg.arriendo = v;
+      // Support legacy scalar and new per-year object
+      if (typeof map['arriendo'] === 'object') {
+        state.cfg.arriendos = map['arriendo'];
+        state.cfg.arriendo = parseFloat(map['arriendo'][new Date().getFullYear()]) || 0;
+      } else {
+        const v = parseFloat(map['arriendo']);
+        if (!isNaN(v)) state.cfg.arriendo = v;
+      }
+    }
+    if (map['arriendos'] && typeof map['arriendos'] === 'object') {
+      state.cfg.arriendos = map['arriendos'];
     }
     if (map['font_scale']) state.cfg.fontScale = map['font_scale'];
+    if (map['tarifas'] && typeof map['tarifas'] === 'object') {
+      state.cfg.tarifas = map['tarifas'];
+    }
+    if (map['arriendos'] && typeof map['arriendos'] === 'object') {
+      state.cfg.arriendos = map['arriendos'];
+    }
 
     console.log('loadConfig:', JSON.stringify(state.cfg));
 
@@ -1780,44 +1852,91 @@ async function loadConfig(applyUI = true) {
   } catch(e) { console.warn('Config load error', e); }
 }
 
+function getImpuestoForYear(year) {
+  if (state.cfg.impuestos && state.cfg.impuestos[year] !== undefined) {
+    return parseFloat(state.cfg.impuestos[year]);
+  }
+  return parseFloat(state.cfg.impuesto) || 15.25;
+}
+
+function renderImpuestos() {
+  const year = state.impuestoYear;
+  const val  = getImpuestoForYear(year);
+  const lbl  = document.getElementById('impuesto-year-label');
+  if (lbl) lbl.textContent = year;
+  const el = document.getElementById('cfg-impuesto');
+  if (el) el.value = val;
+}
+
+function impuestoYearChange(delta) {
+  state.impuestoYear += delta;
+  renderImpuestos();
+}
+
+function getArriendoForYear(year) {
+  if (state.cfg.arriendos && state.cfg.arriendos[year] !== undefined) {
+    return parseFloat(state.cfg.arriendos[year]) || 0;
+  }
+  // Fallback to legacy scalar for current year
+  return parseFloat(state.cfg.arriendo) || 0;
+}
+
+function renderArriendos() {
+  const year = state.arriendoYear;
+  const val  = getArriendoForYear(year);
+  const lbl  = document.getElementById('arriendo-year-label');
+  if (lbl) lbl.textContent = year;
+  const el = document.getElementById('cfg-arriendo');
+  if (el) el.value = val || '';
+}
+
+function arriendoYearChange(delta) {
+  state.arriendoYear += delta;
+  renderArriendos();
+}
+
 function applyConfigToUI() {
-  // Config inputs
-  const impEl = document.getElementById('cfg-impuesto');
-  if (impEl) impEl.value = state.cfg.impuesto;
-
-  const arrEl = document.getElementById('cfg-arriendo');
-  if (arrEl) arrEl.value = state.cfg.arriendo || '';
-
   // Font scale
   applyFontScale(state.cfg.fontScale || 'small');
+  renderImpuestos();
+  renderArriendos();
 }
 
 // ── Save individual config keys ──
 async function saveConfigImpuesto() {
-  const val = parseFloat(document.getElementById('cfg-impuesto').value) || 15.25;
-  state.cfg.impuesto = val;
+  const val  = parseFloat(document.getElementById('cfg-impuesto').value) || 15.25;
+  const year = state.impuestoYear;
+  if (!state.cfg.impuestos) state.cfg.impuestos = {};
+  state.cfg.impuestos[year] = val;
+  if (year === new Date().getFullYear()) state.cfg.impuesto = val;
   try {
-    await cfgSet('impuesto', val);
-    showToast('Impuesto guardado: ' + val + '%');
+    await cfgSet('impuestos', state.cfg.impuestos);
+    showToast('Impuesto ' + year + ' guardado: ' + val + '%');
   } catch(e) {
     showToast('Error guardando: ' + e.message);
     return;
   }
   renderDashboard();
+  renderResumen();
 }
 
 async function saveConfigArriendo() {
-  const raw = document.getElementById('cfg-arriendo').value;
-  const val = parseFloat(raw) || 0;
-  state.cfg.arriendo = val;
+  const raw  = document.getElementById('cfg-arriendo').value;
+  const val  = parseFloat(raw) || 0;
+  const year = state.arriendoYear;
+  if (!state.cfg.arriendos) state.cfg.arriendos = {};
+  state.cfg.arriendos[year] = val;
+  // Keep legacy scalar in sync with current year
+  if (year === new Date().getFullYear()) state.cfg.arriendo = val;
   try {
-    await cfgSet('arriendo', val);
-    showToast('Gastos guardados: ' + fmt(val));
+    await cfgSet('arriendos', state.cfg.arriendos);
+    showToast('Gastos ' + year + ' guardados: ' + fmt(val));
   } catch(e) {
     showToast('Error guardando: ' + e.message);
     return;
   }
   renderDashboard();
+  renderResumen();
 }
 
 // gastos simplificado a arriendo único
@@ -1905,8 +2024,8 @@ function renderDashboard() {
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
   // Líquido anual = total facturado año − impuesto − (gastos fijos × meses completados)
-  const gastosFijos  = Number(state.cfg.arriendo) || 0;
-  const impPct       = Number(state.cfg.impuesto)  || 15.25;
+  const gastosFijos  = getArriendoForYear(year);
+  const impPct       = getImpuestoForYear(year);
   const mesHoy       = new Date().getMonth(); // 0-based (0=ene, 4=may)
   // Meses completados = meses que ya terminaron en el año actual
   // Si estamos en mayo (índice 4), hay 4 meses completados (ene-abr)
@@ -2028,8 +2147,8 @@ function renderInactividad() {
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rule-2)">
       <i class="ti ${level.icon}" style="font-size:20px;color:${level.color};flex-shrink:0"></i>
       <div style="flex:1;min-width:0">
-        <div class="fs-target-name" style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
-        <div style="font-size:12px;color:var(--ink-4);margin-top:1px">${lastStr}</div>
+        <div class="patient-name private-name">${pac.nombre}</div>
+        <div class="patient-meta">${lastStr}</div>
       </div>
       <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:${level.color};color:white;white-space:nowrap">${level.label}</span>
     </div>`;
@@ -2082,7 +2201,7 @@ function renderPacientes() {
       <div class="patient-row" onclick="togglePaciente('${p.id}')">
         <div class="patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
         <div class="patient-info">
-          <div class="patient-name fs-target-name">${p.nombre}</div>
+          <div class="patient-name fs-target-name private-name">${p.nombre}</div>
           <div class="patient-meta">
             <span class="tag ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span>
             ${nextSes}
@@ -2095,7 +2214,7 @@ function renderPacientes() {
       </div>
       <div class="session-panel" id="sp-${p.id}">
         <div class="session-panel-header">
-          <span class="session-panel-title">${ses.length} ses. · ${fmt(total)}</span>
+          <span class="session-panel-title">${ses.length} ses. · <span class="private-val">${fmt(total)}</span></span>
           <button class="btn-sm blue" onclick="openResumenPaciente('${p.id}');event.stopPropagation()">
             <i class="ti ti-chart-bar"></i> $
           </button>
@@ -2130,7 +2249,7 @@ function renderSessionRows(ses) {
       <span class="session-date">${fmtFecha(s.fecha)}</span>
       <span class="tag ${prevKey(s.prevision)}">${prevLabel(s.prevision)}</span>
       <span class="badge ${est}">${s.estado||'Pendiente'}</span>
-      <span class="session-amount">${fmt(s.monto)}</span>
+      <span class="session-amount private-val">${fmt(s.monto)}</span>
       <span class="session-edit" onclick="openEditSesion('${s.id}');event.stopPropagation()"><i class="ti ti-pencil"></i></span>
     </div>`;
   }).join('');
@@ -2268,11 +2387,11 @@ function renderResumen() {
     <div class="per-patient-row">
       <div class="per-patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
       <div class="per-patient-info">
-        <div class="per-patient-name fs-target-name">${p.nombre}</div>
+        <div class="per-patient-name fs-target-name private-name">${p.nombre}</div>
         <div class="per-patient-meta"><span class="tag ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
       </div>
       <div class="per-patient-amounts">
-        <span class="per-patient-total">${fmt(p._total)}</span>
+        <span class="per-patient-total private-val">${fmt(p._total)}</span>
         ${p._cobrado?`<span class="per-patient-cobrado">${fmt(p._cobrado)}</span>`:''}
         ${p._pendiente?`<span class="per-patient-pendiente">${fmt(p._pendiente)}</span>`:`<span class="per-patient-aldia">Al día ✓</span>`}
       </div>
@@ -2294,8 +2413,8 @@ function renderResumen() {
     </div>`;
 
   // ── Tabla líquido mensual ──
-  const gastosFijosR  = Number(state.cfg.arriendo) || 0;
-  const impPctR       = Number(state.cfg.impuesto)  || 15.25;
+  const gastosFijosR  = getArriendoForYear(year);
+  const impPctR       = getImpuestoForYear(year);
   const mesHoyR       = new Date().getMonth();
   const anoHoyR       = new Date().getFullYear();
 
@@ -2323,17 +2442,17 @@ function renderResumen() {
     liqTbody.innerHTML = liquidoRows.map(r => `
       <tr class="${r.isCur?'current-month':''}">
         <td>${r.mes}${!r.esMesCerrado?' <span style="font-size:10px;color:var(--ink-4)">(en curso)</span>':''}</td>
-        <td>${fmt(r.total)}</td>
-        <td style="color:var(--neg)">−${fmt(r.imp)}</td>
-        <td style="color:var(--warn)">${r.esMesCerrado?'−'+fmt(r.gastos):'—'}</td>
-        <td style="color:${r.liquido>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:600">${fmt(r.liquido)}</td>
+        <td class="private-val">${fmt(r.total)}</td>
+        <td class="private-val" style="color:var(--neg)">−${fmt(r.imp)}</td>
+        <td class="private-val" style="color:var(--warn)">${r.esMesCerrado?'−'+fmt(r.gastos):'—'}</td>
+        <td class="private-val" style="color:${r.liquido>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:600">${fmt(r.liquido)}</td>
       </tr>`).join('') + `
       <tr class="totals">
         <td>Total ${year}</td>
-        <td>${fmt(totFact)}</td>
-        <td style="color:var(--neg)">−${fmt(totImp)}</td>
-        <td style="color:var(--warn)">−${fmt(totGast)}</td>
-        <td style="color:${totLiq>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:700">${fmt(totLiq)}</td>
+        <td class="private-val">${fmt(totFact)}</td>
+        <td class="private-val" style="color:var(--neg)">−${fmt(totImp)}</td>
+        <td class="private-val" style="color:var(--warn)">−${fmt(totGast)}</td>
+        <td class="private-val" style="color:${totLiq>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:700">${fmt(totLiq)}</td>
       </tr>`;
   }
 }
@@ -2349,17 +2468,54 @@ function changeYear(delta) {
 // ═══════════════════════════════════════════
 // CONFIG RENDER
 // ═══════════════════════════════════════════
-function renderConfig() {
+// tarifaYear inicializado con año actual
+
+function tarifaYearChange(delta) {
+  state.tarifaYear += delta;
+  renderTarifas();
+}
+
+function renderTarifas() {
   const PROVS = ['Fonasa','Colmena','Cruz Blanca','Particular'];
+  const year  = state.tarifaYear;
+  const saved = (state.cfg.tarifas && state.cfg.tarifas[year]) || {};
+  const lbl   = document.getElementById('tarifa-year-label');
+  if (lbl) lbl.textContent = year;
+
   document.getElementById('tarifas-list').innerHTML = PROVS.map(pv => {
-    const ses = state.sesiones.filter(s=>s.prevision===pv && Number(s.monto)>0);
-    const avg = ses.length ? Math.round(ses.reduce((a,s)=>a+(Number(s.monto)||0),0)/ses.length) : 0;
     const css = prevKey(pv);
-    return `<div class="config-row">
+    const val = saved[pv] || '';
+    return `<div class="config-row" style="gap:8px">
       <span class="config-label"><span class="tag ${css}" style="margin-right:6px">${pv}</span></span>
-      <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--ink-3)">${avg?fmt(avg)+' prom.':'sin datos'}</span>
+      <input class="config-input" type="number" id="tarifa-${css}"
+        value="${val}" placeholder="$0" style="width:120px"
+        oninput="">
     </div>`;
   }).join('');
+}
+
+async function saveTarifas() {
+  const PROVS = ['Fonasa','Colmena','Cruz Blanca','Particular'];
+  const year  = state.tarifaYear;
+  if (!state.cfg.tarifas) state.cfg.tarifas = {};
+  if (!state.cfg.tarifas[year]) state.cfg.tarifas[year] = {};
+  PROVS.forEach(pv => {
+    const css = prevKey(pv);
+    const el  = document.getElementById(`tarifa-${css}`);
+    if (el) state.cfg.tarifas[year][pv] = parseFloat(el.value) || 0;
+  });
+  try {
+    await cfgSet('tarifas', state.cfg.tarifas);
+    showToast('Tarifas ' + year + ' guardadas');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+}
+
+function renderConfig() {
+  renderTarifas();
+  renderArriendos();
+  renderImpuestos();
   applyConfigToUI();
 }
 
