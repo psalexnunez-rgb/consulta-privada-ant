@@ -1314,15 +1314,16 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       <!-- Gastos mensuales -->
       <div class="section-card">
         <div class="section-header">
-          <div class="section-title">Gastos mensuales</div>
+          <div class="section-title">Gastos mensuales fijos</div>
           <span style="font-size:11px;color:var(--ink-4)">para líquido</span>
         </div>
-        <div class="config-section" id="gastos-list">
-          <!-- rows injected by JS -->
+        <div class="config-section">
+          <div class="config-row">
+            <span class="config-label">Arriendo / Gastos fijos ($)</span>
+            <input class="config-input" type="number" id="cfg-arriendo" placeholder="60000"
+              onchange="saveConfigArriendo()">
+          </div>
         </div>
-        <button onclick="addGasto()" style="width:calc(100% - 32px);margin:0 16px 14px;background:none;border:1px dashed var(--rule);border-radius:10px;padding:10px;font-size:13px;color:var(--ink-4);cursor:pointer;font-family:'DM Sans',sans-serif">
-          <i class="ti ti-plus"></i> Agregar gasto
-        </button>
       </div>
       <!-- Impuesto -->
       <div class="section-card">
@@ -1719,7 +1720,7 @@ async function loadConfig() {
 
     state.cfg.profesional = map['profesional'] || '';
     state.cfg.impuesto    = parseFloat(map['impuesto']) || 15.25;
-    state.cfg.gastos      = Array.isArray(map['gastos']) ? map['gastos'] : [];
+    state.cfg.arriendo    = parseFloat(map['arriendo'])  || 0;
     state.cfg.fontScale   = map['font_scale'] || 'small';
 
     applyConfigToUI();
@@ -1738,11 +1739,11 @@ function applyConfigToUI() {
   const impEl = document.getElementById('cfg-impuesto');
   if (impEl) impEl.value = state.cfg.impuesto;
 
+  const arrEl = document.getElementById('cfg-arriendo');
+  if (arrEl) arrEl.value = state.cfg.arriendo || '';
+
   // Font scale
   applyFontScale(state.cfg.fontScale || 'small');
-
-  // Gastos
-  renderGastos();
 }
 
 // ── Save individual config keys ──
@@ -1762,45 +1763,14 @@ async function saveConfigImpuesto() {
   renderDashboard();
 }
 
-async function saveGastos() {
-  try { await cfgSet('gastos', state.cfg.gastos); } catch(e) { showToast('Error guardando gastos'); }
+async function saveConfigArriendo() {
+  const val = parseFloat(document.getElementById('cfg-arriendo').value) || 0;
+  state.cfg.arriendo = val;
+  try { await cfgSet('arriendo', val); } catch(e) { showToast('Error guardando arriendo'); }
   renderDashboard();
 }
 
-function renderGastos() {
-  const el = document.getElementById('gastos-list');
-  if (!el) return;
-  const gastos = state.cfg.gastos || [];
-  el.innerHTML = gastos.map((g,i) => `
-    <div class="config-row" style="gap:8px">
-      <input style="flex:1;border:none;background:none;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none"
-        value="${g.nombre||''}" placeholder="Nombre del gasto"
-        onchange="updateGasto(${i},'nombre',this.value)">
-      <input class="config-input" type="number" style="width:110px"
-        value="${g.monto||''}" placeholder="$0"
-        onchange="updateGasto(${i},'monto',this.value)">
-      <button onclick="removeGasto(${i})" style="background:none;border:none;color:var(--neg);font-size:18px;cursor:pointer;padding:0 4px">
-        <i class="ti ti-x"></i>
-      </button>
-    </div>`).join('');
-}
-
-function addGasto() {
-  if (!state.cfg.gastos) state.cfg.gastos = [];
-  state.cfg.gastos.push({nombre:'', monto:0});
-  renderGastos();
-}
-async function updateGasto(i, key, val) {
-  if (!state.cfg.gastos || !state.cfg.gastos[i]) return;
-  state.cfg.gastos[i][key] = key==='monto' ? (parseFloat(val)||0) : val;
-  await saveGastos();
-}
-async function removeGasto(i) {
-  if (!state.cfg.gastos) return;
-  state.cfg.gastos.splice(i,1);
-  renderGastos();
-  await saveGastos();
-}
+// gastos simplificado a arriendo único
 
 // ── Frecuencia individual: saved to pacientes.frecuencia_dias ──
 async function saveFrecuencia(pacId, days) {
@@ -1884,13 +1854,14 @@ function renderDashboard() {
   document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Líquido: total facturado mes actual − gastos fijos − impuesto
-  const sesMes = sesYear.filter(s => fechaMonth(s.fecha) === curMonth);
+  // Líquido mes actual: totalFacturado − impuesto (15.25%) − arriendo
+  const allSes    = state.sesiones.filter(s => fechaYear(s.fecha) === new Date().getFullYear());
+  const sesMes    = allSes.filter(s => fechaMonth(s.fecha) === new Date().getMonth());
   const totalMes  = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
-  const gastosFij = (state.cfg.gastos||[]).reduce((a,g) => a+(Number(g.monto)||0), 0);
-  const impPct    = state.cfg.impuesto || 15.25;
+  const arriendo  = Number(state.cfg.arriendo) || 0;
+  const impPct    = Number(state.cfg.impuesto)  || 15.25;
   const impuesto  = Math.round(totalMes * impPct / 100);
-  const liquido   = totalMes - gastosFij - impuesto;
+  const liquido   = totalMes - impuesto - arriendo;
   document.getElementById('kpi-liquido').textContent = fmt(liquido);
 
   // Profesional name
@@ -2007,7 +1978,7 @@ function renderInactividad() {
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rule-2)">
       <i class="ti ${level.icon}" style="font-size:20px;color:${level.color};flex-shrink:0"></i>
       <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
+        <div class="fs-target-name" style="font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
         <div style="font-size:12px;color:var(--ink-4);margin-top:1px">${lastStr}</div>
       </div>
       <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:${level.color};color:white;white-space:nowrap">${level.label}</span>
