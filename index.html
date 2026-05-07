@@ -1114,7 +1114,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           <div style="text-align:right;flex-shrink:0">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.08 165);margin-bottom:3px">Líquido</div>
             <div class="fs-target-kpilg" style="font-family:'DM Mono',monospace;font-weight:500;color:oklch(0.88 0.13 165)" id="kpi-neto">$0</div>
-            <div style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px">est. mensual</div>
+            <div id="kpi-neto-sub" style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px;font-family:'DM Mono',monospace">—</div>
           </div>
         </div>
       </div>
@@ -1543,23 +1543,28 @@ async function cfgGet(id) {
   return rows && rows[0] ? rows[0].valor : null;
 }
 async function cfgSet(id, valor) {
-  // Usar fetch directo para evitar conflicto de headers en supa()
+  // UPSERT: si la fila no existe la crea, si existe la actualiza
+  setSyncState('saving');
   try {
-    const r = await fetch(`${SUPA_URL}/rest/v1/configuracion?id=eq.${id}`, {
-      method: 'PATCH',
+    const r = await fetch(`${SUPA_URL}/rest/v1/configuracion`, {
+      method: 'POST',
       headers: {
         'apikey': SUPA_KEY,
         'Authorization': `Bearer ${state.token || SUPA_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
+        'Prefer': 'resolution=merge-duplicates,return=representation'
       },
-      body: JSON.stringify({ valor })
+      body: JSON.stringify({ id: id, valor: valor })
     });
     if (!r.ok) {
       const txt = await r.text();
+      console.error('cfgSet error:', txt);
       throw new Error(txt);
     }
+    const data = await r.json();
+    console.log('cfgSet ok:', id, '=', valor, '→', data);
     setSyncState('ok');
+    return data;
   } catch(e) {
     setSyncState('error');
     throw e;
@@ -1733,9 +1738,19 @@ async function loadConfig(applyUI = true) {
     const map  = {};
     (rows||[]).forEach(r => { map[r.id] = r.valor; });
 
-    state.cfg.impuesto  = parseFloat(map['impuesto']) || 15.25;
-    state.cfg.arriendo  = parseFloat(map['arriendo'])  || 0;
-    state.cfg.fontScale = map['font_scale'] || 'small';
+    // Solo actualizar si la clave existe en BD
+    // jsonb puede venir como número, string o null
+    if (map['impuesto'] !== undefined && map['impuesto'] !== null) {
+      const v = parseFloat(map['impuesto']);
+      if (!isNaN(v)) state.cfg.impuesto = v;
+    }
+    if (map['arriendo'] !== undefined && map['arriendo'] !== null) {
+      const v = parseFloat(map['arriendo']);
+      if (!isNaN(v)) state.cfg.arriendo = v;
+    }
+    if (map['font_scale']) state.cfg.fontScale = map['font_scale'];
+
+    console.log('loadConfig:', JSON.stringify(state.cfg));
 
     if (applyUI) applyConfigToUI();
     else {
@@ -1762,14 +1777,27 @@ function applyConfigToUI() {
 async function saveConfigImpuesto() {
   const val = parseFloat(document.getElementById('cfg-impuesto').value) || 15.25;
   state.cfg.impuesto = val;
-  try { await cfgSet('impuesto', val); } catch(e) { showToast('Error guardando'); }
+  try {
+    await cfgSet('impuesto', val);
+    showToast('Impuesto guardado: ' + val + '%');
+  } catch(e) {
+    showToast('Error guardando: ' + e.message);
+    return;
+  }
   renderDashboard();
 }
 
 async function saveConfigArriendo() {
-  const val = parseFloat(document.getElementById('cfg-arriendo').value) || 0;
+  const raw = document.getElementById('cfg-arriendo').value;
+  const val = parseFloat(raw) || 0;
   state.cfg.arriendo = val;
-  try { await cfgSet('arriendo', val); } catch(e) { showToast('Error guardando arriendo'); }
+  try {
+    await cfgSet('arriendo', val);
+    showToast('Gastos guardados: ' + fmt(val));
+  } catch(e) {
+    showToast('Error guardando: ' + e.message);
+    return;
+  }
   renderDashboard();
 }
 
@@ -1857,19 +1885,41 @@ function renderDashboard() {
   document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Líquido mensual: bono_mes − impuesto_mes − gastos_fijos
+  // Líquido del último mes con datos (no necesariamente calendario actual)
+  // Fórmula: bono_mes − impuesto_mes − gastos_fijos
   const gastosFijos = Number(state.cfg.arriendo) || 0;
   const impPct      = Number(state.cfg.impuesto)  || 15.25;
-  // Usar mes actual real siempre
-  const mesActual   = new Date().getMonth();
-  const anoActual   = new Date().getFullYear();
-  const sesMesActual = state.sesiones.filter(s =>
-    fechaYear(s.fecha) === anoActual && fechaMonth(s.fecha) === mesActual
-  );
-  const bonoMes    = sesMesActual.reduce((a,s) => a+(Number(s.monto)||0), 0);
-  const impMes     = Math.round(bonoMes * impPct / 100);
-  const liquidoMes = bonoMes - impMes - gastosFijos;
+
+  // Encontrar el mes más reciente con sesiones (de cualquier año)
+  let ultMes = -1, ultAno = -1;
+  state.sesiones.forEach(s => {
+    const y = fechaYear(s.fecha);
+    const m = fechaMonth(s.fecha);
+    if (y === null || m === null) return;
+    if (y > ultAno || (y === ultAno && m > ultMes)) {
+      ultAno = y; ultMes = m;
+    }
+  });
+
+  let liquidoMes = 0, bonoMes = 0;
+  if (ultMes >= 0) {
+    const sesMes = state.sesiones.filter(s =>
+      fechaYear(s.fecha) === ultAno && fechaMonth(s.fecha) === ultMes
+    );
+    bonoMes    = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
+    const impMes = Math.round(bonoMes * impPct / 100);
+    liquidoMes = bonoMes - impMes - gastosFijos;
+  }
   document.getElementById('kpi-neto').textContent = fmt(liquidoMes);
+  // Update sub-label to show which month is being computed
+  const subEl = document.getElementById('kpi-neto-sub');
+  if (subEl) {
+    if (ultMes >= 0) {
+      subEl.textContent = `${MONTHS[ultMes]} ${ultAno}`;
+    } else {
+      subEl.textContent = 'sin datos';
+    }
+  }
 
   // Bar chart
   const byMonth = Array(12).fill(0);
