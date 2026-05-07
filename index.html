@@ -1094,7 +1094,7 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           <span class="brand-psi">ψ</span>
           <div>
             <div class="brand-name">Consulta Privada</div>
-            <div id="brand-profesional" style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400"></div>
+            <div style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400">Alex Nuñez</div>
           </div>
           <span class="brand-year" id="current-year-brand"></span>
         </div>
@@ -1105,9 +1105,18 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       </div>
       <!-- KPI Main -->
       <div class="kpi-main" id="kpi-main">
-        <div class="kpi-main-label">Total facturado</div>
-        <div class="kpi-main-value fs-target-kpimain" id="kpi-total">$0</div>
-        <div class="kpi-main-sub" id="kpi-total-sub">— sesiones este año</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div>
+            <div class="kpi-main-label">Total facturado</div>
+            <div class="kpi-main-value fs-target-kpimain" id="kpi-total">$0</div>
+            <div class="kpi-main-sub" id="kpi-total-sub">— sesiones este año</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.10em;color:oklch(0.70 0.08 165);margin-bottom:3px">Neto est.</div>
+            <div class="fs-target-kpilg" style="font-family:'DM Mono',monospace;font-weight:500;color:oklch(0.88 0.13 165)" id="kpi-neto">$0</div>
+            <div style="font-size:10px;color:oklch(0.65 0.08 165);margin-top:2px">−imp. −gastos</div>
+          </div>
+        </div>
       </div>
       <!-- KPI Grid -->
       <div class="kpi-grid">
@@ -1122,18 +1131,9 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
           <div class="kpi-sub" style="color:var(--accent);opacity:0.7" id="kpi-pagado-sub">0 sesiones</div>
         </div>
       </div>
-      <div class="kpi-grid" style="margin-top:0">
-        <div class="kpi-full" style="margin-bottom:0;gap:8px">
-          <div class="kpi-label" style="color:var(--neg)"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
-          <div class="kpi-value fs-target-kpi" style="color:var(--neg);flex-shrink:0" id="kpi-pendiente">$0</div>
-        </div>
-        <div class="kpi-full" style="margin-bottom:0;background:linear-gradient(135deg,oklch(0.22 0.09 165 / 0.85),oklch(0.18 0.07 170 / 0.95));border-color:oklch(0.62 0.13 165 / 0.3)">
-          <div>
-            <div class="kpi-label" style="color:oklch(0.80 0.08 165)"><span class="dot" style="background:oklch(0.75 0.12 165)"></span>Líquido</div>
-            <div style="font-size:10px;color:oklch(0.70 0.08 165);margin-top:1px">−imp. −gastos</div>
-          </div>
-          <div class="kpi-value fs-target-kpi" style="color:oklch(0.85 0.12 165)" id="kpi-liquido">$0</div>
-        </div>
+      <div class="kpi-full" style="margin-bottom:0;gap:8px">
+        <div class="kpi-label" style="color:var(--neg)"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
+        <div class="kpi-value fs-target-kpi" style="color:var(--neg);flex-shrink:0" id="kpi-pendiente">$0</div>
       </div>
     </div>
     <div class="tab-body">
@@ -1301,21 +1301,11 @@ html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
       </div>
     </div>
     <div class="tab-body">
-      <!-- Profesional -->
-      <div class="section-card" style="margin-top:4px">
-        <div class="section-header"><div class="section-title">Profesional</div></div>
-        <div class="config-section">
-          <div class="config-row">
-            <label class="config-label" for="cfg-nombre-prof">Nombre</label>
-            <input class="config-input" type="text" id="cfg-nombre-prof" placeholder="Tu nombre" style="width:180px;text-align:right;font-family:'DM Sans',sans-serif" onchange="saveConfigProfesional()">
-          </div>
-        </div>
-      </div>
       <!-- Gastos mensuales -->
       <div class="section-card">
         <div class="section-header">
           <div class="section-title">Gastos mensuales fijos</div>
-          <span style="font-size:11px;color:var(--ink-4)">para líquido</span>
+          <span style="font-size:11px;color:var(--ink-4)">para neto est.</span>
         </div>
         <div class="config-section">
           <div class="config-row">
@@ -1562,7 +1552,7 @@ const state = {
   searchQuery: '',
   editingSesionId: null,
   // config cached from Supabase
-  cfg: { profesional:'', impuesto:15.25, gastos:[], fontScale:'small' }
+  cfg: { impuesto:15.25, arriendo:0, fontScale:'small' }
 };
 
 // ── Helpers ──
@@ -1718,7 +1708,6 @@ async function loadConfig() {
     const map  = {};
     (rows||[]).forEach(r => { map[r.id] = r.valor; });
 
-    state.cfg.profesional = map['profesional'] || '';
     state.cfg.impuesto    = parseFloat(map['impuesto']) || 15.25;
     state.cfg.arriendo    = parseFloat(map['arriendo'])  || 0;
     state.cfg.fontScale   = map['font_scale'] || 'small';
@@ -1728,14 +1717,7 @@ async function loadConfig() {
 }
 
 function applyConfigToUI() {
-  // Profesional name in header
-  const profEl = document.getElementById('brand-profesional');
-  if (profEl) profEl.textContent = state.cfg.profesional || '';
-
   // Config inputs
-  const nomEl = document.getElementById('cfg-nombre-prof');
-  if (nomEl) nomEl.value = state.cfg.profesional || '';
-
   const impEl = document.getElementById('cfg-impuesto');
   if (impEl) impEl.value = state.cfg.impuesto;
 
@@ -1747,15 +1729,6 @@ function applyConfigToUI() {
 }
 
 // ── Save individual config keys ──
-async function saveConfigProfesional() {
-  const val = document.getElementById('cfg-nombre-prof').value;
-  state.cfg.profesional = val;
-  const profEl = document.getElementById('brand-profesional');
-  if (profEl) profEl.textContent = val;
-  try { await cfgSet('profesional', val); } catch(e) { showToast('Error guardando'); }
-  renderDashboard();
-}
-
 async function saveConfigImpuesto() {
   const val = parseFloat(document.getElementById('cfg-impuesto').value) || 15.25;
   state.cfg.impuesto = val;
@@ -1854,19 +1827,12 @@ function renderDashboard() {
   document.getElementById('kpi-pagado-sub').textContent  = `${pagadoSes} sesiones`;
   document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
 
-  // Líquido mes actual: totalFacturado − impuesto (15.25%) − arriendo
-  const allSes    = state.sesiones.filter(s => fechaYear(s.fecha) === new Date().getFullYear());
-  const sesMes    = allSes.filter(s => fechaMonth(s.fecha) === new Date().getMonth());
-  const totalMes  = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
+  // Neto estimado: (total año − impuesto%) − gastos fijos mensuales
   const arriendo  = Number(state.cfg.arriendo) || 0;
   const impPct    = Number(state.cfg.impuesto)  || 15.25;
-  const impuesto  = Math.round(totalMes * impPct / 100);
-  const liquido   = totalMes - impuesto - arriendo;
-  document.getElementById('kpi-liquido').textContent = fmt(liquido);
-
-  // Profesional name
-  const profEl = document.getElementById('brand-profesional');
-  if (profEl) profEl.textContent = state.cfg.profesional || '';
+  const impuesto  = Math.round(total * impPct / 100);
+  const neto      = (total - impuesto) - arriendo;
+  document.getElementById('kpi-neto').textContent = fmt(neto);
 
   // Bar chart
   const byMonth = Array(12).fill(0);
