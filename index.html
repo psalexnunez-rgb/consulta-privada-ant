@@ -37,7 +37,6 @@
   --nav-h: 64px;
   --header-h: 56px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --fs: 1; /* font scale multiplier */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -53,16 +52,42 @@ html, body {
 
 
 /* ───── FONT SCALE (set via JS) ───── */
-/* font scale: --fs set by JS via style property */
-html { font-size: calc(15px * var(--fs, 1)); }
-.kpi-main-value   { font-size: calc(30px * var(--fs, 1)) !important; }
-.kpi-value-lg     { font-size: calc(22px * var(--fs, 1)) !important; }
-.kpi-value        { font-size: calc(18px * var(--fs, 1)) !important; }
-.patient-name     { font-size: calc(16px * var(--fs, 1)) !important; }
-.session-date, .session-amount { font-size: calc(13px * var(--fs, 1)) !important; }
-.per-patient-name { font-size: calc(15px * var(--fs, 1)) !important; }
-.nav-tab span     { font-size: calc(11px * var(--fs, 1)) !important; }
-.tag, .badge      { font-size: calc(11px * var(--fs, 1)) !important; }
+/* ── FONT SCALE via data-fs on <html> ── */
+/* small (default) */
+.fs-target-name    { font-size: 16px !important; }
+.fs-target-nextname{ font-size: 16px !important; }
+.fs-target-kpimain { font-size: 30px !important; }
+.fs-target-kpilg   { font-size: 22px !important; }
+.fs-target-kpi     { font-size: 18px !important; }
+.fs-target-meta    { font-size: 13px !important; }
+.fs-target-sm      { font-size: 11px !important; }
+
+/* normal */
+html[data-fs="normal"] .fs-target-name    { font-size: 17px !important; }
+html[data-fs="normal"] .fs-target-nextname{ font-size: 17px !important; }
+html[data-fs="normal"] .fs-target-kpimain { font-size: 33px !important; }
+html[data-fs="normal"] .fs-target-kpilg   { font-size: 24px !important; }
+html[data-fs="normal"] .fs-target-kpi     { font-size: 20px !important; }
+html[data-fs="normal"] .fs-target-meta    { font-size: 14px !important; }
+html[data-fs="normal"] .fs-target-sm      { font-size: 12px !important; }
+
+/* large */
+html[data-fs="large"] .fs-target-name    { font-size: 19px !important; }
+html[data-fs="large"] .fs-target-nextname{ font-size: 19px !important; }
+html[data-fs="large"] .fs-target-kpimain { font-size: 36px !important; }
+html[data-fs="large"] .fs-target-kpilg   { font-size: 26px !important; }
+html[data-fs="large"] .fs-target-kpi     { font-size: 22px !important; }
+html[data-fs="large"] .fs-target-meta    { font-size: 15px !important; }
+html[data-fs="large"] .fs-target-sm      { font-size: 13px !important; }
+
+/* xlarge */
+html[data-fs="xlarge"] .fs-target-name    { font-size: 21px !important; }
+html[data-fs="xlarge"] .fs-target-nextname{ font-size: 21px !important; }
+html[data-fs="xlarge"] .fs-target-kpimain { font-size: 40px !important; }
+html[data-fs="xlarge"] .fs-target-kpilg   { font-size: 29px !important; }
+html[data-fs="xlarge"] .fs-target-kpi     { font-size: 25px !important; }
+html[data-fs="xlarge"] .fs-target-meta    { font-size: 16px !important; }
+html[data-fs="xlarge"] .fs-target-sm      { font-size: 14px !important; }
 
 /* ───── AUTH SCREEN ───── */
 #auth-screen {
@@ -366,7 +391,7 @@ html { font-size: calc(15px * var(--fs, 1)); }
   backdrop-filter: blur(10px);
 }
 .kpi-full .kpi-label { margin-bottom: 0; }
-.kpi-full .kpi-value { font-size: 18px; }
+.kpi-full .kpi-value { }
 
 /* ───── SECTION CARDS ───── */
 .section-card {
@@ -458,7 +483,6 @@ html { font-size: calc(15px * var(--fs, 1)); }
 }
 .patient-info { flex: 1; min-width: 0; }
 .patient-name {
-  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
@@ -771,7 +795,7 @@ html { font-size: calc(15px * var(--fs, 1)); }
   color: white; flex-shrink: 0;
 }
 .per-patient-info { flex: 1; min-width: 0; }
-.per-patient-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.per-patient-name { font-weight: 600; color: var(--ink); }
 .per-patient-meta { font-size: 12px; color: var(--ink-4); margin-top: 1px; }
 .per-patient-amounts { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
 .per-patient-total { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--ink); }
@@ -986,7 +1010,7 @@ html { font-size: calc(15px * var(--fs, 1)); }
 .next-day { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--ink); line-height: 1; }
 .next-mon { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-4); }
 .next-info { flex: 1; min-width: 0; }
-.next-name { font-size: 15px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next-name { font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .next-meta { font-size: 13px; color: var(--ink-4); margin-top: 2px; }
 
 /* ───── BODY SCROLL WRAPPER ───── */
@@ -1082,33 +1106,33 @@ html { font-size: calc(15px * var(--fs, 1)); }
       <!-- KPI Main -->
       <div class="kpi-main" id="kpi-main">
         <div class="kpi-main-label">Total facturado</div>
-        <div class="kpi-main-value" id="kpi-total">$0</div>
+        <div class="kpi-main-value fs-target-kpimain" id="kpi-total">$0</div>
         <div class="kpi-main-sub" id="kpi-total-sub">— sesiones este año</div>
       </div>
       <!-- KPI Grid -->
       <div class="kpi-grid">
         <div class="kpi-card" style="border-color:oklch(0.62 0.13 165 / 0.35)">
           <div class="kpi-label" style="color:var(--pos)"><span class="dot" style="background:var(--pos)"></span>Cobrado</div>
-          <div class="kpi-value kpi-value-lg" style="color:var(--pos)" id="kpi-cobrado">$0</div>
+          <div class="kpi-value kpi-value-lg fs-target-kpilg" style="color:var(--pos)" id="kpi-cobrado">$0</div>
           <div class="kpi-sub" style="color:var(--pos);opacity:0.7" id="kpi-cobrado-sub">0 sesiones</div>
         </div>
         <div class="kpi-card" style="border-color:oklch(0.55 0.18 255 / 0.35)">
           <div class="kpi-label" style="color:var(--accent)"><span class="dot" style="background:var(--accent)"></span>Pagado</div>
-          <div class="kpi-value kpi-value-lg" style="color:var(--accent)" id="kpi-pagado">$0</div>
+          <div class="kpi-value kpi-value-lg fs-target-kpilg" style="color:var(--accent)" id="kpi-pagado">$0</div>
           <div class="kpi-sub" style="color:var(--accent);opacity:0.7" id="kpi-pagado-sub">0 sesiones</div>
         </div>
       </div>
       <div class="kpi-grid" style="margin-top:0">
-        <div class="kpi-full" style="margin-bottom:0">
-          <div class="kpi-label"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
-          <div class="kpi-value" style="color:var(--neg)" id="kpi-pendiente">$0</div>
+        <div class="kpi-full" style="margin-bottom:0;gap:8px">
+          <div class="kpi-label" style="color:var(--neg)"><span class="dot" style="background:var(--neg)"></span>Pendiente</div>
+          <div class="kpi-value fs-target-kpi" style="color:var(--neg);flex-shrink:0" id="kpi-pendiente">$0</div>
         </div>
         <div class="kpi-full" style="margin-bottom:0;background:linear-gradient(135deg,oklch(0.22 0.09 165 / 0.85),oklch(0.18 0.07 170 / 0.95));border-color:oklch(0.62 0.13 165 / 0.3)">
           <div>
             <div class="kpi-label" style="color:oklch(0.80 0.08 165)"><span class="dot" style="background:oklch(0.75 0.12 165)"></span>Líquido</div>
             <div style="font-size:10px;color:oklch(0.70 0.08 165);margin-top:1px">−imp. −gastos</div>
           </div>
-          <div class="kpi-value" style="color:oklch(0.85 0.12 165)" id="kpi-liquido">$0</div>
+          <div class="kpi-value fs-target-kpi" style="color:oklch(0.85 0.12 165)" id="kpi-liquido">$0</div>
         </div>
       </div>
     </div>
@@ -1624,11 +1648,9 @@ function setSyncState(s) {
 // ═══════════════════════════════════════════
 // FONT SCALE
 // ═══════════════════════════════════════════
-const FS_MAP = { small:1, normal:1.08, large:1.16, xlarge:1.25 };
 function applyFontScale(scale) {
   state.cfg.fontScale = scale;
-  const mult = FS_MAP[scale] || 1;
-  document.documentElement.style.setProperty('--fs', mult);
+  document.documentElement.setAttribute('data-fs', scale);
   ['small','normal','large','xlarge'].forEach(s => {
     const btn = document.getElementById(`fs-btn-${s}`);
     if (!btn) return;
@@ -1799,10 +1821,11 @@ function getFrecuencia(pac) {
 // LOAD ALL DATA
 // ═══════════════════════════════════════════
 async function loadAll() {
+  // Load config first so state.cfg is ready before render
+  await loadConfig();
   const [pacs, sess] = await Promise.all([
     supaGet('pacientes', 'order=nombre.asc'),
-    supaGet('sesiones',  'order=created_at.desc'),
-    loadConfig()
+    supaGet('sesiones',  'order=created_at.desc')
   ]);
   state.pacientes = pacs || [];
   state.sesiones  = sess || [];
@@ -1821,10 +1844,10 @@ function setupRealtime() {
   clearInterval(realtimeInterval);
   realtimeInterval = setInterval(async () => {
     try {
+      await loadConfig();
       const [pacs, sess] = await Promise.all([
         supaGet('pacientes', 'order=nombre.asc'),
-        supaGet('sesiones',  'order=created_at.desc'),
-        loadConfig()
+        supaGet('sesiones',  'order=created_at.desc')
       ]);
       state.pacientes = pacs || [];
       state.sesiones  = sess || [];
@@ -1910,7 +1933,7 @@ function renderDashboard() {
           <div class="next-mon">${MONTHS[d.getMonth()]}</div>
         </div>
         <div class="next-info">
-          <div class="next-name">${pac.nombre}</div>
+          <div class="next-name fs-target-nextname">${pac.nombre}</div>
           <div class="next-meta">
             <span class="tag ${prevKey(pac.prevision)}">${prevLabel(pac.prevision)}</span>
             <span>${pac.modalidad||''}</span>
@@ -2038,7 +2061,7 @@ function renderPacientes() {
       <div class="patient-row" onclick="togglePaciente('${p.id}')">
         <div class="patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
         <div class="patient-info">
-          <div class="patient-name">${p.nombre}</div>
+          <div class="patient-name fs-target-name">${p.nombre}</div>
           <div class="patient-meta">
             <span class="tag ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span>
             ${nextSes}
@@ -2224,7 +2247,7 @@ function renderResumen() {
     <div class="per-patient-row">
       <div class="per-patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
       <div class="per-patient-info">
-        <div class="per-patient-name">${p.nombre}</div>
+        <div class="per-patient-name fs-target-name">${p.nombre}</div>
         <div class="per-patient-meta"><span class="tag ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
       </div>
       <div class="per-patient-amounts">
