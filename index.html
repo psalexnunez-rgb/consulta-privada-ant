@@ -1127,10 +1127,12 @@ body.privacy .private-name {
         <div class="header-brand">
           <span class="brand-psi">ψ</span>
           <div>
-            <div class="brand-name">Consulta Privada</div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div class="brand-name">Consulta Privada</div>
+              <span class="brand-year" id="current-year-brand"></span>
+            </div>
             <div style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400">Alex Nuñez</div>
           </div>
-          <span class="brand-year" id="current-year-brand"></span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <button class="privacy-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar datos">
@@ -2212,7 +2214,7 @@ function renderPacientes() {
           <i class="ti ti-chevron-right patient-chevron"></i>
         </div>
       </div>
-      <div class="session-panel" id="sp-${p.id}">
+      <div class="session-panel" id="sp-${p.id}" onclick="event.stopPropagation()">
         <div class="session-panel-header">
           <span class="session-panel-title">${ses.length} ses. · <span class="private-val">${fmt(total)}</span></span>
           <button class="btn-sm blue" onclick="openResumenPaciente('${p.id}');event.stopPropagation()">
@@ -2220,6 +2222,12 @@ function renderPacientes() {
           </button>
           <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()">
             <i class="ti ti-plus"></i>
+          </button>
+          <button class="btn-sm" style="background:oklch(0.55 0.14 30);color:white" onclick="darAltaPaciente('${p.id}','${p.nombre}',${p.alta});event.stopPropagation()" title="${p.alta?'Reactivar':'Dar de alta'}">
+            <i class="ti ti-${p.alta?'user-check':'user-off'}"></i>
+          </button>
+          <button class="btn-sm" style="background:oklch(0.45 0.18 15);color:white" onclick="eliminarPaciente('${p.id}','${p.nombre}');event.stopPropagation()" title="Eliminar paciente">
+            <i class="ti ti-trash"></i>
           </button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:oklch(0.97 0.01 255);border-bottom:1px solid var(--rule-2)">
@@ -2258,6 +2266,37 @@ function renderSessionRows(ses) {
 function togglePaciente(id) {
   const card = document.getElementById(`pac-${id}`);
   if (card) card.classList.toggle('expanded');
+}
+
+async function darAltaPaciente(id, nombre, esAlta) {
+  const accion = esAlta ? 'Reactivar' : 'Dar de alta';
+  const msg    = esAlta
+    ? `¿Reactivar a ${nombre}? Volverá a la lista de activos.`
+    : `¿Dar de alta a ${nombre}? Pasará a pacientes inactivos.`;
+  if (!confirm(msg)) return;
+  try {
+    await supaPatch('pacientes', id, { alta: !esAlta });
+    const pac = state.pacientes.find(p => p.id === id);
+    if (pac) pac.alta = !esAlta;
+    showToast(`${nombre} ${!esAlta ? 'dado de alta' : 'reactivado'}`);
+    renderPacientes();
+    renderDashboard();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function eliminarPaciente(id, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer y borrará también todas sus sesiones.`)) return;
+  try {
+    // Borrar sesiones primero
+    const sesIds = state.sesiones.filter(s => s.paciente_id === id).map(s => s.id);
+    for (const sid of sesIds) await supaDelete('sesiones', sid);
+    await supaDelete('pacientes', id);
+    state.pacientes = state.pacientes.filter(p => p.id !== id);
+    state.sesiones  = state.sesiones.filter(s => s.paciente_id !== id);
+    showToast(`${nombre} eliminado`);
+    renderPacientes();
+    renderDashboard();
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
 // ═══════════════════════════════════════════
