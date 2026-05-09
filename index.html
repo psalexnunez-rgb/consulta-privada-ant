@@ -39,8 +39,8 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ───── PORTRAIT LOCK (phones only: max 480px wide in portrait) ───── */
-@media screen and (orientation: landscape) and (max-height: 480px) {
+/* ───── PORTRAIT LOCK (phones only) ───── */
+@media screen and (orientation: landscape) and (max-height: 430px) and (pointer: coarse) and (hover: none) {
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -2075,13 +2075,18 @@ function renderDashboard() {
           <div class="next-mon">${MONTHS[d.getMonth()]}</div>
         </div>
         <div class="next-info">
-          <div class="next-name fs-target-nextname">${pac.nombre}</div>
+          <div class="next-name fs-target-nextname private-name">${pac.nombre}</div>
           <div class="next-meta">
             <span class="tag ${prevKey(pac.prevision)}">${prevLabel(pac.prevision)}</span>
             <span>${pac.modalidad||''}</span>
           </div>
         </div>
-        <span class="badge agendado">Agendado</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge agendado">Agendado</span>
+          ${pac.telefono ? `<button onclick="openWhatsApp('${pac.id}')" style="background:#25D366;border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="Confirmar por WhatsApp">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.054 23.25a.75.75 0 00.916.916l5.396-1.478A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.51-5.18-1.4l-.37-.22-3.843 1.052 1.022-3.74-.24-.386A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          </button>` : ''}
+        </div>
       </div>`).join('');
   }
 
@@ -2223,6 +2228,9 @@ function renderPacientes() {
           <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()">
             <i class="ti ti-plus"></i>
           </button>
+          <button class="btn-sm" style="background:#25D366;color:white" onclick="openWhatsApp('${p.id}');event.stopPropagation()" title="Enviar WhatsApp">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.054 23.25a.75.75 0 00.916.916l5.396-1.478A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.51-5.18-1.4l-.37-.22-3.843 1.052 1.022-3.74-.24-.386A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          </button>
           <button class="btn-sm" style="background:oklch(0.55 0.14 30);color:white" onclick="darAltaPaciente('${p.id}','${p.nombre}',${p.alta});event.stopPropagation()" title="${p.alta?'Reactivar':'Dar de alta'}">
             <i class="ti ti-${p.alta?'user-check':'user-off'}"></i>
           </button>
@@ -2261,6 +2269,38 @@ function renderSessionRows(ses) {
       <span class="session-edit" onclick="openEditSesion('${s.id}');event.stopPropagation()"><i class="ti ti-pencil"></i></span>
     </div>`;
   }).join('');
+}
+
+function openWhatsApp(pacId) {
+  const pac = state.pacientes.find(p => p.id === pacId);
+  if (!pac) return;
+
+  const tel = (pac.telefono || '').replace(/\D/g, '');
+  if (!tel) {
+    showToast('Este paciente no tiene teléfono registrado');
+    return;
+  }
+
+  // Format next session date in natural Spanish
+  let fechaTexto = '';
+  if (pac.next_session) {
+    const d = parseFecha(pac.next_session);
+    if (d) {
+      const dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+      const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      fechaTexto = `el día ${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
+    }
+  }
+
+  const nombre   = pac.nombre.split(' ')[0]; // First name only
+  const fechaPart = fechaTexto
+    ? `te escribo para confirmar nuestra próxima sesión. Podríamos vernos ${fechaTexto}`
+    : `te escribo para coordinar nuestra próxima sesión`;
+
+  const msg = `Buenos días ${nombre}, esperando te encuentres bien, ${fechaPart}, así que quedo atento a tu confirmación. Un abrazo.`;
+
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
 }
 
 function togglePaciente(id) {
@@ -2660,7 +2700,7 @@ async function savePaciente() {
     await supaPost('pacientes', { nombre, prevision, modalidad, alta });
     showToast('Paciente agregado');
     closeModal('modal-paciente');
-    document.getElementById('pac-nombre').value='';
+    document.getElementById('pac-nombre').value = '';
     await loadAll();
   } catch(e) { showToast('Error: '+e.message); }
 }
