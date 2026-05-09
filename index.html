@@ -1131,7 +1131,7 @@ body.privacy .private-name {
               <div class="brand-name">Consulta Privada</div>
               <span class="brand-year" id="current-year-brand"></span>
             </div>
-            <div style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400">Alex Nuñez</div>
+            <div style="font-size:11px;color:oklch(0.70 0.06 255);margin-top:1px;font-weight:400">Alex Nuñez · <span style="opacity:0.6">v1.1</span></div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -2275,6 +2275,10 @@ function openWhatsApp(pacId) {
   const pac = state.pacientes.find(p => p.id === pacId);
   if (!pac) return;
 
+  // Greeting based on time of day
+  const hora = new Date().getHours();
+  const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+
   let fechaTexto = '';
   if (pac.next_session) {
     const d = parseFecha(pac.next_session);
@@ -2290,7 +2294,7 @@ function openWhatsApp(pacId) {
     ? `te escribo para confirmar nuestra próxima sesión. Podríamos vernos ${fechaTexto}`
     : `te escribo para coordinar nuestra próxima sesión`;
 
-  const msg  = `Buenos días ${nombre}, esperando te encuentres bien, ${fechaPart}, así que quedo atento a tu confirmación. Un abrazo.`;
+  const msg = `${saludo} ${nombre}, esperando te encuentres bien, ${fechaPart}, así que quedo atento a tu confirmación. Un abrazo.`;
 
   // Open WhatsApp with message ready — user picks the contact
   window.location.href = `whatsapp://send?text=${encodeURIComponent(msg)}`;
