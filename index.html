@@ -2275,13 +2275,6 @@ function openWhatsApp(pacId) {
   const pac = state.pacientes.find(p => p.id === pacId);
   if (!pac) return;
 
-  const tel = (pac.telefono || '').replace(/\D/g, '');
-  if (!tel) {
-    showToast('Este paciente no tiene teléfono registrado');
-    return;
-  }
-
-  // Format next session date in natural Spanish
   let fechaTexto = '';
   if (pac.next_session) {
     const d = parseFecha(pac.next_session);
@@ -2292,15 +2285,15 @@ function openWhatsApp(pacId) {
     }
   }
 
-  const nombre   = pac.nombre.split(' ')[0]; // First name only
+  const nombre    = pac.nombre.split(' ')[0];
   const fechaPart = fechaTexto
     ? `te escribo para confirmar nuestra próxima sesión. Podríamos vernos ${fechaTexto}`
     : `te escribo para coordinar nuestra próxima sesión`;
 
-  const msg = `Buenos días ${nombre}, esperando te encuentres bien, ${fechaPart}, así que quedo atento a tu confirmación. Un abrazo.`;
+  const msg  = `Buenos días ${nombre}, esperando te encuentres bien, ${fechaPart}, así que quedo atento a tu confirmación. Un abrazo.`;
 
-  const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
+  // Open WhatsApp with message ready — user picks the contact
+  window.location.href = `whatsapp://send?text=${encodeURIComponent(msg)}`;
 }
 
 function togglePaciente(id) {
