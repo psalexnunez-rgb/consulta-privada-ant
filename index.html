@@ -1775,9 +1775,18 @@ function applyZoom(pct) {
   const scale = pct / 100;
   const app   = document.getElementById('app');
   if (app) {
-    app.style.transform = `scale(${scale})`;
-    app.style.width     = `${100 / scale}%`;
-    app.style.height    = `${100 / scale}%`;
+    if (scale === 1) {
+      app.style.transform = '';
+      app.style.width     = '';
+      app.style.height    = '';
+    } else {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      app.style.transformOrigin = 'top left';
+      app.style.transform = `scale(${scale})`;
+      app.style.width     = `${vw / scale}px`;
+      app.style.height    = `${vh / scale}px`;
+    }
   }
   // Update controls
   const idx   = ZOOM_STEPS.indexOf(pct);
@@ -1803,6 +1812,10 @@ async function resetZoom() {
   applyZoom(100);
   try { await cfgSet('zoom', 100); showToast('Zoom restablecido'); } catch(e) { /* non-critical */ }
 }
+
+window.addEventListener('resize', () => {
+  if (state.cfg.zoom && state.cfg.zoom !== 100) applyZoom(state.cfg.zoom);
+});
 
 // Keep font scale stub for backward compat
 function applyFontScale(scale) { state.cfg.fontScale = scale; }
