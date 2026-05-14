@@ -557,7 +557,7 @@ body.privacy .private-name {
 }
 .patient-info { flex: 1; min-width: 0; }
 .patient-name {
-  font-size: 1.23rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
@@ -1091,7 +1091,7 @@ body.privacy .private-name {
 .next-day { font-family: 'DM Mono', monospace; font-size: 1.38rem; font-weight: 500; color: var(--ink); line-height: 1; }
 .next-mon { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-4); }
 .next-info { flex: 1; min-width: 0; }
-.next-name { font-size: 1.23rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next-name { font-size: 1.05rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .next-meta { font-size: 1rem; color: var(--ink-4); margin-top: 2px; }
 
 /* ───── BODY SCROLL WRAPPER ───── */
@@ -1153,7 +1153,7 @@ body.privacy .private-name {
   <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:-10px">
     <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)" id="auth-year"></span>
     <span style="font-size:11px;color:oklch(0.50 0.06 255)">·</span>
-    <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)">v1.14</span>
+    <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)">v1.19</span>
   </div>
   <div class="auth-card">
     <div class="auth-field">
@@ -1307,6 +1307,37 @@ body.privacy .private-name {
     <div class="fab-group">
       <button class="fab blue" onclick="openModal('modal-paciente')"><i class="ti ti-user-plus"></i></button>
       <button class="fab green" onclick="openModal('modal-sesion')"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+
+  <!-- ATENDIDOS TAB -->
+  <div class="tab-content" id="tab-atendidos">
+    <div class="tab-header" id="hdr-atendidos">
+      <div class="header-top">
+        <div>
+          <div class="header-title">Atendidos</div>
+          <div class="header-subtitle" id="atendidos-subtitle">Cargando…</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onclick="changeAtendidosMonth(-1)" style="width:30px;height:30px;border-radius:50%;border:1px solid oklch(1 0 0/.20);background:oklch(1 0 0/.10);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">‹</button>
+          <span id="atendidos-month-label" style="font-size:0.95rem;font-weight:600;color:white;min-width:90px;text-align:center"></span>
+          <button onclick="changeAtendidosMonth(1)" style="width:30px;height:30px;border-radius:50%;border:1px solid oklch(1 0 0/.20);background:oklch(1 0 0/.10);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-body" style="padding:0">
+      <!-- Calendar -->
+      <div style="background:white;padding:12px 14px">
+        <div id="atendidos-cal-dow" style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:5px"></div>
+        <div id="atendidos-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+        <div style="display:flex;gap:12px;padding:10px 0 2px">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-3)"><div style="width:12px;height:12px;border-radius:3px;background:oklch(0.55 0.18 255/.12)"></div>1 sesión</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-3)"><div style="width:12px;height:12px;border-radius:3px;background:oklch(0.55 0.18 255/.28)"></div>2 sesiones</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-3)"><div style="width:12px;height:12px;border-radius:3px;background:oklch(0.55 0.18 255/.50)"></div>3+ sesiones</div>
+        </div>
+      </div>
+      <!-- Weekly breakdown -->
+      <div id="atendidos-weeks"></div>
     </div>
   </div>
 
@@ -1532,6 +1563,10 @@ body.privacy .private-name {
       <i class="ti ti-users"></i>
       <span>Pacientes</span>
     </button>
+    <button class="nav-tab" onclick="switchTab('atendidos',this)">
+      <i class="ti ti-calendar-stats"></i>
+      <span>Atendidos</span>
+    </button>
     <button class="nav-tab" onclick="switchTab('resumen',this)">
       <i class="ti ti-chart-bar"></i>
       <span>Resumen</span>
@@ -1721,6 +1756,8 @@ const state = {
   arriendoYear: new Date().getFullYear(),
   impuestoYear: new Date().getFullYear(),
   pacienteFilter: 'activos',
+  filterMonth: new Date().getMonth(),
+  filterMonthYear: new Date().getFullYear(),
   searchQuery: '',
   editingSesionId: null,
   // config cached from Supabase
@@ -2167,6 +2204,7 @@ async function loadAll() {
 function renderAll() {
   renderDashboard();
   renderPacientes();
+  renderAtendidos();
   renderResumen();
   renderConfig();
 }
@@ -2360,6 +2398,23 @@ function setFilter(f, el) {
   state.pacienteFilter = f;
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
+  const ms = document.getElementById('month-selector');
+  if (ms) ms.style.display = f === 'mes' ? 'flex' : 'none';
+  if (f === 'mes') updateFilterMonthLabel();
+  renderPacientes();
+}
+
+function updateFilterMonthLabel() {
+  const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const el = document.getElementById('filter-month-label');
+  if (el) el.textContent = `${MESES_FULL[state.filterMonth]} ${state.filterMonthYear}`;
+}
+
+function changeFilterMonth(delta) {
+  state.filterMonth += delta;
+  if (state.filterMonth > 11) { state.filterMonth = 0; state.filterMonthYear++; }
+  if (state.filterMonth < 0)  { state.filterMonth = 11; state.filterMonthYear--; }
+  updateFilterMonthLabel();
   renderPacientes();
 }
 function filterPacientes() {
@@ -2372,6 +2427,116 @@ function renderPacientes() {
   const expanded = new Set(
     [...document.querySelectorAll('.patient-card.expanded')].map(el => el.id.replace('pac-',''))
   );
+
+  // MES MODE — semana a semana con resumen financiero
+  if (state.pacienteFilter === 'mes') {
+    const m = state.filterMonth;
+    const y = state.filterMonthYear;
+    const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const today = new Date(); today.setHours(23,59,59,0);
+    const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+
+    const sesMes = state.sesiones.filter(s => {
+      const d = parseFecha(s.fecha);
+      return d && d.getMonth() === m && d.getFullYear() === y;
+    }).sort((a,b) => parseFecha(a.fecha) - parseFecha(b.fecha));
+
+    const totalMes    = sesMes.reduce((a,s) => a+(Number(s.monto)||0), 0);
+    const imp         = Math.round(totalMes * (getImpuestoForYear(y)/100));
+    const gastos      = getArriendoForYear(y);
+    const daysInMonth = new Date(y, m+1, 0).getDate();
+    const daysElapsed = isCurrentMonth ? Math.min(today.getDate(), daysInMonth) : daysInMonth;
+    const gastosMes   = Math.round(gastos * (daysElapsed / daysInMonth));
+    const liquido     = totalMes - imp - gastosMes;
+    const pacIds      = [...new Set(sesMes.map(s => s.paciente_id))];
+
+    document.getElementById('pacientes-subtitle').textContent =
+      `${pacIds.length} pacientes · ${sesMes.length} sesiones · ${MESES_FULL[m]} ${y}`;
+
+    if (!sesMes.length) {
+      listEl.innerHTML = `<div class="empty-state"><i class="ti ti-calendar-off"></i>Sin sesiones en ${MESES_FULL[m]} ${y}</div>`;
+      return;
+    }
+
+    // ── Resumen financiero del mes ──
+    let html = `<div style="background:var(--kpi-main-bg);padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:0.80rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:oklch(.70 .06 255)">Facturado</span>
+        <span style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:white" class="private-val">${fmt(totalMes)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:0.82rem;color:oklch(.65 .05 255)">Impuesto (${getImpuestoForYear(y)}%)</span>
+        <span style="font-family:'DM Mono',monospace;font-size:0.92rem;color:var(--neg)" class="private-val">−${fmt(imp)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:0.82rem;color:oklch(.65 .05 255)">Gastos fijos${isCurrentMonth?' ('+daysElapsed+'/'+daysInMonth+' días)':''}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:0.92rem;color:var(--warn)" class="private-val">−${fmt(gastosMes)}</span>
+      </div>
+      <div style="border-top:1px solid oklch(1 0 0/.15);padding-top:8px;display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:0.80rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:oklch(.70 .06 255)">Líquido${isCurrentMonth?' (parcial)':''}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:${liquido>=0?'oklch(.88 .13 165)':'var(--neg)'}" class="private-val">${fmt(liquido)}</span>
+      </div>
+    </div>`;
+
+    // ── Semanas ──
+    const getWeekOfMonth = (dateStr) => {
+      const d = parseFecha(dateStr);
+      return d ? Math.ceil(d.getDate() / 7) : 0;
+    };
+    const weeks = {};
+    sesMes.forEach(s => {
+      const w = getWeekOfMonth(s.fecha);
+      if (!weeks[w]) weeks[w] = [];
+      weeks[w].push(s);
+    });
+    const weekLabels = ['','1ª semana','2ª semana','3ª semana','4ª semana','5ª semana'];
+
+    Object.keys(weeks).sort((a,b) => a-b).forEach(w => {
+      const sesW   = weeks[w];
+      const totalW = sesW.reduce((a,s) => a+(Number(s.monto)||0), 0);
+      const dates  = sesW.map(s => parseFecha(s.fecha)?.getDate()).filter(Boolean);
+      const minD   = Math.min(...dates);
+      const maxD   = Math.max(...dates);
+      const dateRange = minD === maxD ? `${minD} ${MESES_FULL[m]}` : `${minD}–${maxD} ${MESES_FULL[m]}`;
+
+      html += `<div class="section-card" style="border-radius:0;border-left:none;border-right:none;margin:0;border-top:1px solid var(--rule-2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;background:var(--rule-2)">
+          <div>
+            <div style="font-size:0.80rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--ink-4)">${weekLabels[w]||('Semana '+w)}</div>
+            <div style="font-size:0.82rem;color:var(--ink-3);margin-top:1px">${dateRange} · ${sesW.length} sesión${sesW.length>1?'es':''}</div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--accent)" class="private-val">${fmt(totalW)}</span>
+        </div>`;
+
+      const pacIdsW = [...new Set(sesW.map(s => s.paciente_id))];
+      pacIdsW.forEach(pid => {
+        const pac  = state.pacientes.find(p => p.id === pid);
+        if (!pac) return;
+        const sesP = sesW.filter(s => s.paciente_id === pid);
+        const totP = sesP.reduce((a,s) => a+(Number(s.monto)||0), 0);
+        const fechas = sesP.map(s => parseFecha(s.fecha)?.getDate()).filter(Boolean).join(', ');
+
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--rule-2)">
+          <div class="patient-avatar" style="background:${avatarColor(pac.nombre)};width:28px;height:28px;font-size:0.78rem;flex-shrink:0">${initials(pac.nombre)}</div>
+          <div style="flex:1;min-width:0">
+            <div class="private-name" style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
+            <div style="font-size:0.80rem;color:var(--ink-4);margin-top:2px;display:flex;gap:5px;align-items:center">
+              <span>Días: ${fechas}</span>
+              <span class="tag ${prevKey(pac.prevision)}">${prevLabel(pac.prevision)}</span>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'DM Mono',monospace;font-size:0.92rem;color:var(--ink)" class="private-val">${fmt(totP)}</div>
+            <div style="font-size:0.78rem;color:var(--ink-4)">${sesP.length} ses.</div>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+
+    listEl.innerHTML = html;
+    return;
+  }
 
   let pacs = state.pacientes.filter(p => {
     if (state.pacienteFilter==='activos') return !p.alta;
@@ -2541,6 +2706,162 @@ async function eliminarPaciente(id, nombre) {
 // ═══════════════════════════════════════════
 // RESUMEN
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// ATENDIDOS
+// ═══════════════════════════════════════════
+const MESES_FULL_A = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function changeAtendidosMonth(delta) {
+  state.filterMonth += delta;
+  if (state.filterMonth > 11) { state.filterMonth = 0; state.filterMonthYear++; }
+  if (state.filterMonth < 0)  { state.filterMonth = 11; state.filterMonthYear--; }
+  renderAtendidos();
+}
+
+function renderAtendidos() {
+  const m = state.filterMonth;
+  const y = state.filterMonthYear;
+  const today = new Date(); today.setHours(23,59,59,0);
+  const isCurrentMonth = y === today.getFullYear() && m === today.getMonth();
+
+  // Label
+  const lbl = document.getElementById('atendidos-month-label');
+  if (lbl) lbl.textContent = `${MESES_FULL_A[m]} ${y}`;
+
+  const sesMes = state.sesiones.filter(s => {
+    const d = parseFecha(s.fecha);
+    return d && d.getMonth() === m && d.getFullYear() === y;
+  }).sort((a,b) => parseFecha(a.fecha) - parseFecha(b.fecha));
+
+  const pacIds = [...new Set(sesMes.map(s => s.paciente_id))];
+  const sub = document.getElementById('atendidos-subtitle');
+  if (sub) sub.textContent = `${pacIds.length} pacientes · ${sesMes.length} sesiones`;
+
+  // ── Calendar ──
+  const dowEl = document.getElementById('atendidos-cal-dow');
+  if (dowEl) dowEl.innerHTML = ['L','M','M','J','V','S','D'].map(d =>
+    `<div style="text-align:center;font-size:9px;font-weight:700;color:var(--ink-4);text-transform:uppercase">${d}</div>`
+  ).join('');
+
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const firstDow    = new Date(y, m, 1).getDay(); // 0=Sun
+  const offset      = firstDow === 0 ? 6 : firstDow - 1;
+
+  // Count sessions per day
+  const sesPerDay = {};
+  const pacsPerDay = {};
+  sesMes.forEach(s => {
+    const d = parseFecha(s.fecha);
+    if (!d) return;
+    const day = d.getDate();
+    sesPerDay[day] = (sesPerDay[day] || 0) + 1;
+    if (!pacsPerDay[day]) pacsPerDay[day] = [];
+    const pac = state.pacientes.find(p => p.id === s.paciente_id);
+    if (pac && !pacsPerDay[day].find(p => p.id === pac.id)) pacsPerDay[day].push(pac);
+  });
+
+  const gridEl = document.getElementById('atendidos-cal-grid');
+  if (!gridEl) return;
+
+  let calHtml = '';
+  // Empty cells
+  for (let i = 0; i < offset; i++) {
+    calHtml += `<div style="aspect-ratio:1"></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const count   = sesPerDay[d] || 0;
+    const isToday = isCurrentMonth && d === today.getDate();
+    const pacs    = pacsPerDay[d] || [];
+    const bgAlpha = count === 0 ? 0 : count === 1 ? 0.12 : count === 2 ? 0.28 : 0.50;
+    const txtColor = count > 0 ? 'var(--accent)' : 'var(--ink-2)';
+    const border   = isToday ? `border:1.5px solid var(--accent)` : 'border:1px solid transparent';
+    // Dots (max 3) colored by prevision
+    const dots = pacs.slice(0,3).map(p => {
+      const k = prevKey(p.prevision);
+      const c = k==='fn' ? 'var(--accent)' : k==='is' ? 'var(--pos)' : 'var(--warn)';
+      return `<div style="width:3px;height:3px;border-radius:50%;background:${c};flex-shrink:0"></div>`;
+    }).join('');
+
+    calHtml += `<div style="aspect-ratio:1;border-radius:6px;background:oklch(0.55 0.18 255/${bgAlpha});${border};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:${count>0?'pointer':'default'}"
+      ${count>0?`onclick="scrollToWeek(${Math.ceil(d/7)})"`:''}>
+      <span style="font-size:13px;font-weight:${count>0?'700':'400'};color:${txtColor}">${d}</span>
+      ${count>0?`<div style="display:flex;gap:1px;margin-top:1px">${dots}</div>`:''}
+    </div>`;
+  }
+  gridEl.innerHTML = calHtml;
+
+  // ── Weekly breakdown ──
+  const weeksEl = document.getElementById('atendidos-weeks');
+  if (!weeksEl) return;
+  if (!sesMes.length) {
+    weeksEl.innerHTML = `<div class="empty-state"><i class="ti ti-calendar-off"></i>Sin sesiones este mes</div>`;
+    return;
+  }
+
+  const weeks = {};
+  sesMes.forEach(s => {
+    const d = parseFecha(s.fecha);
+    if (!d) return;
+    const w = Math.ceil(d.getDate() / 7);
+    if (!weeks[w]) weeks[w] = [];
+    weeks[w].push(s);
+  });
+  const wkLabels = ['','1ª semana','2ª semana','3ª semana','4ª semana','5ª semana'];
+
+  let html = '';
+  Object.keys(weeks).sort((a,b)=>a-b).forEach(w => {
+    const sesW   = weeks[w];
+    const totalW = sesW.reduce((a,s) => a+(Number(s.monto)||0), 0);
+    const dates  = sesW.map(s => parseFecha(s.fecha)?.getDate()).filter(Boolean);
+    const dRange = Math.min(...dates) === Math.max(...dates)
+      ? `${Math.min(...dates)} ${MESES_FULL_A[m]}`
+      : `${Math.min(...dates)}–${Math.max(...dates)} ${MESES_FULL_A[m]}`;
+
+    html += `<div id="atendidos-week-${w}" style="border-top:1px solid var(--rule-2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 7px;background:var(--rule-2)">
+        <div>
+          <div style="font-size:0.80rem;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--ink-4)">${wkLabels[w]||('Semana '+w)}</div>
+          <div style="font-size:0.82rem;color:var(--ink-3);margin-top:1px">${dRange} · ${sesW.length} sesión${sesW.length>1?'es':''}</div>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:600;color:var(--accent)" class="private-val">${fmt(totalW)}</span>
+      </div>`;
+
+    const pacIdsW = [...new Set(sesW.map(s => s.paciente_id))];
+    pacIdsW.forEach(pid => {
+      const pac  = state.pacientes.find(p => p.id === pid);
+      if (!pac) return;
+      const sesP = sesW.filter(s => s.paciente_id === pid);
+      const totP = sesP.reduce((a,s) => a+(Number(s.monto)||0), 0);
+      const dias = sesP.map(s => parseFecha(s.fecha)?.getDate()).filter(Boolean).join(', ');
+      const k    = prevKey(pac.prevision);
+      const avBg = k==='fn'?'oklch(0.55 0.18 255/.15)':k==='is'?'oklch(0.52 0.14 165/.15)':'oklch(0.58 0.14 75/.15)';
+      const avCl = k==='fn'?'var(--accent)':k==='is'?'var(--pos)':'var(--warn)';
+
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--rule-2)">
+        <div style="width:28px;height:28px;border-radius:50%;background:${avBg};color:${avCl};display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(pac.nombre)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="private-name" style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
+          <div style="font-size:0.80rem;color:var(--ink-4);margin-top:2px;display:flex;gap:5px;align-items:center">
+            <span>Días: ${dias}</span>
+            <span class="tag ${k}">${prevLabel(pac.prevision)}</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'DM Mono',monospace;font-size:0.92rem;color:var(--ink)" class="private-val">${fmt(totP)}</div>
+          <div style="font-size:0.78rem;color:var(--ink-4)">${sesP.length} ses.</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  weeksEl.innerHTML = html;
+}
+
+function scrollToWeek(w) {
+  const el = document.getElementById(`atendidos-week-${w}`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function renderResumen() {
   const year          = state.currentYear;
   const isCurrentYear = year === new Date().getFullYear();
@@ -2954,8 +3275,9 @@ function switchTab(tab, btn) {
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   btn.classList.add('active');
-  if (tab==='resumen') renderResumen();
-  if (tab==='config')  renderConfig();
+  if (tab==='resumen')   renderResumen();
+  if (tab==='config')    renderConfig();
+  if (tab==='atendidos') renderAtendidos();
 }
 
 // ═══════════════════════════════════════════
