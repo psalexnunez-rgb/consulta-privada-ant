@@ -2191,12 +2191,17 @@ async function doLogin() {
     if (!r.ok) throw new Error(d.error_description || d.msg || 'Error de autenticación');
     state.token = d.access_token;
     state.user  = d.user;
+    // Persist session so page reloads don't force re-login
+    sessionStorage.setItem('cp_token', d.access_token);
+    sessionStorage.setItem('cp_email', email);
+    sessionStorage.setItem('cp_token_exp', Date.now() + 15 * 60 * 1000); // 15 min
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('config-email-display').textContent = email;
     initYearLabels();
     await loadAll();
     setupRealtime();
+    requestWakeLock();
   } catch(e) {
     document.getElementById('auth-error').textContent = e.message;
   }
@@ -2205,6 +2210,10 @@ document.getElementById('auth-password').addEventListener('keydown', e => { if(e
 
 async function doSignOut() {
   clearInterval(realtimeInterval);
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+  sessionStorage.removeItem('cp_token');
+  sessionStorage.removeItem('cp_email');
+  sessionStorage.removeItem('cp_token_exp');
   state.token = null;
   document.getElementById('app').classList.add('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
@@ -3495,6 +3504,56 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
+
+// ═══════════════════════════════════════════
+// WAKE LOCK — mantiene pantalla activa 15 min
+// ═══════════════════════════════════════════
+let wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch(e) { /* no disponible en este dispositivo */ }
+}
+
+// Re-adquirir wake lock si fue liberado al volver de background
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible') {
+    // Re-adquirir wake lock
+    if (!wakeLock && state.token) requestWakeLock();
+
+    // Verificar que la sesión no haya expirado (15 min)
+    const exp = parseInt(sessionStorage.getItem('cp_token_exp') || '0');
+    if (exp && Date.now() > exp) {
+      // Sesión expirada → cerrar sesión limpiamente
+      doSignOut();
+      return;
+    }
+
+    // Recargar datos sin recargar la página
+    if (state.token) {
+      try { await loadAll(); } catch(e) {}
+    }
+  }
+});
+
+// ── Restaurar sesión al cargar la página (si venía de un reload) ──
+(async function restoreSession() {
+  const token = sessionStorage.getItem('cp_token');
+  const email = sessionStorage.getItem('cp_email');
+  const exp   = parseInt(sessionStorage.getItem('cp_token_exp') || '0');
+  if (!token || !email || Date.now() > exp) return; // sin sesión válida
+
+  state.token = token;
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('config-email-display').textContent = email;
+  initYearLabels();
+  await loadAll();
+  setupRealtime();
+  requestWakeLock();
+})();
 
 // Init
 initYearLabels();
