@@ -1974,166 +1974,233 @@ function exportarPDF() {
   const pagPct= total?Math.round(pagado/total*100):0;
   const penPct= total?Math.round(pendiente/total*100):0;
 
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Respaldo Consulta Privada ${year}</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1e2340;background:white}
-  .page{width:210mm;min-height:297mm;padding:16mm 18mm;page-break-after:always}
-  .page:last-child{page-break-after:auto}
-  h1{font-size:20px;font-weight:600;letter-spacing:-.3px;color:white}
-  h2{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:#525c80;margin:0 0 10px}
-  .header{background:linear-gradient(135deg,#101e35,#1a2f55);padding:20px 24px;margin:-16mm -18mm 16px;color:white}
-  .header-sub{font-size:10px;opacity:.5;margin-top:3px;font-family:'DM Mono',monospace}
-  .meta-row{display:flex;gap:24px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
-  .meta-item .l{font-size:9px;opacity:.55}
-  .meta-item .v{font-size:11px;font-weight:500;margin-top:1px}
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-  .kpi{background:#f4f6fb;border-radius:8px;padding:10px 12px}
-  .kpi-l{font-size:9px;color:#525c80;margin-bottom:3px}
-  .kpi-v{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
-  .chart-box{display:flex;flex-direction:column;align-items:center;gap:8px}
-  .chart-lbl{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.10em;color:#525c80;text-align:center}
-  .leg{display:flex;flex-direction:column;gap:4px;width:100%}
-  .leg-r{display:flex;align-items:center;gap:6px;font-size:10px}
-  .leg-d{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-  .leg-n{flex:1;color:#1e2340}
-  .leg-v{font-family:'DM Mono',monospace;font-size:10px;color:#525c80}
-  table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}
-  th{text-align:left;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#525c80;padding:5px 6px 5px 0;border-bottom:0.5px solid #dde2f0}
-  td{padding:6px 6px 6px 0;border-bottom:0.5px solid #eef0f7;color:#1e2340}
-  tr:last-child td{border-bottom:none}
-  .total td{font-weight:500;background:#f4f6fb;padding:7px 6px}
-  .mono{font-family:'DM Mono',monospace;font-size:10px}
-  .pos{color:#0f6e56}
-  .neg{color:#993c1d}
-  .badge{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:500}
-  .fn{background:#e6f1fb;color:#185fa5}
-  .is{background:#e1f5ee;color:#0f6e56}
-  .pa{background:#faeeda;color:#854f0b}
-  .pac-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
-  .pac-item{background:#f4f6fb;border-radius:7px;padding:8px 10px}
-  .pac-nm{font-size:11px;font-weight:500;margin-bottom:2px}
-  .pac-mt{font-size:9px;color:#525c80}
-  .footer{position:fixed;bottom:12mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:9px;color:#aab0cc;font-family:'DM Mono',monospace;border-top:0.5px solid #dde2f0;padding-top:6px}
-  .section{margin-bottom:14px}
-  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style>
-</head>
-<body>
+  // ── Generate PDF with jsPDF (no print dialog) ──
+  showToast('Generando PDF…');
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => { _buildJsPDF({year,fecha,total,cobrado,pagado,pendiente,liquido,imp,gastos,activos,sesYear,monthRows,perPac,recentSes,pie1Data:[{v:fn,c:'#1a4a8a'},{v:is,c:'#2d7ec4'},{v:pa,c:'#6db3e8'}],pie2Data:[{v:cobrado-pagado,c:'#2980c4'},{v:pagado,c:'#5ba8d6'},{v:pendiente,c:'#b8d8ef'}],fnPct,isPct,paPct,cobPct,pagPct,penPct}); };
+  document.head.appendChild(script);
+}
 
-<div class="page">
-  <div class="header">
-    <div style="font-size:18px;opacity:.8;margin-bottom:4px">ψ</div>
-    <h1>Consulta Privada — Respaldo</h1>
-    <div class="header-sub">Generado el ${fecha} · v1.20 · Alex Nuñez</div>
-    <div class="meta-row">
-      <div class="meta-item"><div class="l">Año</div><div class="v">${year}</div></div>
-      <div class="meta-item"><div class="l">Pacientes activos</div><div class="v">${activos}</div></div>
-      <div class="meta-item"><div class="l">Sesiones totales</div><div class="v">${sesYear.length}</div></div>
-      <div class="meta-item"><div class="l">Tasa impuesto</div><div class="v">${getImpuestoForYear(year)}%</div></div>
-    </div>
-  </div>
+function _buildJsPDF(d) {
+  const {jsPDF} = window.jspdf;
+  const vw = Math.min(window.innerWidth, 430);
+  const vh = window.innerHeight;
+  const doc = new jsPDF({ orientation:'portrait', unit:'pt', format:[vw, vh] });
+  const W = vw, M = 20;
+  const year = d.year;
+  const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const fecha = d.fecha;
 
-  <h2>Resumen financiero ${year}</h2>
-  <div class="kpis">
-    <div class="kpi"><div class="kpi-l">Facturado</div><div class="kpi-v">${fmt(total)}</div></div>
-    <div class="kpi"><div class="kpi-l">Cobrado</div><div class="kpi-v pos">${fmt(cobrado)}</div></div>
-    <div class="kpi"><div class="kpi-l">Líquido estimado</div><div class="kpi-v pos">${fmt(liquido)}</div></div>
-  </div>
+  function drawPieChart(x, y, r, data, cx, cy) {
+    const sum = data.reduce((a,i)=>a+i.v,0)||1;
+    let angle = -Math.PI/2;
+    data.forEach(item => {
+      const sweep = (item.v/sum)*Math.PI*2;
+      if (sweep < 0.01) { angle+=sweep; return; }
+      // Draw slice
+      doc.setFillColor(item.c);
+      const steps = Math.max(8, Math.floor(sweep*16));
+      const pts = [[cx,cy]];
+      for (let i=0;i<=steps;i++) {
+        const a = angle + (sweep*i/steps);
+        pts.push([cx+r*Math.cos(a), cy+r*Math.sin(a)]);
+      }
+      doc.setDrawColor(255,255,255);
+      doc.setLineWidth(1);
+      doc.moveTo(pts[0][0],pts[0][1]);
+      doc.beginPath();
+      pts.forEach(p=>doc.lineTo(p[0],p[1]));
+      doc.closePath();
+      doc.fillStroke();
+      angle += sweep;
+    });
+    // Center hole
+    doc.setFillColor(255,255,255);
+    doc.circle(cx, cy, r*0.58, 'F');
+  }
 
-  <div class="charts">
-    <div class="chart-box">
-      <div class="chart-lbl">Por previsión</div>
-      <svg viewBox="0 0 120 120" width="100" height="100">
-        ${pie1}
-        <circle cx="60" cy="60" r="30" fill="white"/>
-        <text x="60" y="57" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#888">total</text>
-        <text x="60" y="68" text-anchor="middle" font-size="10" font-weight="500" font-family="DM Mono,monospace" fill="#1e2340">${sesYear.length} ses.</text>
-      </svg>
-      <div class="leg">
-        <div class="leg-r"><div class="leg-d" style="background:#1a4a8a"></div><span class="leg-n">Fonasa</span><span class="leg-v">${fmt(fn)} · ${fnPct}%</span></div>
-        <div class="leg-r"><div class="leg-d" style="background:#2d7ec4"></div><span class="leg-n">Isapre</span><span class="leg-v">${fmt(is)} · ${isPct}%</span></div>
-        <div class="leg-r"><div class="leg-d" style="background:#6db3e8"></div><span class="leg-n">Particular</span><span class="leg-v">${fmt(pa)} · ${paPct}%</span></div>
-      </div>
-    </div>
-    <div class="chart-box">
-      <div class="chart-lbl">Estado de cobro</div>
-      <svg viewBox="0 0 120 120" width="100" height="100">
-        ${pie2}
-        <circle cx="60" cy="60" r="30" fill="white"/>
-        <text x="60" y="57" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#888">cobro</text>
-        <text x="60" y="68" text-anchor="middle" font-size="10" font-weight="500" font-family="DM Mono,monospace" fill="#1e2340">${total?Math.round(cobrado/total*100):0}%</text>
-      </svg>
-      <div class="leg">
-        <div class="leg-r"><div class="leg-d" style="background:#2980c4"></div><span class="leg-n">Cobrado</span><span class="leg-v">${fmt(cobrado-pagado)} · ${cobPct}%</span></div>
-        <div class="leg-r"><div class="leg-d" style="background:#5ba8d6"></div><span class="leg-n">Pagado</span><span class="leg-v">${fmt(pagado)} · ${pagPct}%</span></div>
-        <div class="leg-r"><div class="leg-d" style="background:#b8d8ef"></div><span class="leg-n">Pendiente</span><span class="leg-v">${fmt(pendiente)} · ${penPct}%</span></div>
-      </div>
-    </div>
-  </div>
+  // ── PAGE 1 ──
+  // Header dark bg
+  doc.setFillColor(16,30,53);
+  doc.rect(0,0,W,72,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16); doc.text('ψ  Consulta Privada — Respaldo', M, 24);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8); doc.setTextColor(180,190,220);
+  doc.text(`Generado el ${fecha} · v1.20 · Alex Nuñez`, M, 36);
+  doc.setFontSize(9); doc.setTextColor(200,210,235);
+  doc.text(`Año ${year}`, M, 54);
+  doc.text(`Pacientes activos: ${d.activos}`, M+70, 54);
+  doc.text(`Sesiones: ${d.sesYear.length}`, M+170, 54);
 
-  <h2>Líquido mensual ${year}</h2>
-  <table>
-    <thead><tr><th>Mes</th><th>Facturado</th><th>Impuesto</th><th>Gastos</th><th>Líquido</th></tr></thead>
-    <tbody>${monthRows}<tr class="total"><td>Total</td><td class="mono">${fmt(total)}</td><td class="mono neg">−${fmt(imp)}</td><td class="mono neg">−${fmt(gastos)}</td><td class="mono pos">${fmt(liquido)}</td></tr></tbody>
-  </table>
-  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 1 / 3</span></div>
-</div>
+  let y = 90;
 
-<div class="page">
-  <h2>Pacientes registrados (${state.pacientes.length})</h2>
-  <div class="pac-grid">
-    ${state.pacientes.map(p=>`<div class="pac-item"><div class="pac-nm">${p.nombre}</div><div class="pac-mt"><span class="badge ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span> · ${p.modalidad||''} · ${p.alta?'en alta':'activo/a'}</div></div>`).join('')}
-  </div>
-  <h2>Facturación por paciente ${year}</h2>
-  <table>
-    <thead><tr><th>Paciente</th><th>Previsión</th><th>Sesiones</th><th>Total</th><th>Cobrado</th></tr></thead>
-    <tbody>
-      ${perPac.map(({p,t,n,c})=>`<tr><td>${p.nombre}</td><td><span class="badge ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span></td><td>${n}</td><td class="mono">${fmt(t)}</td><td class="mono pos">${fmt(c)}</td></tr>`).join('')}
-      <tr class="total"><td colspan="3">Total</td><td class="mono">${fmt(total)}</td><td class="mono pos">${fmt(cobrado)}</td></tr>
-    </tbody>
-  </table>
-  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 2 / 3</span></div>
-</div>
+  // KPIs
+  const kpiW = (W-M*2-12)/3;
+  [[`Facturado`,fmt(d.total),'#1e2340'],[`Cobrado`,fmt(d.cobrado),'#0f6e56'],[`Líquido est.`,fmt(d.liquido),'#0f6e56']].forEach(([lbl,val,col],i)=>{
+    const kx = M+i*(kpiW+6);
+    doc.setFillColor(244,246,251); doc.roundedRect(kx,y,kpiW,32,4,4,'F');
+    doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','normal');
+    doc.text(lbl, kx+8, y+12);
+    doc.setFontSize(11); doc.setTextColor(col); doc.setFont('helvetica','bold');
+    doc.text(val, kx+8, y+25);
+  });
+  y += 44;
 
-<div class="page">
-  <h2>Historial de sesiones (últimas ${recentSes.length})</h2>
-  <table>
-    <thead><tr><th>Fecha</th><th>Paciente</th><th>Estado</th><th>Modalidad</th><th>Monto</th></tr></thead>
-    <tbody>
-      ${recentSes.map(s=>{
-        const p=state.pacientes.find(x=>x.id===s.paciente_id);
-        const est=normEstado(s.estado);
-        return `<tr><td>${s.fecha||''}</td><td>${p?p.nombre:'—'}</td><td><span class="badge ${est==='cobrado'?'fn':est==='pagado'?'is':'pa'}">${s.estado||''}</span></td><td>${s.modalidad||''}</td><td class="mono">${fmt(s.monto)}</td></tr>`;
-      }).join('')}
-    </tbody>
-  </table>
-  <h2 style="margin-top:14px">Configuración por año</h2>
-  <table>
-    <thead><tr><th>Parámetro</th>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<th>${y}</th>`).join('')}</tr></thead>
-    <tbody>
-      <tr><td>Tarifa Fonasa</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).fonasa||0)}</td>`).join('')}</tr>
-      <tr><td>Tarifa Isapre</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).isapre||0)}</td>`).join('')}</tr>
-      <tr><td>Tarifa Particular</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).pa||0)}</td>`).join('')}</tr>
-      <tr><td>Gastos mensuales</td>${Object.keys(state.cfg.arriendos||{}).sort().map(y=>`<td class="mono">${fmt(state.cfg.arriendos[y]||0)}</td>`).join('')}</tr>
-      <tr><td>Tasa impuesto</td>${Object.keys(state.cfg.impuestos||{}).sort().map(y=>`<td class="mono">${state.cfg.impuestos[y]||0}%</td>`).join('')}</tr>
-    </tbody>
-  </table>
-  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 3 / 3</span></div>
-</div>
+  // Pie charts side by side
+  doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','normal');
+  doc.text('POR PREVISIÓN', M+22, y+8);
+  doc.text('ESTADO DE COBRO', W/2+20, y+8);
+  y += 12;
 
-</body></html>`;
+  const pr = 36, p1x = M+pr+20, p1y = y+pr+4;
+  const p2x = W/2+pr+20, p2y = y+pr+4;
+  drawPieChart(0,0,pr,d.pie1Data,p1x,p1y);
+  drawPieChart(0,0,pr,d.pie2Data,p2x,p2y);
 
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  win.onload = () => { win.focus(); win.print(); };
+  // Center labels
+  doc.setFontSize(7); doc.setTextColor(150,150,160); doc.setFont('helvetica','normal');
+  doc.text('total', p1x, p1y-3, {align:'center'});
+  doc.setFontSize(9); doc.setTextColor(30,35,64); doc.setFont('helvetica','bold');
+  doc.text(`${d.sesYear.length}s`, p1x, p1y+6, {align:'center'});
+  doc.setFontSize(7); doc.setTextColor(150,150,160); doc.setFont('helvetica','normal');
+  doc.text('cobro', p2x, p2y-3, {align:'center'});
+  doc.setFontSize(9); doc.setTextColor(30,35,64); doc.setFont('helvetica','bold');
+  doc.text(`${d.total?Math.round(d.cobrado/d.total*100):0}%`, p2x, p2y+6, {align:'center'});
+
+  // Legends
+  const legX1 = M+pr*2+28, legX2 = W/2+pr*2+28;
+  const leg1 = [['Fonasa','#1a4a8a',`${fmt(d.pie1Data[0].v)} · ${d.fnPct}%`],['Isapre','#2d7ec4',`${fmt(d.pie1Data[1].v)} · ${d.isPct}%`],['Particular','#6db3e8',`${fmt(d.pie1Data[2].v)} · ${d.paPct}%`]];
+  const leg2 = [['Cobrado','#2980c4',`${d.cobPct}%`],['Pagado','#5ba8d6',`${d.pagPct}%`],['Pendiente','#b8d8ef',`${d.penPct}%`]];
+  [leg1,leg2].forEach((leg,li)=>{
+    const lx = li===0?legX1:legX2;
+    leg.forEach(([lbl,col,val],i)=>{
+      const ly = y+i*14+6;
+      doc.setFillColor(col); doc.circle(lx, ly, 3.5, 'F');
+      doc.setFontSize(8); doc.setTextColor(30,35,64); doc.setFont('helvetica','normal');
+      doc.text(lbl, lx+8, ly+2.5);
+      doc.setTextColor(100,108,140);
+      doc.text(val, lx+8, ly+10);
+    });
+  });
+  y += pr*2+16;
+
+  // Monthly table
+  doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','bold');
+  doc.text(`LÍQUIDO MENSUAL ${year}`, M, y); y+=8;
+  doc.setFillColor(230,234,245);
+  doc.rect(M, y, W-M*2, 14, 'F');
+  doc.setFontSize(7.5); doc.setTextColor(82,92,128); doc.setFont('helvetica','bold');
+  const cols = [M+2, M+52, M+112, M+162, M+212];
+  ['Mes','Facturado','Impuesto','Gastos','Líquido'].forEach((h,i)=>doc.text(h,cols[i],y+9));
+  y+=14;
+  MESES.forEach((mes,mi)=>{
+    const sesM = d.sesYear.filter(s=>fechaMonth(s.fecha)===mi);
+    const f=sesM.reduce((a,s)=>a+(Number(s.monto)||0),0);
+    if(!f) return;
+    const im=Math.round(f*(getImpuestoForYear(year)/100));
+    const g=getArriendoForYear(year);
+    const l=f-im-g;
+    if(mi%2===0){doc.setFillColor(249,250,253);doc.rect(M,y,W-M*2,13,'F');}
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.setTextColor(30,35,64); doc.text(mes,cols[0],y+9);
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,35,64); doc.text(fmt(f),cols[1],y+9);
+    doc.setTextColor(153,60,29); doc.text(`-${fmt(im)}`,cols[2],y+9);
+    doc.setTextColor(153,60,29); doc.text(`-${fmt(g)}`,cols[3],y+9);
+    doc.setTextColor(l>=0?'#0f6e56':'#993c1d'); doc.text(fmt(l),cols[4],y+9);
+    y+=13;
+  });
+  // Total row
+  doc.setFillColor(230,234,245); doc.rect(M,y,W-M*2,14,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(30,35,64);
+  doc.text('Total',cols[0],y+9);
+  doc.text(fmt(d.total),cols[1],y+9);
+  doc.setTextColor(153,60,29); doc.text(`-${fmt(d.imp)}`,cols[2],y+9);
+  doc.setTextColor(153,60,29); doc.text(`-${fmt(d.gastos)}`,cols[3],y+9);
+  doc.setTextColor(d.liquido>=0?'#0f6e56':'#993c1d'); doc.text(fmt(d.liquido),cols[4],y+9);
+
+  // Footer pg1
+  doc.setFontSize(7); doc.setTextColor(170,176,204); doc.setFont('helvetica','normal');
+  doc.text(`consulta-privada · respaldo-${year}.pdf`, M, vh-10);
+  doc.text('pág. 1 / 3', W-M, vh-10, {align:'right'});
+
+  // ── PAGE 2 ──
+  doc.addPage([W,vh]);
+  y = M+10;
+  doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','bold');
+  doc.text(`PACIENTES REGISTRADOS (${state.pacientes.length})`, M, y); y+=10;
+
+  state.pacientes.forEach((p,i)=>{
+    if(y > vh-30){ doc.addPage([W,vh]); y=M; }
+    if(i%2===0){doc.setFillColor(244,246,251);doc.rect(M,y,W-M*2,24,'F');}
+    doc.setFontSize(9); doc.setTextColor(30,35,64); doc.setFont('helvetica','bold');
+    doc.text(p.nombre, M+6, y+10);
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(82,92,128);
+    doc.text(`${prevLabel(p.prevision)} · ${p.modalidad||''} · ${p.alta?'en alta':'activo/a'}`, M+6, y+19);
+    y+=24;
+  });
+  y+=8;
+
+  doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','bold');
+  doc.text(`FACTURACIÓN POR PACIENTE ${year}`, M, y); y+=8;
+  doc.setFillColor(230,234,245); doc.rect(M,y,W-M*2,14,'F');
+  doc.setFontSize(7.5); doc.setTextColor(82,92,128);
+  const pc = [M+2, M+90, M+130, M+175, M+225];
+  ['Paciente','Prev.','Ses.','Total','Cobrado'].forEach((h,i)=>doc.text(h,pc[i],y+9));
+  y+=14;
+  d.perPac.forEach(({p,t,n,c},i)=>{
+    if(y>vh-30){doc.addPage([W,vh]);y=M;}
+    if(i%2===0){doc.setFillColor(249,250,253);doc.rect(M,y,W-M*2,13,'F');}
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(30,35,64);
+    doc.text(p.nombre.length>18?p.nombre.slice(0,17)+'…':p.nombre, pc[0], y+9);
+    doc.text(prevLabel(p.prevision).slice(0,6), pc[1], y+9);
+    doc.text(String(n), pc[2], y+9);
+    doc.text(fmt(t), pc[3], y+9);
+    doc.setTextColor(15,110,86); doc.text(fmt(c), pc[4], y+9);
+    y+=13;
+  });
+  doc.setFillColor(230,234,245); doc.rect(M,y,W-M*2,14,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(30,35,64);
+  doc.text('Total',pc[0],y+9); doc.text(fmt(d.total),pc[3],y+9);
+  doc.setTextColor(15,110,86); doc.text(fmt(d.cobrado),pc[4],y+9);
+
+  doc.setFontSize(7); doc.setTextColor(170,176,204); doc.setFont('helvetica','normal');
+  doc.text(`consulta-privada · respaldo-${year}.pdf`, M, vh-10);
+  doc.text('pág. 2 / 3', W-M, vh-10, {align:'right'});
+
+  // ── PAGE 3 ──
+  doc.addPage([W,vh]);
+  y = M+10;
+  doc.setFontSize(8); doc.setTextColor(82,92,128); doc.setFont('helvetica','bold');
+  doc.text(`HISTORIAL DE SESIONES (últimas ${d.recentSes.length})`, M, y); y+=8;
+  doc.setFillColor(230,234,245); doc.rect(M,y,W-M*2,14,'F');
+  doc.setFontSize(7.5); doc.setTextColor(82,92,128);
+  const sc=[M+2,M+55,M+120,M+165,M+220];
+  ['Fecha','Paciente','Estado','Modal.','Monto'].forEach((h,i)=>doc.text(h,sc[i],y+9));
+  y+=14;
+  d.recentSes.forEach((s,i)=>{
+    if(y>vh-30){doc.addPage([W,vh]);y=M;}
+    const p=state.pacientes.find(x=>x.id===s.paciente_id);
+    if(i%2===0){doc.setFillColor(249,250,253);doc.rect(M,y,W-M*2,12,'F');}
+    doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(30,35,64);
+    doc.text(s.fecha||'', sc[0], y+8);
+    const nm=p?p.nombre:'—'; doc.text(nm.length>16?nm.slice(0,15)+'…':nm, sc[1], y+8);
+    doc.text(s.estado||'', sc[2], y+8);
+    doc.text(s.modalidad||'', sc[3], y+8);
+    doc.text(fmt(s.monto), sc[4], y+8);
+    y+=12;
+  });
+
+  doc.setFontSize(7); doc.setTextColor(170,176,204); doc.setFont('helvetica','normal');
+  doc.text(`consulta-privada · respaldo-${year}.pdf`, M, vh-10);
+  doc.text('pág. 3 / 3', W-M, vh-10, {align:'right'});
+
+  // Save
+  const fechaFile = new Date().toISOString().slice(0,10);
+  doc.save(`consulta-privada-respaldo-${fechaFile}.pdf`);
+  showToast('PDF descargado');
 }
 
 // ═══════════════════════════════════════════
