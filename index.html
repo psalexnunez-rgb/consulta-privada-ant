@@ -1153,7 +1153,7 @@ body.privacy .private-name {
   <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:-10px">
     <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)" id="auth-year"></span>
     <span style="font-size:11px;color:oklch(0.50 0.06 255)">·</span>
-    <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)">v1.19</span>
+    <span style="font-size:11px;font-family:'DM Mono',monospace;color:oklch(0.50 0.06 255)">v1.20</span>
   </div>
   <div class="auth-card">
     <div class="auth-field">
@@ -1539,6 +1539,30 @@ body.privacy .private-name {
           </div>
         </div>
       </div>
+      <!-- Respaldo y exportación -->
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">Respaldo y exportación</div></div>
+        <div class="config-section">
+          <div class="config-row" style="flex-direction:column;gap:8px;align-items:stretch">
+            <button onclick="exportarJSON()" style="background:var(--glass-bg);border:var(--glass-border);border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:10px;width:100%">
+              <i class="ti ti-database-export" style="font-size:20px;color:var(--accent)"></i>
+              <div style="text-align:left">
+                <div>Respaldo JSON</div>
+                <div style="font-size:0.82rem;font-weight:400;color:var(--ink-4);margin-top:1px">Exporta todos los datos en formato JSON</div>
+              </div>
+              <i class="ti ti-download" style="margin-left:auto;color:var(--ink-4)"></i>
+            </button>
+            <button onclick="exportarPDF()" style="background:var(--glass-bg);border:var(--glass-border);border-radius:10px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:10px;width:100%">
+              <i class="ti ti-file-type-pdf" style="font-size:20px;color:var(--accent)"></i>
+              <div style="text-align:left">
+                <div>Exportar PDF completo</div>
+                <div style="font-size:0.82rem;font-weight:400;color:var(--ink-4);margin-top:1px">Resumen financiero, pacientes y sesiones</div>
+              </div>
+              <i class="ti ti-printer" style="margin-left:auto;color:var(--ink-4)"></i>
+            </button>
+          </div>
+        </div>
+      </div>
       <!-- Cuenta -->
       <div class="section-card">
         <div class="section-header"><div class="section-title">Cuenta</div></div>
@@ -1860,6 +1884,256 @@ function updateKpiToggle() {
   document.getElementById('kpi-toggle-sub').textContent  = `${ses} sesiones`;
   document.getElementById('kpi-toggle-sub').style.color  = color;
   card.style.borderColor = isCob ? 'oklch(0.62 0.13 165 / 0.35)' : 'oklch(0.55 0.18 255 / 0.35)';
+}
+
+// ═══════════════════════════════════════════
+// EXPORTACIÓN Y RESPALDO
+// ═══════════════════════════════════════════
+function exportarJSON() {
+  const data = {
+    exportado: new Date().toISOString(),
+    version: 'v1.20',
+    pacientes: state.pacientes,
+    sesiones: state.sesiones,
+    configuracion: state.cfg,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = URL.createObjectURL(blob);
+  a.download = `consulta-privada-respaldo-${fecha}.json`;
+  a.click();
+  showToast('Respaldo JSON descargado');
+}
+
+function exportarPDF() {
+  const year = state.currentYear;
+  const fecha = new Date().toLocaleDateString('es-CL', {day:'2-digit',month:'long',year:'numeric'});
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  // ── Financial data ──
+  const sesYear = state.sesiones.filter(s => fechaYear(s.fecha) === year);
+  const total   = sesYear.reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const cobrado = sesYear.filter(s=>normEstado(s.estado)!=='pendiente').reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const pagado  = sesYear.filter(s=>normEstado(s.estado)==='pagado').reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const pendiente= sesYear.filter(s=>normEstado(s.estado)==='pendiente').reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const imp     = Math.round(total * (getImpuestoForYear(year)/100));
+  const gastos  = getArriendoForYear(year) * 12;
+  const liquido = total - imp - gastos;
+  const activos = state.pacientes.filter(p=>!p.alta).length;
+
+  // ── Monthly breakdown ──
+  const monthRows = MESES.map((mes,i) => {
+    const sesM = sesYear.filter(s=>fechaMonth(s.fecha)===i);
+    const f = sesM.reduce((a,s)=>a+(Number(s.monto)||0),0);
+    const im= Math.round(f*(getImpuestoForYear(year)/100));
+    const g = getArriendoForYear(year);
+    const l = f-im-g;
+    if(!f) return '';
+    return `<tr><td>${mes}</td><td class="mono">${fmt(f)}</td><td class="mono neg">−${fmt(im)}</td><td class="mono neg">−${fmt(g)}</td><td class="mono pos">${fmt(l)}</td></tr>`;
+  }).join('');
+
+  // ── Per patient ──
+  const perPac = state.pacientes.map(p=>{
+    const t=sesYear.filter(s=>s.paciente_id===p.id).reduce((a,s)=>a+(Number(s.monto)||0),0);
+    const n=sesYear.filter(s=>s.paciente_id===p.id).length;
+    const c=sesYear.filter(s=>s.paciente_id===p.id&&normEstado(s.estado)!=='pendiente').reduce((a,s)=>a+(Number(s.monto)||0),0);
+    return {p,t,n,c};
+  }).filter(x=>x.t>0).sort((a,b)=>b.t-a.t);
+
+  // ── Session history (last 100) ──
+  const recentSes = [...state.sesiones].sort((a,b)=>parseFecha(b.fecha)-parseFecha(a.fecha)).slice(0,100);
+
+  // ── Pie chart SVGs ──
+  // Torta 1: por previsión
+  const fn=sesYear.filter(s=>prevKey(state.pacientes.find(p=>p.id===s.paciente_id)?.prevision)==='fn').reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const is=sesYear.filter(s=>prevKey(state.pacientes.find(p=>p.id===s.paciente_id)?.prevision)==='is').reduce((a,s)=>a+(Number(s.monto)||0),0);
+  const pa=sesYear.filter(s=>prevKey(state.pacientes.find(p=>p.id===s.paciente_id)?.prevision)==='pa').reduce((a,s)=>a+(Number(s.monto)||0),0);
+
+  function pieSlices(data) {
+    const sum = data.reduce((a,d)=>a+d.v,0)||1;
+    let angle = -Math.PI/2;
+    return data.map(d=>{
+      const start = angle;
+      const sweep = (d.v/sum)*Math.PI*2;
+      angle += sweep;
+      const x1=60+52*Math.cos(start), y1=60+52*Math.sin(start);
+      const x2=60+52*Math.cos(start+sweep), y2=60+52*Math.sin(start+sweep);
+      const lg = sweep>Math.PI?1:0;
+      return `<path d="M60,60 L${x1},${y1} A52,52 0 ${lg},1 ${x2},${y2} Z" fill="${d.c}"/>
+              <line x1="60" y1="60" x2="${x1}" y2="${y1}" stroke="white" stroke-width="1.5"/>`;
+    }).join('');
+  }
+  const pie1 = pieSlices([{v:fn,c:'#1a4a8a'},{v:is,c:'#2d7ec4'},{v:pa,c:'#6db3e8'}]);
+  const pie2 = pieSlices([{v:cobrado-pagado,c:'#2980c4'},{v:pagado,c:'#5ba8d6'},{v:pendiente,c:'#b8d8ef'}]);
+
+  const fnPct = total?Math.round(fn/total*100):0;
+  const isPct = total?Math.round(is/total*100):0;
+  const paPct = total?Math.round(pa/total*100):0;
+  const cobPct= total?Math.round((cobrado-pagado)/total*100):0;
+  const pagPct= total?Math.round(pagado/total*100):0;
+  const penPct= total?Math.round(pendiente/total*100):0;
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Respaldo Consulta Privada ${year}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;font-size:12px;color:#1e2340;background:white}
+  .page{width:210mm;min-height:297mm;padding:16mm 18mm;page-break-after:always}
+  .page:last-child{page-break-after:auto}
+  h1{font-size:20px;font-weight:600;letter-spacing:-.3px;color:white}
+  h2{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:#525c80;margin:0 0 10px}
+  .header{background:linear-gradient(135deg,#101e35,#1a2f55);padding:20px 24px;margin:-16mm -18mm 16px;color:white}
+  .header-sub{font-size:10px;opacity:.5;margin-top:3px;font-family:'DM Mono',monospace}
+  .meta-row{display:flex;gap:24px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
+  .meta-item .l{font-size:9px;opacity:.55}
+  .meta-item .v{font-size:11px;font-weight:500;margin-top:1px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .kpi{background:#f4f6fb;border-radius:8px;padding:10px 12px}
+  .kpi-l{font-size:9px;color:#525c80;margin-bottom:3px}
+  .kpi-v{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+  .chart-box{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .chart-lbl{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.10em;color:#525c80;text-align:center}
+  .leg{display:flex;flex-direction:column;gap:4px;width:100%}
+  .leg-r{display:flex;align-items:center;gap:6px;font-size:10px}
+  .leg-d{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .leg-n{flex:1;color:#1e2340}
+  .leg-v{font-family:'DM Mono',monospace;font-size:10px;color:#525c80}
+  table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}
+  th{text-align:left;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#525c80;padding:5px 6px 5px 0;border-bottom:0.5px solid #dde2f0}
+  td{padding:6px 6px 6px 0;border-bottom:0.5px solid #eef0f7;color:#1e2340}
+  tr:last-child td{border-bottom:none}
+  .total td{font-weight:500;background:#f4f6fb;padding:7px 6px}
+  .mono{font-family:'DM Mono',monospace;font-size:10px}
+  .pos{color:#0f6e56}
+  .neg{color:#993c1d}
+  .badge{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:500}
+  .fn{background:#e6f1fb;color:#185fa5}
+  .is{background:#e1f5ee;color:#0f6e56}
+  .pa{background:#faeeda;color:#854f0b}
+  .pac-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+  .pac-item{background:#f4f6fb;border-radius:7px;padding:8px 10px}
+  .pac-nm{font-size:11px;font-weight:500;margin-bottom:2px}
+  .pac-mt{font-size:9px;color:#525c80}
+  .footer{position:fixed;bottom:12mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:9px;color:#aab0cc;font-family:'DM Mono',monospace;border-top:0.5px solid #dde2f0;padding-top:6px}
+  .section{margin-bottom:14px}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div style="font-size:18px;opacity:.8;margin-bottom:4px">ψ</div>
+    <h1>Consulta Privada — Respaldo</h1>
+    <div class="header-sub">Generado el ${fecha} · v1.20 · Alex Nuñez</div>
+    <div class="meta-row">
+      <div class="meta-item"><div class="l">Año</div><div class="v">${year}</div></div>
+      <div class="meta-item"><div class="l">Pacientes activos</div><div class="v">${activos}</div></div>
+      <div class="meta-item"><div class="l">Sesiones totales</div><div class="v">${sesYear.length}</div></div>
+      <div class="meta-item"><div class="l">Tasa impuesto</div><div class="v">${getImpuestoForYear(year)}%</div></div>
+    </div>
+  </div>
+
+  <h2>Resumen financiero ${year}</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-l">Facturado</div><div class="kpi-v">${fmt(total)}</div></div>
+    <div class="kpi"><div class="kpi-l">Cobrado</div><div class="kpi-v pos">${fmt(cobrado)}</div></div>
+    <div class="kpi"><div class="kpi-l">Líquido estimado</div><div class="kpi-v pos">${fmt(liquido)}</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-box">
+      <div class="chart-lbl">Por previsión</div>
+      <svg viewBox="0 0 120 120" width="100" height="100">
+        ${pie1}
+        <circle cx="60" cy="60" r="30" fill="white"/>
+        <text x="60" y="57" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#888">total</text>
+        <text x="60" y="68" text-anchor="middle" font-size="10" font-weight="500" font-family="DM Mono,monospace" fill="#1e2340">${sesYear.length} ses.</text>
+      </svg>
+      <div class="leg">
+        <div class="leg-r"><div class="leg-d" style="background:#1a4a8a"></div><span class="leg-n">Fonasa</span><span class="leg-v">${fmt(fn)} · ${fnPct}%</span></div>
+        <div class="leg-r"><div class="leg-d" style="background:#2d7ec4"></div><span class="leg-n">Isapre</span><span class="leg-v">${fmt(is)} · ${isPct}%</span></div>
+        <div class="leg-r"><div class="leg-d" style="background:#6db3e8"></div><span class="leg-n">Particular</span><span class="leg-v">${fmt(pa)} · ${paPct}%</span></div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-lbl">Estado de cobro</div>
+      <svg viewBox="0 0 120 120" width="100" height="100">
+        ${pie2}
+        <circle cx="60" cy="60" r="30" fill="white"/>
+        <text x="60" y="57" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#888">cobro</text>
+        <text x="60" y="68" text-anchor="middle" font-size="10" font-weight="500" font-family="DM Mono,monospace" fill="#1e2340">${total?Math.round(cobrado/total*100):0}%</text>
+      </svg>
+      <div class="leg">
+        <div class="leg-r"><div class="leg-d" style="background:#2980c4"></div><span class="leg-n">Cobrado</span><span class="leg-v">${fmt(cobrado-pagado)} · ${cobPct}%</span></div>
+        <div class="leg-r"><div class="leg-d" style="background:#5ba8d6"></div><span class="leg-n">Pagado</span><span class="leg-v">${fmt(pagado)} · ${pagPct}%</span></div>
+        <div class="leg-r"><div class="leg-d" style="background:#b8d8ef"></div><span class="leg-n">Pendiente</span><span class="leg-v">${fmt(pendiente)} · ${penPct}%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Líquido mensual ${year}</h2>
+  <table>
+    <thead><tr><th>Mes</th><th>Facturado</th><th>Impuesto</th><th>Gastos</th><th>Líquido</th></tr></thead>
+    <tbody>${monthRows}<tr class="total"><td>Total</td><td class="mono">${fmt(total)}</td><td class="mono neg">−${fmt(imp)}</td><td class="mono neg">−${fmt(gastos)}</td><td class="mono pos">${fmt(liquido)}</td></tr></tbody>
+  </table>
+  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 1 / 3</span></div>
+</div>
+
+<div class="page">
+  <h2>Pacientes registrados (${state.pacientes.length})</h2>
+  <div class="pac-grid">
+    ${state.pacientes.map(p=>`<div class="pac-item"><div class="pac-nm">${p.nombre}</div><div class="pac-mt"><span class="badge ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span> · ${p.modalidad||''} · ${p.alta?'en alta':'activo/a'}</div></div>`).join('')}
+  </div>
+  <h2>Facturación por paciente ${year}</h2>
+  <table>
+    <thead><tr><th>Paciente</th><th>Previsión</th><th>Sesiones</th><th>Total</th><th>Cobrado</th></tr></thead>
+    <tbody>
+      ${perPac.map(({p,t,n,c})=>`<tr><td>${p.nombre}</td><td><span class="badge ${prevKey(p.prevision)}">${prevLabel(p.prevision)}</span></td><td>${n}</td><td class="mono">${fmt(t)}</td><td class="mono pos">${fmt(c)}</td></tr>`).join('')}
+      <tr class="total"><td colspan="3">Total</td><td class="mono">${fmt(total)}</td><td class="mono pos">${fmt(cobrado)}</td></tr>
+    </tbody>
+  </table>
+  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 2 / 3</span></div>
+</div>
+
+<div class="page">
+  <h2>Historial de sesiones (últimas ${recentSes.length})</h2>
+  <table>
+    <thead><tr><th>Fecha</th><th>Paciente</th><th>Estado</th><th>Modalidad</th><th>Monto</th></tr></thead>
+    <tbody>
+      ${recentSes.map(s=>{
+        const p=state.pacientes.find(x=>x.id===s.paciente_id);
+        const est=normEstado(s.estado);
+        return `<tr><td>${s.fecha||''}</td><td>${p?p.nombre:'—'}</td><td><span class="badge ${est==='cobrado'?'fn':est==='pagado'?'is':'pa'}">${s.estado||''}</span></td><td>${s.modalidad||''}</td><td class="mono">${fmt(s.monto)}</td></tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+  <h2 style="margin-top:14px">Configuración por año</h2>
+  <table>
+    <thead><tr><th>Parámetro</th>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<th>${y}</th>`).join('')}</tr></thead>
+    <tbody>
+      <tr><td>Tarifa Fonasa</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).fonasa||0)}</td>`).join('')}</tr>
+      <tr><td>Tarifa Isapre</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).isapre||0)}</td>`).join('')}</tr>
+      <tr><td>Tarifa Particular</td>${Object.keys(state.cfg.tarifas||{}).sort().map(y=>`<td class="mono">${fmt((state.cfg.tarifas[y]||{}).pa||0)}</td>`).join('')}</tr>
+      <tr><td>Gastos mensuales</td>${Object.keys(state.cfg.arriendos||{}).sort().map(y=>`<td class="mono">${fmt(state.cfg.arriendos[y]||0)}</td>`).join('')}</tr>
+      <tr><td>Tasa impuesto</td>${Object.keys(state.cfg.impuestos||{}).sort().map(y=>`<td class="mono">${state.cfg.impuestos[y]||0}%</td>`).join('')}</tr>
+    </tbody>
+  </table>
+  <div class="footer"><span>consulta-privada · respaldo-${year}.pdf</span><span>pág. 3 / 3</span></div>
+</div>
+
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload = () => { win.focus(); win.print(); };
 }
 
 // ═══════════════════════════════════════════
