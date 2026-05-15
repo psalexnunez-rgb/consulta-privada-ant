@@ -20,7 +20,7 @@
   --rule: oklch(0.90 0.020 255);
   --rule-2: oklch(0.95 0.014 255);
   --accent: oklch(0.55 0.18 255);
-  --pos: oklch(0.62 0.13 165);
+  --pos: oklch(0.72 0.20 138);
   --warn: oklch(0.72 0.13 75);
   --neg: oklch(0.60 0.18 18);
   --header-bg: radial-gradient(280px 160px at -10% 0%, oklch(0.45 0.18 270 / 0.4), transparent 60%),
@@ -526,7 +526,7 @@ body.privacy .private-name {
   padding: 2px 8px;
   white-space: nowrap;
 }
-.badge.pagado { color: var(--pos); background: oklch(0.62 0.13 165 / 0.10); }
+.badge.pagado { color: var(--pos); background: oklch(0.72 0.20 138 / 0.12); }
 .badge.cobrado { color: var(--accent); background: oklch(0.55 0.18 255 / 0.10); }
 .badge.pendiente { color: var(--neg); background: oklch(0.60 0.18 18 / 0.10); }
 .badge.agendado { color: var(--warn); background: oklch(0.72 0.13 75 / 0.10); }
@@ -626,7 +626,7 @@ body.privacy .private-name {
   -webkit-tap-highlight-color: transparent;
 }
 .btn-sm.blue { background: oklch(0.52 0.18 255); color: white; box-shadow: 0 2px 8px oklch(0.52 0.18 255 / 0.35); }
-.btn-sm.green { background: oklch(0.55 0.16 158); color: white; box-shadow: 0 2px 8px oklch(0.55 0.16 158 / 0.35); }
+.btn-sm.green { background: oklch(0.72 0.20 138); color: oklch(0.20 0.08 138); box-shadow: 0 2px 8px oklch(0.72 0.20 138 / 0.40); }
 
 .session-table { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .session-table .session-row { min-width: 340px; }
@@ -640,7 +640,7 @@ body.privacy .private-name {
   font-size: 1rem;
 }
 .session-row:last-child { border-bottom: none; }
-.session-row.paid { background: oklch(0.62 0.13 165 / 0.04); }
+.session-row.paid { background: oklch(0.72 0.20 138 / 0.04); }
 .session-date { font-family: 'DM Mono', monospace; font-size: 1rem; color: var(--ink-2); }
 .session-amount { font-family: 'DM Mono', monospace; font-size: 1rem; color: var(--ink); text-align: right; white-space: nowrap; }
 .session-edit { color: var(--ink-4); font-size: 1.3rem; cursor: pointer; text-align: center; -webkit-tap-highlight-color: transparent; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
@@ -709,7 +709,7 @@ body.privacy .private-name {
   gap: 5px;
   -webkit-tap-highlight-color: transparent;
 }
-.hdr-btn.green { background: oklch(0.55 0.16 158); color: white; box-shadow: 0 3px 10px oklch(0.55 0.16 158 / 0.4); font-size: 1rem; }
+.hdr-btn.green { background: oklch(0.72 0.20 138); color: oklch(0.20 0.08 138); box-shadow: 0 3px 10px oklch(0.72 0.20 138 / 0.45); font-size: 1rem; }
 .hdr-btn.blue { background: oklch(0.52 0.18 255); color: white; box-shadow: 0 3px 10px oklch(0.52 0.18 255 / 0.4); }
 
 /* ───── FABs ───── */
@@ -735,7 +735,7 @@ body.privacy .private-name {
   box-shadow: 0 4px 16px oklch(0 0 0 / 0.25);
 }
 .fab:active { transform: scale(0.93); }
-.fab.green { background: oklch(0.55 0.16 158); box-shadow: 0 4px 16px oklch(0.55 0.16 158 / 0.45); }
+.fab.green { background: oklch(0.72 0.20 138); box-shadow: 0 4px 16px oklch(0.72 0.20 138 / 0.50); }
 .fab.blue { background: oklch(0.52 0.18 255); box-shadow: 0 4px 16px oklch(0.52 0.18 255 / 0.45); }
 
 /* ───── CHARTS ───── */
@@ -1217,7 +1217,7 @@ body.privacy .private-name {
       </div>
       <!-- KPI Grid -->
       <div class="kpi-grid">
-        <div class="kpi-card" id="kpi-toggle-card" onclick="toggleKpiCard()" style="cursor:pointer;border-color:oklch(0.62 0.13 165 / 0.35);user-select:none">
+        <div class="kpi-card" id="kpi-toggle-card" onclick="toggleKpiCard()" style="cursor:pointer;border-color:oklch(0.72 0.20 138 / 0.40);user-select:none">
           <div class="kpi-label" id="kpi-toggle-label" style="color:var(--pos)"><span class="dot" id="kpi-toggle-dot" style="background:var(--pos)"></span>Cobrado</div>
           <div class="kpi-value kpi-value-lg fs-target-kpilg private-val" id="kpi-toggle-val" style="color:var(--pos)">$0</div>
           <div class="kpi-sub" id="kpi-toggle-sub" style="color:var(--pos);opacity:0.7">0 sesiones</div>
@@ -1909,7 +1909,7 @@ function updateKpiToggle() {
   document.getElementById('kpi-toggle-val').style.color  = color;
   document.getElementById('kpi-toggle-sub').textContent  = `${ses} sesiones`;
   document.getElementById('kpi-toggle-sub').style.color  = color;
-  card.style.borderColor = isCob ? 'oklch(0.62 0.13 165 / 0.35)' : 'oklch(0.55 0.18 255 / 0.35)';
+  card.style.borderColor = isCob ? 'oklch(0.72 0.20 138 / 0.40)' : 'oklch(0.55 0.18 255 / 0.35)';
 }
 
 // ═══════════════════════════════════════════
@@ -2540,8 +2540,8 @@ function renderDashboard() {
       <div class="next-session-item" style="align-items:center;padding:9px 14px">
         <div style="width:28px;height:28px;border-radius:50%;background:${avatarColor(pac.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(pac.nombre)}</div>
         <div style="flex:1;margin-left:10px;min-width:0">
-          <div style="font-size:0.90rem;font-weight:600;color:var(--ink)" class="private-name">${pac.nombre}</div>
-          <div style="font-size:0.80rem;color:var(--ink-4);margin-top:1px">${prevLabel(pac.prevision)} · ${pac.modalidad||'—'}</div>
+          <div style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
+          <div style="font-size:1rem;color:var(--ink-4);margin-top:2px">${prevLabel(pac.prevision)} · ${pac.modalidad||'—'}</div>
         </div>
         <button onclick="desmarcarProximaSemana('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-4)" title="Quitar">
           <i class="ti ti-x" style="font-size:12px"></i>
@@ -2562,8 +2562,8 @@ function renderDashboard() {
       <div class="next-session-item" style="align-items:flex-start;padding:10px 14px">
         <div style="width:28px;height:28px;border-radius:50%;background:${avatarColor(pac.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace;margin-top:2px">${initials(pac.nombre)}</div>
         <div style="flex:1;min-width:0;margin-left:10px">
-          <div style="font-size:0.90rem;font-weight:600;color:var(--ink);margin-bottom:3px" class="private-name">${pac.nombre}</div>
-          <div style="font-size:0.83rem;color:var(--ink-3);line-height:1.4;white-space:pre-wrap">${pac.notas.trim()}</div>
+          <div style="font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
+          <div style="font-size:1rem;color:var(--ink-3);line-height:1.4;white-space:pre-wrap">${pac.notas.trim()}</div>
         </div>
         <button onclick="openNotasPaciente('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--ink-4);margin-left:8px" title="Editar nota">
           <i class="ti ti-pencil" style="font-size:13px"></i>
@@ -2839,7 +2839,7 @@ function renderPacientes() {
             <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()" title="Nueva sesión">
               <i class="ti ti-plus"></i>
             </button>
-            <button class="btn-sm" style="background:oklch(0.52 0.14 165);color:white" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
+            <button class="btn-sm" style="background:oklch(0.72 0.20 138);color:oklch(0.20 0.08 138)" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
               <i class="ti ti-calendar-week"></i>
             </button>
             <button class="btn-sm" style="background:oklch(0.55 0.14 280);color:white" onclick="openNotasPaciente('${p.id}');event.stopPropagation()" title="Notas">
@@ -3147,7 +3147,7 @@ function renderResumen() {
     return `<div class="bar-col">
       <div style="width:100%;height:76px;display:flex;align-items:flex-end;gap:1px">
         <div style="flex:1;height:${hT}px;background:${isCur?'var(--accent)':'oklch(0.55 0.18 255/'+(has?'0.45':'0.14')+')'}; border-radius:3px 3px 0 0"></div>
-        <div style="flex:1;height:${hC}px;background:${isCur?'var(--pos)':'oklch(0.62 0.13 165/'+(has?'0.55':'0.10')+')'}; border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:${hC}px;background:${isCur?'var(--pos)':'oklch(0.72 0.20 138/'+(has?'0.55':'0.10')+')'}; border-radius:3px 3px 0 0"></div>
       </div>
       <div class="bar-label">${MONTHS[i][0]}</div>
     </div>`;
