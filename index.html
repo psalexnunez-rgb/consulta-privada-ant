@@ -39,7 +39,26 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ── TEMA: Celeste claro ── */
+/* ── TEMA: Índigo Glass ── */
+[data-theme="indigo-glass"] {
+  --accent: oklch(0.60 0.20 255);
+  --header-bg:
+    radial-gradient(400px 300px at 50% -20%, oklch(0.60 0.22 265 / 0.55), transparent 65%),
+    radial-gradient(300px 250px at 110% 80%, oklch(0.50 0.18 240 / 0.35), transparent 60%),
+    linear-gradient(170deg, oklch(0.18 0.07 268) 0%, oklch(0.24 0.09 262) 50%, oklch(0.30 0.10 256) 100%);
+  --kpi-main-bg:
+    radial-gradient(280px 180px at 100% 0%, oklch(0.65 0.22 250 / 0.28), transparent 55%),
+    radial-gradient(240px 200px at -10% 110%, oklch(0.55 0.20 275 / 0.22), transparent 55%),
+    linear-gradient(145deg, oklch(1 0 0 / 0.10) 0%, oklch(1 0 0 / 0.05) 100%);
+  --glass-bg: linear-gradient(145deg, oklch(1 0 0 / 0.14), oklch(1 0 0 / 0.06));
+  --glass-border: 1px solid oklch(1 0 0 / 0.22);
+  --body-bg:
+    radial-gradient(360px 240px at 0% 0%, oklch(0.88 0.06 265 / 0.50), transparent 65%),
+    radial-gradient(300px 260px at 100% 20%, oklch(0.92 0.04 240 / 0.38), transparent 65%),
+    linear-gradient(180deg, oklch(0.968 0.014 258), oklch(0.942 0.024 260));
+  --sidebar-grad: linear-gradient(180deg, oklch(0.18 0.07 268) 0%, oklch(0.24 0.09 262) 50%, oklch(0.30 0.10 256) 100%);
+  --ink-4: oklch(0.65 0.04 255);
+}
 [data-theme="celeste"] {
   --accent: oklch(0.58 0.17 222);
   --header-bg: radial-gradient(300px 170px at -5% 0%, oklch(0.60 0.18 228 / 0.35), transparent 60%),
@@ -355,7 +374,7 @@ body.privacy .private-name {
 }
 .nav-tab span {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--ink-4);
   transition: color 0.15s;
   font-family: 'DM Sans', sans-serif;
@@ -1502,6 +1521,7 @@ body.privacy .private-name {
         <div class="config-section">
           <div class="config-row" style="gap:8px;flex-wrap:wrap">
             <button id="theme-btn-indigo" onclick="setTheme('indigo')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid var(--accent);background:linear-gradient(160deg,oklch(0.20 0.075 268),oklch(0.32 0.105 258));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer">Índigo</button>
+            <button id="theme-btn-indigo-glass" onclick="setTheme('indigo-glass')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.18 0.07 268),oklch(0.30 0.10 256));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;position:relative;overflow:hidden"><span style="position:relative;z-index:1">Índigo Glass</span><span style="position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));border-radius:8px;pointer-events:none"></span></button>
             <button id="theme-btn-celeste" onclick="setTheme('celeste')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.35 0.12 232),oklch(0.62 0.17 218));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer">Celeste</button>
           </div>
         </div>
@@ -2160,7 +2180,7 @@ async function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme === 'indigo' ? '' : theme);
   state.cfg.theme = theme;
   // Update button borders
-  ['indigo','celeste'].forEach(t => {
+  ['indigo','indigo-glass','celeste'].forEach(t => {
     const btn = document.getElementById('theme-btn-' + t);
     if (btn) btn.style.borderColor = t === theme ? 'var(--accent)' : 'transparent';
   });
@@ -2170,7 +2190,7 @@ async function setTheme(theme) {
 function applyThemeFromCfg() {
   const t = state.cfg.theme || 'indigo';
   document.documentElement.setAttribute('data-theme', t === 'indigo' ? '' : t);
-  ['indigo','celeste'].forEach(name => {
+  ['indigo','indigo-glass','celeste'].forEach(name => {
     const btn = document.getElementById('theme-btn-' + name);
     if (btn) btn.style.borderColor = name === t ? 'var(--accent)' : 'transparent';
   });
@@ -2446,6 +2466,7 @@ function setupRealtime() {
       ]);
       state.pacientes = pacs || [];
       state.sesiones  = sess || [];
+      restoreProxSemana();
       renderAll();
     } catch(e) {}
   }, 20000);
