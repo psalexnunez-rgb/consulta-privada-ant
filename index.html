@@ -2276,6 +2276,11 @@ async function loadConfig(applyUI = true) {
     if (map['arriendos'] && typeof map['arriendos'] === 'object') {
       state.cfg.arriendos = map['arriendos'];
     }
+    if (Array.isArray(map['proxima_semana'])) {
+      state.cfg.proximaSemana = map['proxima_semana'];
+    } else {
+      state.cfg.proximaSemana = state.cfg.proximaSemana || [];
+    }
 
     console.log('loadConfig:', JSON.stringify(state.cfg));
 
@@ -3528,13 +3533,15 @@ async function saveNotasPaciente() {
 async function marcarProximaSemana(pacId) {
   const pac = state.pacientes.find(p => p.id === pacId);
   if (!pac) return;
-  // Guardar en campo notas o en state local; usamos campo proxima_semana en memoria
+  if (!state.cfg.proximaSemana) state.cfg.proximaSemana = [];
+  if (!state.cfg.proximaSemana.includes(pacId)) {
+    state.cfg.proximaSemana.push(pacId);
+  }
   pac.proxima_semana = true;
-  // Persistir como tag en notas de configuración (sin columna nueva: usamos state + sessionStorage)
-  const stored = JSON.parse(sessionStorage.getItem('cp_proxsemana') || '[]');
-  if (!stored.includes(pacId)) stored.push(pacId);
-  sessionStorage.setItem('cp_proxsemana', JSON.stringify(stored));
-  showToast(`${pac.nombre} → próxima semana`);
+  try {
+    await cfgSet('proxima_semana', state.cfg.proximaSemana);
+    showToast(`${pac.nombre} → próxima semana`);
+  } catch(e) { showToast('Error guardando: ' + e.message); }
   renderDashboard();
   renderPacientes();
 }
@@ -3542,18 +3549,19 @@ async function marcarProximaSemana(pacId) {
 async function desmarcarProximaSemana(pacId) {
   const pac = state.pacientes.find(p => p.id === pacId);
   if (pac) pac.proxima_semana = false;
-  const stored = JSON.parse(sessionStorage.getItem('cp_proxsemana') || '[]');
-  sessionStorage.setItem('cp_proxsemana', JSON.stringify(stored.filter(id => id !== pacId)));
+  state.cfg.proximaSemana = (state.cfg.proximaSemana || []).filter(id => id !== pacId);
+  try {
+    await cfgSet('proxima_semana', state.cfg.proximaSemana);
+  } catch(e) { showToast('Error guardando: ' + e.message); }
   renderDashboard();
   renderPacientes();
 }
 
 // Restaurar marcas de próxima semana desde sessionStorage
 function restoreProxSemana() {
-  const stored = JSON.parse(sessionStorage.getItem('cp_proxsemana') || '[]');
-  stored.forEach(id => {
-    const pac = state.pacientes.find(p => p.id === id);
-    if (pac) pac.proxima_semana = true;
+  const ids = state.cfg.proximaSemana || [];
+  state.pacientes.forEach(p => {
+    p.proxima_semana = ids.includes(p.id);
   });
 }
 
