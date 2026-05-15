@@ -577,8 +577,7 @@ body.privacy .private-name {
 .patient-card.expanded .session-panel { display: block; }
 .session-panel-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 10px 16px;
   background: oklch(0.96 0.015 255);
   border-top: 1px solid var(--rule);
@@ -589,7 +588,11 @@ body.privacy .private-name {
   font-size: 1rem;
   font-weight: 600;
   color: var(--ink-3);
-  flex: 1;
+}
+.session-panel-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 .btn-sm {
   font-size: 12px;
@@ -2806,27 +2809,29 @@ function renderPacientes() {
       <div class="session-panel" id="sp-${p.id}" onclick="event.stopPropagation()">
         <div class="session-panel-header">
           <span class="session-panel-title">${ses.length} ses. · <span class="private-val">${fmt(total)}</span></span>
-          <button class="btn-sm blue" onclick="openResumenPaciente('${p.id}');event.stopPropagation()" title="Resumen">
-            <i class="ti ti-chart-bar"></i>
-          </button>
-          <button class="btn-sm" style="background:oklch(0.55 0.14 280);color:white" onclick="openNotasPaciente('${p.id}');event.stopPropagation()" title="Notas">
-            <i class="ti ti-notes"></i>
-          </button>
-          <button class="btn-sm" style="background:oklch(0.52 0.14 165);color:white" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
-            <i class="ti ti-calendar-week"></i>
-          </button>
-          <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()">
-            <i class="ti ti-plus"></i>
-          </button>
-          <button class="btn-sm" style="background:#25D366;color:white" onclick="openWhatsApp('${p.id}');event.stopPropagation()" title="Enviar WhatsApp">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.054 23.25a.75.75 0 00.916.916l5.396-1.478A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.51-5.18-1.4l-.37-.22-3.843 1.052 1.022-3.74-.24-.386A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-          </button>
-          <button class="btn-sm" style="background:oklch(0.55 0.14 30);color:white" onclick="darAltaPaciente('${p.id}','${p.nombre}',${p.alta});event.stopPropagation()" title="${p.alta?'Reactivar':'Dar de alta'}">
-            <i class="ti ti-${p.alta?'user-check':'user-off'}"></i>
-          </button>
-          <button class="btn-sm" style="background:oklch(0.45 0.18 15);color:white" onclick="eliminarPaciente('${p.id}','${p.nombre}');event.stopPropagation()" title="Eliminar paciente">
-            <i class="ti ti-trash"></i>
-          </button>
+          <div class="session-panel-btns">
+            <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()" title="Nueva sesión">
+              <i class="ti ti-plus"></i>
+            </button>
+            <button class="btn-sm" style="background:oklch(0.52 0.14 165);color:white" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
+              <i class="ti ti-calendar-week"></i>
+            </button>
+            <button class="btn-sm" style="background:oklch(0.55 0.14 280);color:white" onclick="openNotasPaciente('${p.id}');event.stopPropagation()" title="Notas">
+              <i class="ti ti-notes"></i>
+            </button>
+            <button class="btn-sm" style="background:#25D366;color:white" onclick="openWhatsApp('${p.id}');event.stopPropagation()" title="Enviar WhatsApp">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.054 23.25a.75.75 0 00.916.916l5.396-1.478A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.655-.51-5.18-1.4l-.37-.22-3.843 1.052 1.022-3.74-.24-.386A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            </button>
+            <button class="btn-sm" style="background:oklch(0.55 0.14 30);color:white" onclick="darAltaPaciente('${p.id}','${p.nombre}',${p.alta});event.stopPropagation()" title="${p.alta?'Reactivar':'Dar de alta'}">
+              <i class="ti ti-${p.alta?'user-check':'user-off'}"></i>
+            </button>
+            <button class="btn-sm blue" onclick="openResumenPaciente('${p.id}');event.stopPropagation()" title="Resumen">
+              <i class="ti ti-chart-bar"></i>
+            </button>
+            <button class="btn-sm" style="background:oklch(0.45 0.18 15);color:white" onclick="eliminarPaciente('${p.id}','${p.nombre}');event.stopPropagation()" title="Eliminar paciente">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:oklch(0.97 0.01 255);border-bottom:1px solid var(--rule-2)">
           <i class="ti ti-clock" style="font-size:14px;color:var(--ink-4)"></i>
