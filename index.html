@@ -31,6 +31,7 @@
     linear-gradient(160deg, oklch(0.22 0.09 268) 0%, oklch(0.16 0.08 270) 100%);
   --glass-bg: linear-gradient(180deg, oklch(1 0 0 / 0.88), oklch(0.99 0.008 250 / 0.72));
   --glass-border: 1px solid oklch(0.85 0.04 255 / 0.6);
+  --section-border: 1px solid oklch(0.90 0.020 255);
   --body-bg: radial-gradient(320px 200px at 0% 0%, oklch(0.92 0.05 260 / 0.55), transparent 65%),
     radial-gradient(280px 220px at 100% 15%, oklch(0.94 0.04 230 / 0.45), transparent 65%),
     linear-gradient(180deg, oklch(0.975 0.012 255), oklch(0.95 0.022 258));
@@ -76,7 +77,53 @@
   --ink-4: oklch(0.62 0.06 220);
 }
 
-/* ───── PORTRAIT LOCK (phones only) ───── */
+/* ── TEMA: Índigo + Borde ── */
+[data-theme="indigo-borde"] {
+  --section-border: 1px solid oklch(0.20 0.075 268 / 0.38);
+}
+
+/* ── TEMA: Índigo Glass + Borde ── */
+[data-theme="indigo-glass-borde"] {
+  --accent: oklch(0.60 0.20 255);
+  --header-bg:
+    radial-gradient(400px 300px at 50% -20%, oklch(0.60 0.22 265 / 0.55), transparent 65%),
+    radial-gradient(300px 250px at 110% 80%, oklch(0.50 0.18 240 / 0.35), transparent 60%),
+    linear-gradient(170deg, oklch(0.18 0.07 268) 0%, oklch(0.24 0.09 262) 50%, oklch(0.30 0.10 256) 100%);
+  --kpi-main-bg:
+    radial-gradient(280px 180px at 100% 0%, oklch(0.65 0.22 250 / 0.28), transparent 55%),
+    radial-gradient(240px 200px at -10% 110%, oklch(0.55 0.20 275 / 0.22), transparent 55%),
+    linear-gradient(145deg, oklch(1 0 0 / 0.10) 0%, oklch(1 0 0 / 0.05) 100%);
+  --glass-bg: linear-gradient(145deg, oklch(1 0 0 / 0.14), oklch(1 0 0 / 0.06));
+  --glass-border: 1px solid oklch(1 0 0 / 0.22);
+  --body-bg:
+    radial-gradient(360px 240px at 0% 0%, oklch(0.88 0.06 265 / 0.50), transparent 65%),
+    radial-gradient(300px 260px at 100% 20%, oklch(0.92 0.04 240 / 0.38), transparent 65%),
+    linear-gradient(180deg, oklch(0.968 0.014 258), oklch(0.942 0.024 260));
+  --sidebar-grad: linear-gradient(180deg, oklch(0.18 0.07 268) 0%, oklch(0.24 0.09 262) 50%, oklch(0.30 0.10 256) 100%);
+  --ink-4: oklch(0.65 0.04 255);
+  --section-border: 1px solid oklch(0.18 0.07 268 / 0.38);
+}
+
+/* ── TEMA: Celeste + Borde ── */
+[data-theme="celeste-borde"] {
+  --accent: oklch(0.58 0.17 222);
+  --header-bg: radial-gradient(300px 170px at -5% 0%, oklch(0.60 0.18 228 / 0.35), transparent 60%),
+    radial-gradient(260px 200px at 110% 100%, oklch(0.55 0.15 215 / 0.25), transparent 60%),
+    linear-gradient(180deg, oklch(0.35 0.12 232) 0%, oklch(0.48 0.14 225) 50%, oklch(0.60 0.16 218) 100%);
+  --kpi-main-bg: radial-gradient(300px 160px at 95% 0%, oklch(0.55 0.17 220 / 0.30), transparent 60%),
+    radial-gradient(260px 180px at 0% 110%, oklch(0.50 0.15 230 / 0.35), transparent 60%),
+    linear-gradient(160deg, oklch(0.42 0.14 228) 0%, oklch(0.32 0.12 234) 100%);
+  --glass-bg: linear-gradient(180deg, oklch(1 0 0 / 0.90), oklch(0.97 0.012 220 / 0.78));
+  --glass-border: 1px solid oklch(0.76 0.08 218 / 0.55);
+  --body-bg: radial-gradient(340px 210px at 0% 0%, oklch(0.88 0.06 225 / 0.50), transparent 65%),
+    radial-gradient(300px 230px at 100% 15%, oklch(0.92 0.04 215 / 0.40), transparent 65%),
+    linear-gradient(180deg, oklch(0.968 0.012 222), oklch(0.942 0.022 218));
+  --sidebar-grad: linear-gradient(180deg, oklch(0.38 0.13 232) 0%, oklch(0.50 0.15 226) 50%, oklch(0.62 0.17 220) 100%);
+  --ink-4: oklch(0.62 0.06 220);
+  --section-border: 1px solid oklch(0.35 0.12 232 / 0.38);
+}
+
+ */
 @media screen and (orientation: landscape) and (max-height: 430px) and (pointer: coarse) and (hover: none) {
   body::before {
     content: '';
@@ -469,7 +516,7 @@ body.privacy .private-name {
 /* ───── SECTION CARDS ───── */
 .section-card {
   background: var(--paper);
-  border: var(--glass-border);
+  border: var(--section-border);
   border-radius: 16px;
   margin: 0 0 12px;
   overflow: hidden;
@@ -1521,8 +1568,11 @@ body.privacy .private-name {
         <div class="config-section">
           <div class="config-row" style="gap:8px;flex-wrap:wrap">
             <button id="theme-btn-indigo" onclick="setTheme('indigo')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid var(--accent);background:linear-gradient(160deg,oklch(0.20 0.075 268),oklch(0.32 0.105 258));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer">Índigo</button>
+            <button id="theme-btn-indigo-borde" onclick="setTheme('indigo-borde')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.20 0.075 268),oklch(0.32 0.105 258));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:2px solid oklch(0.20 0.075 268 / 0.5);outline-offset:2px">Índigo Borde</button>
             <button id="theme-btn-indigo-glass" onclick="setTheme('indigo-glass')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.18 0.07 268),oklch(0.30 0.10 256));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;position:relative;overflow:hidden"><span style="position:relative;z-index:1">Índigo Glass</span><span style="position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));border-radius:8px;pointer-events:none"></span></button>
+            <button id="theme-btn-indigo-glass-borde" onclick="setTheme('indigo-glass-borde')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.18 0.07 268),oklch(0.30 0.10 256));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;position:relative;overflow:hidden;outline:2px solid oklch(0.18 0.07 268 / 0.5);outline-offset:2px"><span style="position:relative;z-index:1">Glass Borde</span><span style="position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));border-radius:8px;pointer-events:none"></span></button>
             <button id="theme-btn-celeste" onclick="setTheme('celeste')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.35 0.12 232),oklch(0.62 0.17 218));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer">Celeste</button>
+            <button id="theme-btn-celeste-borde" onclick="setTheme('celeste-borde')" style="flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid transparent;background:linear-gradient(160deg,oklch(0.35 0.12 232),oklch(0.62 0.17 218));color:white;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:2px solid oklch(0.35 0.12 232 / 0.5);outline-offset:2px">Celeste Borde</button>
           </div>
         </div>
       </div>
@@ -2180,7 +2230,7 @@ async function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme === 'indigo' ? '' : theme);
   state.cfg.theme = theme;
   // Update button borders
-  ['indigo','indigo-glass','celeste'].forEach(t => {
+  ['indigo','indigo-borde','indigo-glass','indigo-glass-borde','celeste','celeste-borde'].forEach(t => {
     const btn = document.getElementById('theme-btn-' + t);
     if (btn) btn.style.borderColor = t === theme ? 'var(--accent)' : 'transparent';
   });
@@ -2190,7 +2240,7 @@ async function setTheme(theme) {
 function applyThemeFromCfg() {
   const t = state.cfg.theme || 'indigo';
   document.documentElement.setAttribute('data-theme', t === 'indigo' ? '' : t);
-  ['indigo','indigo-glass','celeste'].forEach(name => {
+  ['indigo','indigo-borde','indigo-glass','indigo-glass-borde','celeste','celeste-borde'].forEach(name => {
     const btn = document.getElementById('theme-btn-' + name);
     if (btn) btn.style.borderColor = name === t ? 'var(--accent)' : 'transparent';
   });
