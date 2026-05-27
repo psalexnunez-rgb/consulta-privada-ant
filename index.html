@@ -702,8 +702,15 @@ body.privacy .private-name {
 }
 .session-panel-btns {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+.session-panel-btns .btn-sm {
+  padding: 6px 9px;
+  flex-shrink: 0;
 }
 .btn-sm {
   font-size: 12px;
@@ -718,7 +725,7 @@ body.privacy .private-name {
   -webkit-tap-highlight-color: transparent;
 }
 .btn-sm.blue { background: oklch(0.52 0.18 255); color: white; box-shadow: 0 2px 8px oklch(0.52 0.18 255 / 0.35); }
-.btn-sm.green { background: oklch(0.72 0.20 138); color: oklch(0.20 0.08 138); box-shadow: 0 2px 8px oklch(0.72 0.20 138 / 0.40); }
+.btn-sm.green { background: oklch(0.72 0.20 138); color: white; box-shadow: 0 2px 8px oklch(0.72 0.20 138 / 0.40); }
 
 .session-table { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .session-table .session-row { min-width: 340px; }
@@ -2938,10 +2945,10 @@ function renderPacientes() {
         <div class="session-panel-header">
           <span class="session-panel-title">${ses.length} ses. · <span class="private-val">${fmt(total)}</span></span>
           <div class="session-panel-btns">
-            <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()" title="Nueva sesión">
+            <button class="btn-sm green" onclick="openNewSesionForPaciente('${p.id}');event.stopPropagation()" title="Nueva sesión" style="color:white">
               <i class="ti ti-plus"></i>
             </button>
-            <button class="btn-sm" style="background:oklch(0.72 0.20 138);color:oklch(0.20 0.08 138)" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
+            <button class="btn-sm" style="background:oklch(0.72 0.20 138);color:white" onclick="marcarProximaSemana('${p.id}');event.stopPropagation()" title="Atender próxima semana">
               <i class="ti ti-calendar-week"></i>
             </button>
             <button class="btn-sm" style="background:oklch(0.55 0.14 280);color:white" onclick="openNotasPaciente('${p.id}');event.stopPropagation()" title="Notas">
