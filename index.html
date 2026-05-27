@@ -709,7 +709,7 @@ body.privacy .private-name {
   gap: 5px;
   -webkit-tap-highlight-color: transparent;
 }
-.hdr-btn.green { background: oklch(0.72 0.20 138); color: oklch(0.20 0.08 138); box-shadow: 0 3px 10px oklch(0.72 0.20 138 / 0.45); font-size: 1rem; }
+.hdr-btn.green { background: oklch(0.72 0.20 138); color: white; box-shadow: 0 3px 10px oklch(0.72 0.20 138 / 0.45); font-size: 1rem; }
 .hdr-btn.blue { background: oklch(0.52 0.18 255); color: white; box-shadow: 0 3px 10px oklch(0.52 0.18 255 / 0.4); }
 
 /* ───── FABs ───── */
@@ -2541,7 +2541,7 @@ function renderDashboard() {
         <div style="width:28px;height:28px;border-radius:50%;background:${avatarColor(pac.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(pac.nombre)}</div>
         <div style="flex:1;margin-left:10px;min-width:0">
           <div style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
-          <div style="font-size:1rem;color:var(--ink-4);margin-top:2px">${prevLabel(pac.prevision)} · ${pac.modalidad||'—'}</div>
+          <div style="font-size:1rem;color:var(--ink-4);margin-top:2px">${pac.prevision ? pac.prevision.charAt(0).toUpperCase() + pac.prevision.slice(1).toLowerCase() : 'Particular'} · ${pac.modalidad||'—'}</div>
         </div>
         <button onclick="desmarcarProximaSemana('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-4)" title="Quitar">
           <i class="ti ti-x" style="font-size:12px"></i>
@@ -2565,9 +2565,14 @@ function renderDashboard() {
           <div style="font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
           <div style="font-size:1rem;color:var(--ink-3);line-height:1.4;white-space:pre-wrap">${pac.notas.trim()}</div>
         </div>
-        <button onclick="openNotasPaciente('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--ink-4);margin-left:8px" title="Editar nota">
-          <i class="ti ti-pencil" style="font-size:13px"></i>
-        </button>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-left:8px;flex-shrink:0">
+          <button onclick="openNotasPaciente('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-4)" title="Editar nota">
+            <i class="ti ti-pencil" style="font-size:13px"></i>
+          </button>
+          <button onclick="borrarNotaDashboard('${pac.id}');event.stopPropagation()" style="background:none;border:1px solid var(--rule);border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--neg)" title="Borrar nota">
+            <i class="ti ti-trash" style="font-size:13px"></i>
+          </button>
+        </div>
       </div>`).join('');
   }
 
@@ -3535,6 +3540,19 @@ function openNotasPaciente(pacId) {
   document.getElementById('modal-notas-pac').classList.remove('hidden');
   // Focus textarea after animation
   setTimeout(() => document.getElementById('modal-notas-pac-text').focus(), 120);
+}
+
+async function borrarNotaDashboard(pacId) {
+  const pac = state.pacientes.find(p => p.id === pacId);
+  if (!pac) return;
+  if (!confirm(`¿Borrar la nota de ${pac.nombre}?`)) return;
+  try {
+    await supaPatch('pacientes', pacId, { notas: '' });
+    pac.notas = '';
+    showToast('Nota eliminada');
+    renderDashboard();
+    renderPacientes();
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
 async function saveNotasPaciente() {
