@@ -2594,19 +2594,20 @@ function renderDashboard() {
   const sesYear       = state.sesiones.filter(s => fechaYear(s.fecha) === year);
 
   // KPI totals (all sesiones for year)
-  let total=0, cobrado=0, cobradoSes=0, pagado=0, pagadoSes=0, pendiente=0;
+  let total=0, cobrado=0, cobradoSes=0, pagado=0, pagadoSes=0, pendiente=0, pendienteSes=0;
   sesYear.forEach(s => {
     const mo  = Number(s.monto)||0;
     const est = normEstado(s.estado);
     total += mo;
-    if (est==='cobrado') { cobrado+=mo; cobradoSes++; }
-    if (est==='pagado')  { pagado+=mo;  pagadoSes++;  }
-    if (est==='pendiente'||est==='pagado') pendiente+=mo;
+    if (est==='cobrado')   { cobrado+=mo;   cobradoSes++;   }
+    if (est==='pagado')    { pagado+=mo;    pagadoSes++;    }
+    if (est==='pendiente') { pendiente+=mo; pendienteSes++; }
   });
 
   document.getElementById('kpi-total').textContent       = fmt(total);
   document.getElementById('kpi-total-sub').textContent   = `${sesYear.length} sesiones este año`;
-  document.getElementById('kpi-pendiente').textContent   = fmt(pendiente);
+  document.getElementById('kpi-pendiente').textContent     = fmt(pendiente);
+  document.getElementById('kpi-pendiente-sub').textContent = `${pendienteSes} sesión${pendienteSes!==1?'es':''}`;
   // Store for toggle card
   state._cobrado    = cobrado;    state._cobradoSes    = cobradoSes;
   state._pagado     = pagado;     state._pagadoSes     = pagadoSes;
@@ -2689,11 +2690,11 @@ function renderDashboard() {
   }
 
   // Requieren atención
-  const pendienteSes = sesYear.filter(s => normEstado(s.estado)==='pendiente');
+  const pendienteSesAlerta = sesYear.filter(s => normEstado(s.estado)==='pendiente');
   const sinAgendar   = state.pacientes.filter(p => !p.alta && !p.next_session);
   let html = '';
-  if (pendienteSes.length) html += `<div class="alert-item">
-    <span class="alert-badge">${pendienteSes.length}</span>
+  if (pendienteSesAlerta.length) html += `<div class="alert-item">
+    <span class="alert-badge">${pendienteSesAlerta.length}</span>
     <span>Sesiones con cobro pendiente (${year})</span>
   </div>`;
   if (sinAgendar.length) html += `<div class="alert-item">
