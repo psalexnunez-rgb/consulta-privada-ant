@@ -1482,12 +1482,7 @@ body.privacy .private-name {
       <!-- Tabla mensual -->
       <div class="section-card" style="overflow:hidden">
         <div class="section-header"><div class="section-title">Detalle mensual</div></div>
-        <div style="overflow-x:auto">
-          <table class="resumen-table" id="resumen-table">
-            <thead><tr><th>Mes</th><th>Ses.</th><th>Total</th><th>Cobrado</th><th>Pagado</th><th>Pendiente</th></tr></thead>
-            <tbody id="resumen-tbody"></tbody>
-          </table>
-        </div>
+        <div id="resumen-tbody"></div>
       </div>
       <!-- Por previsión -->
       <div class="section-card">
@@ -1529,19 +1524,8 @@ body.privacy .private-name {
           <div class="section-title">Líquido mensual</div>
           <div style="font-size:11px;color:var(--ink-4)">facturado − imp. − gastos</div>
         </div>
-        <div style="overflow-x:auto">
-          <table class="resumen-table" style="min-width:420px;width:100%">
-            <thead>
-              <tr>
-                <th>Mes</th>
-                <th>Facturado</th>
-                <th>Impuesto</th>
-                <th>Gastos</th>
-                <th style="color:oklch(0.55 0.14 165)">Líquido</th>
-              </tr>
-            </thead>
-            <tbody id="liquido-tbody"></tbody>
-          </table>
+        <div style="overflow-x:hidden">
+          <div id="liquido-tbody"></div>
         </div>
       </div>
     </div>
@@ -3275,25 +3259,54 @@ function renderResumen() {
     </div>`;
   }).join('');
 
-  // Monthly table
+  // Monthly stacked list
   let totSes=0,totTotal=0,totCob=0,totPag=0,totPend=0;
-  document.getElementById('resumen-tbody').innerHTML = monthly.map((m,i) => {
+  const monthRows = monthly.map((m,i) => {
     totSes+=m.ses; totTotal+=m.total; totCob+=m.cobrado; totPag+=m.pagado; totPend+=m.pendiente;
     if (!m.ses && !(isCurrentYear && i===curMonth)) return '';
     const isCur = isCurrentYear && i===curMonth;
-    return `<tr class="${isCur?'current-month':''}">
-      <td>${MONTHS_FULL[i]}</td><td>${m.ses||'—'}</td>
-      <td>${m.total?fmt(m.total):'—'}</td>
-      <td style="color:${m.cobrado?'var(--pos)':'var(--ink-4)'}">${m.cobrado?fmt(m.cobrado):'—'}</td>
-      <td style="color:${m.pagado?'oklch(0.60 0.15 60)':'var(--ink-4)'}">${m.pagado?fmt(m.pagado):'—'}</td>
-      <td style="color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</td>
-    </tr>`;
-  }).join('') + `<tr class="totals">
-    <td>Total</td><td>${totSes}</td><td>${fmt(totTotal)}</td>
-    <td style="color:var(--pos)">${fmt(totCob)}</td>
-    <td style="color:oklch(0.60 0.15 60)">${totPag?fmt(totPag):'—'}</td>
-    <td style="color:${totPend?'var(--neg)':'var(--pos)'}">${totPend?fmt(totPend):'Al día'}</td>
-  </tr>`;
+    return `<div style="padding:10px 16px;border-bottom:1px solid var(--rule-2);${isCur?'background:oklch(0.55 0.18 255 / 0.04)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+        <span style="font-size:0.95rem;font-weight:600;color:var(--ink)">${MONTHS_FULL[i]} <span style="font-size:0.78rem;color:var(--ink-4);font-weight:400">${m.ses} ses.</span></span>
+        <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:var(--ink)">${m.total?fmt(m.total):'—'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px">
+        <div>
+          <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Cobrado</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:${m.cobrado?'var(--pos)':'var(--ink-4)'}">${m.cobrado?fmt(m.cobrado):'—'}</div>
+        </div>
+        <div>
+          <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pagado</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:${m.pagado?'oklch(0.60 0.15 60)':'var(--ink-4)'}">${m.pagado?fmt(m.pagado):'—'}</div>
+        </div>
+        <div>
+          <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pendiente</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:${m.pendiente?'var(--neg)':'var(--ink-4)'}">${m.pendiente?fmt(m.pendiente):'—'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const totalRow = `<div style="padding:10px 16px;background:var(--rule-2)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+      <span style="font-size:0.95rem;font-weight:700;color:var(--ink)">Total ${year} <span style="font-size:0.78rem;color:var(--ink-4);font-weight:400">${totSes} ses.</span></span>
+      <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:var(--ink)">${fmt(totTotal)}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px">
+      <div>
+        <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Cobrado</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:var(--pos)">${fmt(totCob)}</div>
+      </div>
+      <div>
+        <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pagado</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:oklch(0.60 0.15 60)">${totPag?fmt(totPag):'—'}</div>
+      </div>
+      <div>
+        <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pendiente</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:${totPend?'var(--neg)':'var(--pos)'}">${totPend?fmt(totPend):'Al día'}</div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('resumen-tbody').innerHTML = monthRows + totalRow;
 
   // By provision
   const PROVS      = ['Fonasa','Colmena','Cruz Blanca','Particular'];
@@ -3430,20 +3443,46 @@ function renderResumen() {
   const liqTbody = document.getElementById('liquido-tbody');
   if (liqTbody) {
     liqTbody.innerHTML = liquidoRows.map(r => `
-      <tr class="${r.isCur?'current-month':''}">
-        <td>${r.mes}${!r.esMesCerrado?' <span style="font-size:10px;color:var(--ink-4)">(en curso)</span>':''}</td>
-        <td class="private-val">${fmt(r.total)}</td>
-        <td class="private-val" style="color:var(--neg)">−${fmt(r.imp)}</td>
-        <td class="private-val" style="color:var(--warn)">${r.esMesCerrado?'−'+fmt(r.gastos):'—'}</td>
-        <td class="private-val" style="color:${r.liquido>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:600">${fmt(r.liquido)}</td>
-      </tr>`).join('') + `
-      <tr class="totals">
-        <td>Total ${year}</td>
-        <td class="private-val">${fmt(totFact)}</td>
-        <td class="private-val" style="color:var(--neg)">−${fmt(totImp)}</td>
-        <td class="private-val" style="color:var(--warn)">−${fmt(totGast)}</td>
-        <td class="private-val" style="color:${totLiq>=0?'oklch(0.50 0.14 165)':'var(--neg)'};font-weight:700">${fmt(totLiq)}</td>
-      </tr>`;
+      <div style="padding:10px 16px;border-bottom:1px solid var(--rule-2);${r.isCur?'background:oklch(0.55 0.18 255 / 0.04)':''}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+          <span style="font-size:0.95rem;font-weight:600;color:var(--ink)">${r.mes}${!r.esMesCerrado?' <span style="font-size:0.78rem;color:var(--ink-4);font-weight:400">(en curso)</span>':''}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:${r.liquido>=0?'oklch(0.50 0.14 165)':'var(--neg)'}" class="private-val">${fmt(r.liquido)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px">
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Facturado</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:var(--ink)" class="private-val">${fmt(r.total)}</div>
+          </div>
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Impuesto</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:var(--neg)" class="private-val">−${fmt(r.imp)}</div>
+          </div>
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Gastos</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;margin-top:1px;color:var(--warn)" class="private-val">${r.esMesCerrado?'−'+fmt(r.gastos):'—'}</div>
+          </div>
+        </div>
+      </div>`).join('') + `
+      <div style="padding:10px 16px;background:var(--rule-2)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+          <span style="font-size:0.95rem;font-weight:700;color:var(--ink)">Total ${year}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:${totLiq>=0?'oklch(0.50 0.14 165)':'var(--neg)'}" class="private-val">${fmt(totLiq)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px">
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Facturado</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:var(--ink)" class="private-val">${fmt(totFact)}</div>
+          </div>
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Impuesto</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:var(--neg)" class="private-val">−${fmt(totImp)}</div>
+          </div>
+          <div>
+            <div style="font-size:0.70rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Gastos</div>
+            <div style="font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:700;margin-top:1px;color:var(--warn)" class="private-val">−${fmt(totGast)}</div>
+          </div>
+        </div>
+      </div>`;
   }
 }
 
