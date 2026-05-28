@@ -731,7 +731,7 @@ body.privacy .private-name {
 .session-table .session-row { min-width: 340px; }
 .session-row {
   display: grid;
-  grid-template-columns: 88px 1fr 76px 72px 36px;
+  grid-template-columns: 88px 1fr 76px 72px 56px;
   align-items: center;
   gap: 6px;
   padding: 9px 16px;
@@ -1754,6 +1754,12 @@ body.privacy .private-name {
           <option value="Pagado">Pagado</option>
           <option value="Alta">Alta</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Observaciones</label>
+        <textarea id="sesion-notas" rows="3"
+          style="width:100%;border:1px solid var(--rule);border-radius:10px;padding:10px 12px;font-size:0.95rem;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--paper);resize:vertical;outline:none;line-height:1.5"
+          placeholder="Notas u observaciones de esta sesión…"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -3002,7 +3008,10 @@ function renderSessionRows(ses) {
       <span class="tag ${prevKey(s.prevision)}">${prevLabel(s.prevision)}</span>
       <span class="badge ${est}">${s.estado||'Pendiente'}</span>
       <span class="session-amount private-val">${fmt(s.monto)}</span>
-      <span class="session-edit" onclick="openEditSesion('${s.id}');event.stopPropagation()"><i class="ti ti-pencil"></i></span>
+      <span style="display:flex;align-items:center;gap:3px">
+        <span class="session-edit" onclick="openEditSesion('${s.id}');event.stopPropagation()" title="Editar sesión"><i class="ti ti-pencil"></i></span>
+        <span class="session-edit" onclick="openEditSesion('${s.id}');event.stopPropagation()" title="${s.notas?'Ver observación':'Agregar observación'}" style="color:${s.notas?'var(--accent)':'var(--ink-4)'}"><i class="ti ti-${s.notas?'message-filled':'message'}"></i></span>
+      </span>
     </div>`;
   }).join('');
 }
@@ -3494,6 +3503,7 @@ function openModal(id) {
     document.getElementById('sesion-id').value    = '';
     document.getElementById('sesion-fecha').value = new Date().toISOString().split('T')[0];
     document.getElementById('sesion-estado').value= '';
+    document.getElementById('sesion-notas').value  = '';
     document.getElementById('sesion-paciente').value = '';
     document.getElementById('btn-delete-sesion').classList.add('hidden');
     populatePacienteSelect('');
@@ -3542,6 +3552,7 @@ function openEditSesion(id) {
   document.getElementById('sesion-prevision').value = s.prevision || 'Fonasa';
   document.getElementById('sesion-monto').value = s.monto || '';
   document.getElementById('sesion-estado').value= s.estado || '';
+  document.getElementById('sesion-notas').value  = s.notas  || '';
   document.getElementById('btn-delete-sesion').classList.remove('hidden');
   populatePacienteSelect(s.paciente_id);
   document.getElementById('modal-sesion').classList.remove('hidden');
@@ -3566,11 +3577,12 @@ async function saveSesion() {
   const prev     = document.getElementById('sesion-prevision').value;
   const monto    = document.getElementById('sesion-monto').value;
   const estado   = document.getElementById('sesion-estado').value;
+  const notas    = document.getElementById('sesion-notas').value.trim();
   if (!pacId||!fechaIso) { showToast('Completa paciente y fecha'); return; }
   const fechaDdMm = isoToDdMm(fechaIso);
   const d         = parseFecha(fechaDdMm);
   const mesNombre = d ? MONTHS_FULL[d.getMonth()].toLowerCase() : '';
-  const body = { paciente_id:pacId, fecha:fechaDdMm, mes:mesNombre, prevision:prev, monto:Number(monto)||0, estado:estado||null };
+  const body = { paciente_id:pacId, fecha:fechaDdMm, mes:mesNombre, prevision:prev, monto:Number(monto)||0, estado:estado||null, notas:notas||null };
   try {
     if (state.editingSesionId) { await supaPatch('sesiones', state.editingSesionId, body); showToast('Sesión actualizada'); }
     else { await supaPost('sesiones', body); showToast('Sesión guardada'); }
