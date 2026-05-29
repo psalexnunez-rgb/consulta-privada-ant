@@ -1526,11 +1526,11 @@ body.privacy .private-name {
         <div id="provision-tbody"></div>
       </div>
       <!-- Por paciente -->
-      <div class="section-card">
+      <div class="section-card" style="overflow:hidden">
         <div class="section-header">
           <div class="section-title">Por paciente</div>
         </div>
-        <div id="per-patient-list"></div>
+        <div id="per-patient-list" style="overflow:hidden"></div>
         <div id="per-patient-totals" style="border-top:2px solid var(--rule);background:var(--rule-2)"></div>
       </div>
       <!-- Líquido mensual -->
@@ -3426,7 +3426,7 @@ function renderResumen() {
     </div>
   </div>`;
 
-  document.getElementById('per-patient-list').innerHTML = `<div class="resumen-card-grid">${pacCards}${pacTotalCard}</div>`;
+  document.getElementById('per-patient-list').innerHTML = `<div class="resumen-card-grid" style="padding:10px 12px;gap:6px;overflow:hidden">${pacCards}${pacTotalCard}</div>`;
   document.getElementById('per-patient-totals').innerHTML = '';
 
   // ── Tabla líquido mensual ──
