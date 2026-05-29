@@ -3406,13 +3406,8 @@ function renderResumen() {
 
   const pacCards = perPac.map(p=>`
     <div class="resumen-card">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-        <div style="width:26px;height:26px;flex-shrink:0"></div>
-        <div style="min-width:0">
-          <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
-          <div style="font-size:0.68rem;color:var(--ink-4);margin-top:1px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
-        </div>
-      </div>
+      <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${p.nombre}</div>
+      <div style="font-size:0.68rem;color:var(--ink-4);margin-bottom:5px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
       <div class="resumen-card-total private-val">${fmt(p._total)}</div>
       <div class="resumen-card-row"><span class="resumen-card-lbl">Cobrado</span><span class="resumen-card-val" style="color:${p._cobrado?'var(--pos)':'var(--ink-4)'}">${p._cobrado?fmt(p._cobrado):'—'}</span></div>
       <div class="resumen-card-row"><span class="resumen-card-lbl">Pagado</span><span class="resumen-card-val" style="color:${p._pagado?'oklch(0.60 0.15 60)':'var(--ink-4)'}">${p._pagado?fmt(p._pagado):'—'}</span></div>
