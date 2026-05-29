@@ -3407,7 +3407,7 @@ function renderResumen() {
   const pacCards = perPac.map(p=>`
     <div class="resumen-card">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-        <div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${pacDot(p.id,'13px')}</div>
+        <div style="width:26px;height:26px;flex-shrink:0"></div>
         <div style="min-width:0">
           <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
           <div style="font-size:0.68rem;color:var(--ink-4);margin-top:1px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
