@@ -3405,28 +3405,55 @@ function renderResumen() {
   const gT=perPac.reduce((a,p)=>a+p._total,0), gC=perPac.reduce((a,p)=>a+p._cobrado,0), gPag=perPac.reduce((a,p)=>a+p._pagado,0), gP=perPac.reduce((a,p)=>a+p._pendiente,0);
 
   const pacCards = perPac.map(p=>`
-    <div class="resumen-card">
-      <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${p.nombre}</div>
-      <div style="font-size:0.68rem;color:var(--ink-4);margin-bottom:5px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
-      <div class="resumen-card-total private-val">${fmt(p._total)}</div>
-      <div class="resumen-card-row"><span class="resumen-card-lbl">Cobrado</span><span class="resumen-card-val" style="color:${p._cobrado?'var(--pos)':'var(--ink-4)'}">${p._cobrado?fmt(p._cobrado):'—'}</span></div>
-      <div class="resumen-card-row"><span class="resumen-card-lbl">Pagado</span><span class="resumen-card-val" style="color:${p._pagado?'oklch(0.60 0.15 60)':'var(--ink-4)'}">${p._pagado?fmt(p._pagado):'—'}</span></div>
-      <div class="resumen-card-row"><span class="resumen-card-lbl">Pendiente</span><span class="resumen-card-val" style="color:${p._pendiente?'var(--neg)':'var(--ink-4)'}">${p._pendiente?fmt(p._pendiente):'—'}</span></div>
+    <div style="background:oklch(0.97 0.012 255);border:1px solid oklch(0.90 0.020 255);border-radius:10px;padding:9px 12px;box-sizing:border-box;width:100%">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+        <div style="min-width:0;flex:1;margin-right:8px">
+          <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+          <div style="font-size:0.68rem;color:var(--ink-4);margin-top:2px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:var(--ink);flex-shrink:0" class="private-val">${fmt(p._total)}</div>
+      </div>
+      <div style="display:flex;gap:0;border-top:1px solid oklch(0.90 0.020 255);padding-top:5px;justify-content:space-between">
+        <div style="flex:1">
+          <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Cobrado</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:600;margin-top:1px;color:${p._cobrado?'var(--pos)':'var(--ink-4)'}" class="private-val">${p._cobrado?fmt(p._cobrado):'—'}</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pagado</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:600;margin-top:1px;color:${p._pagado?'oklch(0.60 0.15 60)':'var(--ink-4)'}" class="private-val">${p._pagado?fmt(p._pagado):'—'}</div>
+        </div>
+        <div style="flex:1;text-align:right">
+          <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pendiente</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:600;margin-top:1px;color:${p._pendiente?'var(--neg)':'var(--ink-4)'}" class="private-val">${p._pendiente?fmt(p._pendiente):'—'}</div>
+        </div>
+      </div>
     </div>`).join('');
 
-  const pacTotalCard = `<div class="resumen-card-total-row">
-    <div>
-      <div class="resumen-card-name">Total ${year} · ${perPac.length} pac.</div>
-      <div class="resumen-card-total">${fmt(gT)}</div>
+  const pacTotalCard = `<div style="background:oklch(0.93 0.020 255);border:1px solid oklch(0.87 0.025 255);border-radius:10px;padding:9px 12px;box-sizing:border-box;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+      <div>
+        <div class="resumen-card-name">Total ${year}</div>
+        <div style="font-size:0.68rem;color:var(--ink-4);margin-top:2px">${perPac.length} pacientes</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.95rem;font-weight:700;color:var(--ink)" class="private-val">${fmt(gT)}</div>
     </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <div><div class="resumen-card-lbl">Cobrado</div><div class="resumen-card-val" style="color:var(--pos)">${gC?fmt(gC):'—'}</div></div>
-      <div><div class="resumen-card-lbl">Pagado</div><div class="resumen-card-val" style="color:oklch(0.60 0.15 60)">${gPag?fmt(gPag):'—'}</div></div>
-      <div><div class="resumen-card-lbl">Pendiente</div><div class="resumen-card-val" style="color:${gP?'var(--neg)':'var(--ink-4)'}">${gP?fmt(gP):'—'}</div></div>
+    <div style="display:flex;border-top:1px solid oklch(0.87 0.025 255);padding-top:5px;justify-content:space-between">
+      <div style="flex:1">
+        <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Cobrado</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:700;margin-top:1px;color:var(--pos)" class="private-val">${gC?fmt(gC):'—'}</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pagado</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:700;margin-top:1px;color:oklch(0.60 0.15 60)" class="private-val">${gPag?fmt(gPag):'—'}</div>
+      </div>
+      <div style="flex:1;text-align:right">
+        <div style="font-size:0.68rem;color:var(--ink-4);text-transform:uppercase;letter-spacing:.05em">Pendiente</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.80rem;font-weight:700;margin-top:1px;color:${gP?'var(--neg)':'var(--ink-4)'}" class="private-val">${gP?fmt(gP):'—'}</div>
+      </div>
     </div>
   </div>`;
 
-  document.getElementById('per-patient-list').innerHTML = `<div class="resumen-card-grid" style="padding:10px 12px;gap:6px;overflow:hidden">${pacCards}${pacTotalCard}</div>`;
+  document.getElementById('per-patient-list').innerHTML = `<div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px">${pacCards}${pacTotalCard}</div>`;
   document.getElementById('per-patient-totals').innerHTML = '';
 
   // ── Tabla líquido mensual ──
