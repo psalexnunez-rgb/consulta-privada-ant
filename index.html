@@ -1968,6 +1968,14 @@ function avatarColor(name) {
 function initials(name) {
   return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
+function pacStatusColor(pacId) {
+  const hasPending = state.sesiones.some(s => s.paciente_id === pacId && normEstado(s.estado) === 'pendiente');
+  return hasPending ? 'oklch(0.82 0.18 88)' : 'oklch(0.72 0.20 138)';
+}
+function pacDot(pacId, size='10px') {
+  const color = pacStatusColor(pacId);
+  return `<span style="display:inline-block;width:${size};height:${size};border-radius:50%;background:${color};flex-shrink:0"></span>`;
+}
 function fmt(n) {
   if (!n && n!==0) return '$0';
   return '$' + Math.round(n).toLocaleString('es-CL');
@@ -2650,7 +2658,7 @@ function renderDashboard() {
   } else {
     proxSemEl.innerHTML = proxSemPacs.map(pac => `
       <div class="next-session-item" style="align-items:center;padding:9px 14px">
-        <div style="width:28px;height:28px;border-radius:50%;background:${avatarColor(pac.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(pac.nombre)}</div>
+        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${pacDot(pac.id,'14px')}</div>
         <div style="flex:1;margin-left:10px;min-width:0">
           <div style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
           <div style="font-size:1rem;color:var(--ink-4);margin-top:2px">${pac.prevision ? pac.prevision.charAt(0).toUpperCase() + pac.prevision.slice(1).toLowerCase() : 'Particular'} · ${pac.modalidad||'—'}</div>
@@ -2672,7 +2680,7 @@ function renderDashboard() {
   } else {
     notasEl.innerHTML = pacsConNotas.map(pac => `
       <div class="next-session-item" style="align-items:flex-start;padding:10px 14px">
-        <div style="width:28px;height:28px;border-radius:50%;background:${avatarColor(pac.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace;margin-top:2px">${initials(pac.nombre)}</div>
+        <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${pacDot(pac.id,'14px')}</div>
         <div style="flex:1;min-width:0;margin-left:10px">
           <div style="font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" class="private-name">${pac.nombre}</div>
           <div style="font-size:1rem;color:var(--ink-3);line-height:1.4;white-space:pre-wrap">${pac.notas.trim()}</div>
@@ -2886,7 +2894,7 @@ function renderPacientes() {
         const fechas = sesP.map(s => parseFecha(s.fecha)?.getDate()).filter(Boolean).join(', ');
 
         html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--rule-2)">
-          <div class="patient-avatar" style="background:${avatarColor(pac.nombre)};width:28px;height:28px;font-size:0.78rem;flex-shrink:0">${initials(pac.nombre)}</div>
+          <div class="patient-avatar" style="background:transparent;width:28px;height:28px;font-size:0.78rem;flex-shrink:0;display:flex;align-items:center;justify-content:center">${pacDot(pac.id,'14px')}</div>
           <div style="flex:1;min-width:0">
             <div class="private-name" style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
             <div style="font-size:0.80rem;color:var(--ink-4);margin-top:2px;display:flex;gap:5px;align-items:center">
@@ -2936,7 +2944,7 @@ function renderPacientes() {
 
     return `<div class="patient-card" id="pac-${p.id}">
       <div class="patient-row" onclick="togglePaciente('${p.id}')">
-        <div class="patient-avatar" style="background:${avatarColor(p.nombre)}">${initials(p.nombre)}</div>
+        <div class="patient-avatar" style="background:transparent;display:flex;align-items:center;justify-content:center">${pacDot(p.id,'14px')}</div>
         <div class="patient-info">
           <div class="patient-name fs-target-name private-name">${p.nombre}</div>
           <div class="patient-meta">
@@ -3216,7 +3224,7 @@ function renderAtendidos() {
       const avCl = k==='fn'?'var(--accent)':k==='is'?'var(--pos)':'var(--warn)';
 
       html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--rule-2)">
-        <div style="width:28px;height:28px;border-radius:50%;background:${avBg};color:${avCl};display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(pac.nombre)}</div>
+        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${pacDot(pac.id,'14px')}</div>
         <div style="flex:1;min-width:0">
           <div class="private-name" style="font-size:1.05rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pac.nombre}</div>
           <div style="font-size:0.80rem;color:var(--ink-4);margin-top:2px">
@@ -3399,7 +3407,7 @@ function renderResumen() {
   const pacCards = perPac.map(p=>`
     <div class="resumen-card">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
-        <div style="width:26px;height:26px;border-radius:50%;background:${avatarColor(p.nombre)};color:white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace">${initials(p.nombre)}</div>
+        <div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${pacDot(p.id,'13px')}</div>
         <div style="min-width:0">
           <div class="resumen-card-name private-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
           <div style="font-size:0.68rem;color:var(--ink-4);margin-top:1px"><span class="tag ${prevKey(p.prevision)}" style="font-size:0.62rem;padding:1px 4px">${prevLabel(p.prevision)}</span> · ${p._ses} ses.</div>
